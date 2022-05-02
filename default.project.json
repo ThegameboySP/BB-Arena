@@ -1,0 +1,80 @@
+{
+    "name": "BB",
+    "tree": {
+      "$className": "DataModel",
+  
+      "ReplicatedStorage": {
+        "$className": "ReplicatedStorage",
+        "Assets": {
+          "$path": "assets"
+        },
+        "Packages": {
+          "$path": "shared-packages.project.json"
+        },
+        "Common": {
+          "$path": "src/shared"
+        },
+        "ClientModules": {
+          "$path": "src/clientModules"
+        },
+        "Configuration": {
+          "$className": "Configuration"
+        }
+      },
+  
+      "ServerScriptService": {
+        "Gamemodes": {
+          "$path": "gamemodes"
+        },
+        "Packages": {
+          "$path": "server-packages.project.json"
+        },
+        "Server": {
+          "$path": "src/server"
+        }
+      },
+
+      "ServerStorage": {
+        "$className": "ServerStorage",
+        "Maps": {
+          "$ignoreUnknownInstances": true,
+          "$className": "Folder"
+        },
+        "Plugin_LightingSaves": {
+          "$className": "Folder"
+        }
+      },
+  
+      "StarterPlayer": {
+        "StarterPlayerScripts": {
+          "Client": {
+            "$path": "src/client"
+          }
+        }
+      },
+
+      "Teams": {
+        "Spectators": {
+          "$className": "Team",
+          "$properties": {
+            "AutoAssignable": true,
+            "TeamColor": { "BrickColor": 1001 }
+          }
+        }
+      },
+
+      "TestService": {
+        "$ignoreUnknownInstances": true,
+        "$properties": {
+          "ExecuteWithStudioRun": true
+        },
+  
+        "DevPackages": {
+          "$path": "dev-packages.project.json"
+        },
+        "RunTests": {
+          "$path": "runTests.server.lua"
+        }
+      }
+    }
+  }

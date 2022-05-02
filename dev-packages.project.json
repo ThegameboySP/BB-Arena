@@ -1,0 +1,9 @@
+{
+	"name": "DevPackages",
+	"globIgnorePaths": [
+		"**/*.spec.lua"
+    ],
+	"tree": {
+		"$path": "DevPackages"
+	}
+}

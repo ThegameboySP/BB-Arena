@@ -1,0 +1,9 @@
+{
+	"name": "CTF",
+	"tree": {
+		"$path": "src",
+		"Dir": {
+			"$path": "defaultDir.lua"
+		}
+	}
+}
