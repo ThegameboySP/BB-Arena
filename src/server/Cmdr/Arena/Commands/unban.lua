@@ -2,9 +2,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 
 return function (Cmdr)
-    local wrappedUserIds = CmdrUtils.wrapAutoSuggestions(Cmdr.Registry.Types.userIds, function()
+    local wrappedUserIds = CmdrUtils.wrapAutoSuggestions(Cmdr.Registry.Types.playerIds, function()
         local suggestions = {}
-        for userId in pairs(Cmdr:GetStore("Common").Store:getState().bannedIds) do
+        for userId in pairs(Cmdr:GetStore("Common").Store:getState().users.banned) do
             table.insert(suggestions, userId)
         end
 

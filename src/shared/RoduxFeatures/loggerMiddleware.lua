@@ -8,4 +8,8 @@ local function loggerMiddleware(nextDispatch, store)
     end
 end
 
-return loggerMiddleware
+return {
+    middlewares = {
+        loggerMiddleware = loggerMiddleware
+    };
+}

@@ -1,10 +1,20 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
+local Llama = require(ReplicatedStorage.Packages.Llama)
+local Dictionary = Llama.Dictionary
 
 local features = {}
 local reducers = {}
 local actions = {}
 local selectors = {}
+local middlewares = {}
+
+actions.merge = function(with)
+    return {
+        type = "merge";
+        payload = with;
+    }
+end
 
 for _, module in pairs(script:GetChildren()) do
     local feature = require(module)
@@ -33,12 +43,31 @@ for _, module in pairs(script:GetChildren()) do
             actions[actionName] = actionCreator
         end
     end
+
+    if feature.middlewares then
+        for middlewareName, middleware in pairs(feature.middlewares) do
+            if middlewares[middlewareName] then
+                error(string.format("Duplicate middleware name %q", middlewareName))
+            end
+
+            middlewares[middlewareName] = middleware
+        end
+    end
 end
+
+local reducer = Rodux.combineReducers(reducers)
 
 return {
     index = features;
 
-    reducer = Rodux.combineReducers(reducers);
+    reducer = function(state, action)
+        if action.type == "merge" then
+            return Dictionary.mergeDeep(state, action.payload)
+        end
+
+        return reducer(state, action)
+    end;
     actions = table.freeze(actions);
     selectors = table.freeze(selectors);
+    middlewares = middlewares;
 }

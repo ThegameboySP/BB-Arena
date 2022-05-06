@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 
-local RoduxFeatures = ReplicatedStorage.Common.RoduxFeatures
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
 local RoduxController = Knit.CreateController({
 	Name = "RoduxController";
@@ -19,24 +19,19 @@ local function stringIndicesToNumber(map)
 end
 
 local function deserialize(state)
-    state.permissions.adminTiers = stringIndicesToNumber(state.permissions.adminTiers)
+    for key, value in pairs(state.users) do
+        state.users[key] = stringIndicesToNumber(value)
+    end
+
     return state
 end
 
 function RoduxController:KnitInit()
     local RoduxService = Knit.GetService("RoduxService")
-    local reducers = {}
-
-    for _, item in pairs(RoduxFeatures:GetChildren()) do
-        if item:IsA("ModuleScript") then
-            local reducer = require(item).reducer
-            reducers[item.Name] = reducer
-        end
-    end
 
     RoduxService.InitState:Connect(function(state)
         Knit.Store = Rodux.Store.new(
-            Rodux.combineReducers(reducers),
+            RoduxFeatures.reducer,
             deserialize(state),
             { Rodux.thunkMiddleware }
         )

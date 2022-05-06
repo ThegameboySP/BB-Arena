@@ -22,7 +22,7 @@ local MapService = Knit.CreateService({
 		PreMapChanged = Knit.CreateSignal();
 		MapChanged = Knit.CreateSignal();
 		CurrentMap = Knit.CreateProperty(nil);
-		MapInfo = Knit.CreateProperty(nil)
+		MapInfo = Knit.CreateProperty({})
 	};
 	
 	Maps = ServerStorage.Maps;

@@ -13,7 +13,8 @@ local function registerCommandsIn(target)
     end
 end
 
-registerCommandsIn(script)
+registerCommandsIn(script.Parent.Arena.Commands)
+registerCommandsIn(script.Parent.Core.Commands)
 
 return function(registry, filter)
     filter = filter or function()

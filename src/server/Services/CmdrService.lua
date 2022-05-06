@@ -8,13 +8,15 @@ local Cmdr = require(ServerScriptService.Packages.Cmdr)
 
 local CmdrCore = ServerScriptService.Server.Cmdr.Core
 local CmdrArena = ServerScriptService.Server.Cmdr.Arena
+local registerCommands = require(ServerScriptService.Server.Cmdr.registerCommands)
 local registerArenaTypes = require(CmdrArena.registerTypes)
 local canRun = require(CmdrArena.Hooks.canRun)
 
-local LitUtils = require(ReplicatedStorage.Common.Utils.LitUtils)
-local defaultPermissions = require(ServerScriptService.Server.defaultPermissions)
-local actions = require(ReplicatedStorage.Common.RoduxFeatures).actions
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+local LitUtils = require(ReplicatedStorage.Common.Utils.LitUtils)
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local actions = RoduxFeatures.actions
+local selectors = RoduxFeatures.selectors
 
 local CmdrService = Knit.CreateService({
 	Name = "CmdrService";
@@ -38,17 +40,6 @@ local BLACKLISTED_COMMANDS = {
 }
 
 function CmdrService:KnitStart()
-	local ownerId = game.PrivateServerOwnerId
-	if ownerId then
-		Knit.Store:dispatch(actions.adminTierChanged(ownerId, GameEnum.AdminTiers.Admin))
-	end
-
-	for userId, adminTier in pairs(defaultPermissions.Admins) do
-		if canPromote(Knit.Store:getState(), userId, adminTier) then
-			Knit.Store:dispatch(actions.adminTierChanged(userId, adminTier))
-		end
-	end
-
 	self:_setupCmdr()
 
 	Players.PlayerAdded:Connect(playerHandler)
@@ -60,6 +51,10 @@ end
 function CmdrService:_setupCmdr()
 	local common = Cmdr.Registry:GetStore("Common")
 	common.Store = Knit.Store
+
+	local CmdrReplicated = Instance.new("Folder")
+	CmdrReplicated.Name = "CmdrReplicated"
+	CmdrReplicated.Parent = ReplicatedStorage
 	
 	Cmdr:RegisterDefaultCommands(function(commandDefinition)
 		local name = commandDefinition.Name:lower()
@@ -67,9 +62,12 @@ function CmdrService:_setupCmdr()
 	end)
 	
 	registerArenaTypes(Cmdr.Registry, Knit.GetService("MapService").Client.MapInfo:Get())
+
 	local commands = registerCommands(Cmdr.Registry)
 	for _, command in pairs(commands) do
-		command.server = CmdrReplicated
+		if command.server then
+			command.server.Parent = CmdrReplicated
+		end
 	end
 	
 	Cmdr.Registry.Types.player = Cmdr.Registry.Types.arenaPlayer
@@ -116,17 +114,13 @@ function CmdrService:_setupCmdr()
 			return
 		end
 		
-		if hasAdminLevel(Knit.Store:getState(), context.Executor.UserId, locked.admin) then
+		if selectors.canUserBeKickedBy(Knit.Store:getState(), context.Executor.UserId, locked.admin) then
 			local tierName = GameEnum.AdminTierByValue[locked.admin]
 			return string.format("This command is locked by %s %s.", LitUtils.getIndefiniteArticle(tierName), tierName)
 		end
 	end)
 	
 	-- Replicate to all clients.
-	local CmdrReplicated = Instance.new("Folder")
-	CmdrReplicated.Name = "CmdrReplicated"
-	CmdrReplicated.Parent = ReplicatedStorage
-
 	CmdrArena.Hooks.Parent = CmdrReplicated
 	CmdrArena.registerTypes.Parent = CmdrReplicated
 	self.Client.CmdrLoaded:Set(true)
@@ -190,8 +184,8 @@ function playerHandler(player)
 	-- TOB Ranktester and beyond gets admin.
 	getRank(player, 3397136):andThen(function(role)
 		if role >= 11 then
-			if canPromote(Knit.Store:getState(), player.UserId, GameEnum.AdminTiers.Admin) then
-				Knit.Store:dispatch(actions.adminTierChanged(player.UserId, GameEnum.AdminTiers.Admin))
+			if (Knit.Store:getState().admins[player.UserId] or 0) < GameEnum.AdminTiers.Admin then
+				Knit.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Admin))
 			end
 		end
 	end):finally(function()
