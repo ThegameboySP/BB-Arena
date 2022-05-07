@@ -8,7 +8,6 @@ local Cmdr = require(ServerScriptService.Packages.Cmdr)
 
 local CmdrCore = ServerScriptService.Server.Cmdr.Core
 local CmdrArena = ServerScriptService.Server.Cmdr.Arena
-local registerCommands = require(ServerScriptService.Server.Cmdr.registerCommands)
 local registerArenaTypes = require(CmdrArena.registerTypes)
 local canRun = require(CmdrArena.Hooks.canRun)
 
@@ -26,9 +25,6 @@ local CmdrService = Knit.CreateService({
 		Warning = Knit.CreateSignal();
 	};
 	
-	canRun = function(player, group)
-		return canRun(GameEnum.AdminTiers, player, group)
-	end;
 	_lockedCommands = {};
 })
 
@@ -38,6 +34,10 @@ local BLACKLISTED_COMMANDS = {
 	respawn = true;
 	replace = true;
 }
+
+function CmdrService:CanRun(player, group)
+	return canRun(Knit.Store:getState().users.admins, player, group)
+end
 
 function CmdrService:KnitStart()
 	self:_setupCmdr()
@@ -63,18 +63,14 @@ function CmdrService:_setupCmdr()
 	
 	registerArenaTypes(Cmdr.Registry, Knit.GetService("MapService").Client.MapInfo:Get())
 
-	local commands = registerCommands(Cmdr.Registry)
-	for _, command in pairs(commands) do
-		if command.server then
-			command.server.Parent = CmdrReplicated
-		end
-	end
+	Cmdr.Registry:RegisterCommandsIn(CmdrArena.Commands)
+	Cmdr.Registry:RegisterCommandsIn(CmdrCore.Commands)
 	
 	Cmdr.Registry.Types.player = Cmdr.Registry.Types.arenaPlayer
 	Cmdr.Registry.Types.players = Cmdr.Registry.Types.arenaPlayers
 	
 	Cmdr.Registry:RegisterHook("BeforeRun", function(context)
-		if not canRun(Knit.Store:getState().permissions.adminTiers, context.Executor, context.Group) then
+		if not self:CanRun(context.Executor, context.Group) then
 			local msg = "You don't have permission to run this command."
 			
 			if context.Executor then
@@ -90,7 +86,6 @@ function CmdrService:_setupCmdr()
 		end
 	end)
 	
-	Cmdr:RegisterCommandsIn(CmdrCore.Commands)
 	Cmdr:RegisterHook("AfterRun", function(context)
 		self.Client.CommandExecuted:FireAll({
 			ExecutorName = context.Executor and context.Executor.Name or "Server";
@@ -184,7 +179,7 @@ function playerHandler(player)
 	-- TOB Ranktester and beyond gets admin.
 	getRank(player, 3397136):andThen(function(role)
 		if role >= 11 then
-			if (Knit.Store:getState().admins[player.UserId] or 0) < GameEnum.AdminTiers.Admin then
+			if (Knit.Store:getState().users.admins[player.UserId] or 0) < GameEnum.AdminTiers.Admin then
 				Knit.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Admin))
 			end
 		end

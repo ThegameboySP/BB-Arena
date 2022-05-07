@@ -8,7 +8,6 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 local CmdrReplicated = ReplicatedStorage:WaitForChild("CmdrReplicated")
 local canRun = require(CmdrReplicated:WaitForChild("Hooks"):WaitForChild("canRun"))
 local CmdrNotifications = require(script.CmdrNotifications)
-local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 
 local LOCAL_PLAYER = Players.LocalPlayer
 local ERROR_COLOR = Color3.fromRGB(255, 112, 112)
@@ -19,7 +18,7 @@ local CmdrController = Knit.CreateController({
 	Cmdr = nil;
 	
 	canRun = function(player, group)
-		return require(canRun)(GameEnum.AdminTiers, player, group)
+		return require(canRun)(Knit.Store:getState().users.admins, player, group)
 	end;
 	_logs = {{}};
 })
@@ -44,7 +43,6 @@ function CmdrController:KnitInit()
 	end)
 end
 
-
 function CmdrController:KnitStart()
     local CmdrService = Knit.GetService("CmdrService")
     local value = CmdrService.CmdrLoaded
@@ -54,15 +52,6 @@ function CmdrController:KnitStart()
 
 	local CmdrClient = require(ReplicatedStorage.CmdrClient)
 	self.Cmdr = CmdrClient
-	
-	-- require(WrapHooks.Permissions)(function(hook)
-	-- 	CmdrClient.Registry:RegisterHook("BeforeRun", function(context)
-	-- 		local warning = hook(context)
-	-- 		if warning and context.Executor == LOCAL_PLAYER then
-	-- 			CmdrNotifications:AddMessage(warning, true, ERROR_COLOR)
-	-- 		end
-	-- 	end)
-	-- end)
 	
     local common = CmdrClient.Registry:GetStore("Common")
 	common.Store = Knit.Store
@@ -118,7 +107,6 @@ function CmdrController:KnitStart()
 	end)
 end
 
-
 function CmdrController:GetLogs(pageIndex)
 	pageIndex = pageIndex or -1
 	if pageIndex == 0 then
@@ -129,7 +117,6 @@ function CmdrController:GetLogs(pageIndex)
 	local index = math.clamp(len + pageIndex + 1, 1, len)
 	return self._logs[index]
 end
-
 
 function CmdrController:OnPlayerLoaded(player)
 	if player:GetAttribute("IsCmdrLoaded") then
