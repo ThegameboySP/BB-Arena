@@ -20,7 +20,9 @@ end
 
 local function deserialize(state)
     for key, value in pairs(state.users) do
-        state.users[key] = stringIndicesToNumber(value)
+        if type(value) == "table" then
+            state.users[key] = stringIndicesToNumber(value)
+        end
     end
 
     return state

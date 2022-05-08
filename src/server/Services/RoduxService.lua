@@ -31,8 +31,11 @@ end
 local function serialize(state)
     local clone = table.clone(state)
     clone.users = table.clone(state.users)
+    
     for key, value in pairs(state.users) do
-        clone.users[key] = numberIndicesToString(value)
+        if type(value) == "table" then
+            clone.users[key] = numberIndicesToString(value)
+        end
     end
 
     return clone
