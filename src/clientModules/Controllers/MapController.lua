@@ -20,6 +20,7 @@ local MapController = Knit.CreateController({
 })
 
 local FADE_INFO = TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
+local TIME_FADE_INFO = TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 local LocalPlayer = game:GetService("Players").LocalPlayer
 
 function MapController:KnitInit()
@@ -29,11 +30,16 @@ function MapController:KnitInit()
 	Lighting:ClearAllChildren()
 
 	MapService.PreMapChanged:Connect(function(mapName, oldMapName)
+		self:_tween(mapName)
 		self.PreMapChanged:Fire(mapName, oldMapName)
 	end)
 
 	MapService.CurrentMap:Observe(function(map)
 		self:_onMapChanged(map)
+	end)
+
+	MapService.CurrentMap:OnReady():andThen(function()
+		self:_tween(MapService.CurrentMap:Get().Name)
 	end)
 end
 
@@ -48,28 +54,20 @@ function MapController:KnitStart()
 	end)
 end
 
-function MapController:_onMapChanged(map)
-	if self._tween then
-		self._tween:Cancel()
-
-		for key, value in pairs(self._tweenProps) do
-			Lighting[key] = value
-		end
+function MapController:_tween(mapName)
+	if self._lightingCleanupFn then
+		self._lightingCleanupFn()
 	end
 
-	local oldMap = self.CurrentMap
-	self.CurrentMap = map
-	self.MapChanged:Fire(map, oldMap)
-
-	local lightingEntry = self:_getLightingEntryOrWarn(map.Name)
+	local lightingEntry = self:_getLightingEntryOrWarn(mapName)
 	if lightingEntry then
 		Lighting:ClearAllChildren()
 		self._skyboxTweener:TweenSkybox(lightingEntry:FindFirstChildWhichIsA("Sky", true):Clone(), FADE_INFO)
 
-		self._tweenProps = {}
+		local tweenProps = {}
 		for _, child in pairs(lightingEntry.Lighting:GetChildren()) do
-			if child:IsA("ValueBase") then
-				self._tweenProps[child.Name] = child.Value
+			if child:IsA("ValueBase") and child.Name ~= "ClockTime" then
+				tweenProps[child.Name] = child.Value
 			end
 		end
 
@@ -79,9 +77,27 @@ function MapController:_onMapChanged(map)
 			end
 		end
 
-		self._tween = TweenService:Create(Lighting, FADE_INFO, self._tweenProps)
-		self._tween:Play()
+		local tween1 = TweenService:Create(Lighting, FADE_INFO, tweenProps)
+		local tween2 = TweenService:Create(Lighting, TIME_FADE_INFO, {ClockTime = lightingEntry.Lighting.ClockTime.Value})
+		tween1:Play()
+		tween2:Play()
+
+		self._lightingCleanupFn = function()
+			tween1:Cancel()
+			tween2:Cancel()
+
+			for key, value in pairs(tweenProps) do
+				Lighting[key] = value
+			end
+			Lighting.ClockTime = lightingEntry.Lighting.ClockTime.Value
+		end
 	end
+end
+
+function MapController:_onMapChanged(map)
+	local oldMap = self.CurrentMap
+	self.CurrentMap = map
+	self.MapChanged:Fire(map, oldMap)
 end
 
 function MapController:_getLightingEntryOrWarn(name)
