@@ -63,6 +63,7 @@ function MapController:_onMapChanged(map)
 
 	local lightingEntry = self:_getLightingEntryOrWarn(map.Name)
 	if lightingEntry then
+		Lighting:ClearAllChildren()
 		self._skyboxTweener:TweenSkybox(lightingEntry:FindFirstChildWhichIsA("Sky", true):Clone(), FADE_INFO)
 
 		self._tweenProps = {}

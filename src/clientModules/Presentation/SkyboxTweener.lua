@@ -26,12 +26,16 @@ end
 function SkyboxTweener:TweenSkybox(skybox, tweenInfo)
     self._promise:cancel()
 
-    local root = self._fakeSkybox:GetRoot()
-    root.ImageTransparency = 1
+    local oldSkybox = self._oldSkybox
+    self._oldSkybox = skybox
 
-    self._promise = self._fakeSkybox:SetSky(skybox):andThen(function()
+    self._promise = self._fakeSkybox:SetSky(oldSkybox or skybox):andThen(function()
+        skybox.Parent = self._lighting
+        local root = self._fakeSkybox:GetRoot()
+        root.ImageTransparency = 0
+
         return Promise.new(function(resolve, _, onCancel)
-            local tween = TweenService:Create(root, tweenInfo, {ImageTransparency = 0})
+            local tween = TweenService:Create(root, tweenInfo, {ImageTransparency = 1})
             tween:Play()
             tween.Completed:Connect(resolve)
 
@@ -39,26 +43,15 @@ function SkyboxTweener:TweenSkybox(skybox, tweenInfo)
                 tween:Cancel()
             end)
         end)
-    end):finally(function()
-        self:_setSkybox(skybox)
     end)
 
     return self._promise
 end
 
-function SkyboxTweener:_setSkybox(skybox)
-    local oldSkybox = self._lighting:FindFirstChildWhichIsA("Skybox")
-    if oldSkybox then
-        oldSkybox.Parent = nil
-    end
-
-    self._fakeSkybox:GetRoot().ImageTransparency = 1
-    skybox.Parent = self._lighting
-end
-
 function SkyboxTweener:SetSkybox(skybox)
     self._promise:cancel()
-    self:_setSkybox(skybox)
+    self._fakeSkybox:GetRoot().ImageTransparency = 1
+    skybox.Parent = self._lighting
 end
 
 return SkyboxTweener
