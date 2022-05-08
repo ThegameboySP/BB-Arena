@@ -1,17 +1,17 @@
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local ContentProvider = game:GetService("ContentProvider")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local import = require(game:GetService("ReplicatedStorage"):WaitForChild("Import"))
-local Maid = import("Game", "Maid")
-local Promise = import("Game", "Promise")
+local Promise = require(ReplicatedStorage.Packages.Promise)
+local Skybox = ReplicatedStorage.Assets.Prefabs.Skybox
 
 local FakeSkybox = {}
 FakeSkybox.__index = FakeSkybox
 
 function FakeSkybox.new()
 	local viewportFrame = Instance.new("ViewportFrame")
-	local skybox = script.Skybox:Clone()
+	local skybox = Skybox:Clone()
 	skybox:SetPrimaryPartCFrame(CFrame.new())
 	scaleModel(skybox, 500)
 	skybox.Parent = viewportFrame
@@ -25,32 +25,37 @@ function FakeSkybox.new()
 	viewportFrame.BackgroundColor3 = Color3.new(0, 0, 0)
 	viewportFrame.BorderColor3 = Color3.new(0, 0, 0)
 	viewportFrame.BackgroundTransparency = 0
+	viewportFrame.BorderSizePixel = 0
 	viewportFrame.Ambient = Color3.new(1, 1, 1)
 	viewportFrame.LightColor = Color3.new(0, 0, 0)
 	viewportFrame.ZIndex = 0
 	viewportFrame.Name = "FakeSkybox"
 	
 	return setmetatable({
-		_maid = Maid.new();
 		_viewport = viewportFrame;
 		_skybox = skybox;
 	}, FakeSkybox)
 end
 
 function FakeSkybox:Destroy()
-	self._maid:DoCleaning()
 	self._viewport:Destroy()
 end
 
+function FakeSkybox:_cleanup()
+	if self._cleanupFn then
+		self._cleanupFn()
+	end
+end
+
 function FakeSkybox:Adorn(gui, root)
-	self._maid:DoCleaning()
+	self:_cleanup()
 
 	local camera
 	local function onCurrentCameraChanged()
 		camera = root.CurrentCamera
 	end
 
-	self._maid.cam = root:GetPropertyChangedSignal("CurrentCamera"):Connect(onCurrentCameraChanged)
+	local camConnection = root:GetPropertyChangedSignal("CurrentCamera"):Connect(onCurrentCameraChanged)
 	onCurrentCameraChanged()
 
 	local viewport = self._viewport
@@ -62,10 +67,11 @@ function FakeSkybox:Adorn(gui, root)
 		viewport.CurrentCamera.CFrame = offset
 	end)
 	
-	self._maid:GiveTask(function()
+	self._cleanupFn = function()
 		RunService:UnbindFromRenderStep(id)
 		viewport.Parent = nil
-	end)
+		camConnection:Disconnect()
+	end
 	
 	viewport.Parent = gui
 end
@@ -79,7 +85,7 @@ function FakeSkybox:SetZIndex(zIndex)
 end
 
 function FakeSkybox:SetSky(sky)
-	return Promise.defer(function(resolve)
+	return Promise.new(function(resolve)
 		-- Roblox won't detect skies as having preloadable properties...
 		local folder = Instance.new("Folder")
 		Instance.new("Decal", folder).Texture = sky.SkyboxLf

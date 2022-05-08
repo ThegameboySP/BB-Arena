@@ -2,17 +2,12 @@ local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
-local import = require(game:GetService("ReplicatedStorage"):WaitForChild("Import"))
-local Maid = import("Game", "Maid")
-
 local SkyboxEffectsGui = {}
 SkyboxEffectsGui.__index = SkyboxEffectsGui
 
 local DEFAULT_CAMERA_DEPTH = 2000
 
 function SkyboxEffectsGui.new()
-	local maid = Maid.new()
-	
 	local part = Instance.new("Part")
 	part.Name = "SkyboxEffectsAdornee"
 	part.Anchored = true
@@ -28,11 +23,11 @@ function SkyboxEffectsGui.new()
 			gui.Size = UDim2.fromOffset(currentCam.ViewportSize.X, currentCam.ViewportSize.Y)
 		end
 		currentCam = workspace.CurrentCamera
-		maid.size = currentCam:GetPropertyChangedSignal("ViewportSize"):Connect(onViewportSizeChanged)
+		currentCam:GetPropertyChangedSignal("ViewportSize"):Connect(onViewportSizeChanged)
 		onViewportSizeChanged()
 	end
 
-	maid.cam = workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(onCurrentCameraChanged)
+	workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(onCurrentCameraChanged)
 	onCurrentCameraChanged()
 
 	gui.ResetOnSpawn = false
@@ -44,53 +39,44 @@ function SkyboxEffectsGui.new()
 
 	local self = setmetatable({
 		_gui = gui;
-		_maid = maid;
 		_effects = {};
 		_enabled = true;
+		_id = HttpService:GenerateGUID();
 	}, SkyboxEffectsGui)
 
-	local id = HttpService:GenerateGUID()
-	RunService:BindToRenderStep(id, Enum.RenderPriority.Camera.Value + 1, function()
+	RunService:BindToRenderStep(self._id, Enum.RenderPriority.Camera.Value + 1, function()
 		if self._enabled then
 		    part.CFrame = currentCam.CFrame:ToWorldSpace(CFrame.new(0, 0, -DEFAULT_CAMERA_DEPTH))
         end
-	end)
-	
-	maid:GiveTask(function()
-		gui:Destroy()
-		RunService:UnbindFromRenderStep(id)
 	end)
 
 	return self
 end
 
 function SkyboxEffectsGui:Destroy()
+	self._gui.Parent = nil
+	RunService:UnbindFromRenderStep(self._id)
+
 	self._maid:DoCleaning()
-	for effect in next, self._effects do
+	for effect in pairs(self._effects) do
 		effect:Destroy()
 	end
 end
 
-
 function SkyboxEffectsGui:AddEffect(effect)
-	assert(type(effect) == "table")
 	effect:Adorn(self:GetRoot(), workspace)
 	self._effects[effect] = true
 	
 	return effect
 end
 
-
 function SkyboxEffectsGui:RemoveEffect(effect)
-	assert(type(effect) == "table")
 	self._effects[effect] = nil
 end
-
 
 function SkyboxEffectsGui:SetEnabled(enabled)
 	self._enabled = enabled
 end
-
 
 function SkyboxEffectsGui:GetRoot()
 	return self._gui

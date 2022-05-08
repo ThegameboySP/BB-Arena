@@ -2,6 +2,9 @@
 	"name": "assets",
 	"tree": {
 		"$className": "Folder",
+		"Prefabs": {
+			"$path": "Prefabs"
+		},
 		"Audio": {
 			"$className": "Folder",
 

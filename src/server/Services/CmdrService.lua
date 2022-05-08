@@ -50,6 +50,7 @@ end
 
 function CmdrService:_setupCmdr()
 	local common = Cmdr.Registry:GetStore("Common")
+	common.Knit = Knit
 	common.Store = Knit.Store
 
 	local CmdrReplicated = Instance.new("Folder")

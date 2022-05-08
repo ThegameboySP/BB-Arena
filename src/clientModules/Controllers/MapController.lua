@@ -6,6 +6,7 @@ local RunService = game:GetService("RunService")
 
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 local Signal = require(ReplicatedStorage.Packages.Signal)
+local SkyboxTweener = require(ReplicatedStorage.ClientModules.Presentation.SkyboxTweener)
 
 local MapController = Knit.CreateController({
 	Name = "MapController";
@@ -14,22 +15,19 @@ local MapController = Knit.CreateController({
 	PreMapChanged = Signal.new();
 
 	CurrentMap = nil;
-	
-	-- _fakeSkybox = FakeSkybox.new();
-	-- _skyboxEffects = SkyboxEffectsGui.new();
-	-- _maid = Maid.new()
+
+ 	_skyboxTweener = SkyboxTweener.new(Lighting);
 })
 
 local FADE_INFO = TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
-local TIME_FADE_INFO = TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
-local LOCAL_PLAYER = game:GetService("Players").LocalPlayer
+local LocalPlayer = game:GetService("Players").LocalPlayer
 
 function MapController:KnitInit()
 	local MapService = Knit.GetService("MapService")
 
 	-- Clear Studio lighting preset.
 	Lighting:ClearAllChildren()
-		
+
 	MapService.PreMapChanged:Connect(function(mapName, oldMapName)
 		self.PreMapChanged:Fire(mapName, oldMapName)
 	end)
@@ -42,7 +40,7 @@ end
 function MapController:KnitStart()
 	-- Focus all render power onto the map, regardless of where you are.
 	RunService:BindToRenderStep("CamFocus", Enum.RenderPriority.Camera.Value, function()
-		if CollectionService:HasTag(LOCAL_PLAYER, "FightingPlayer") then
+		if CollectionService:HasTag(LocalPlayer, "FightingPlayer") then
             return
         end
         
@@ -51,40 +49,47 @@ function MapController:KnitStart()
 end
 
 function MapController:_onMapChanged(map)
+	if self._tween then
+		self._tween:Cancel()
+
+		for key, value in pairs(self._tweenProps) do
+			Lighting[key] = value
+		end
+	end
+
 	local oldMap = self.CurrentMap
 	self.CurrentMap = map
 	self.MapChanged:Fire(map, oldMap)
+
+	local lightingEntry = self:_getLightingEntryOrWarn(map.Name)
+	if lightingEntry then
+		self._skyboxTweener:TweenSkybox(lightingEntry:FindFirstChildWhichIsA("Sky", true):Clone(), FADE_INFO)
+
+		self._tweenProps = {}
+		for _, child in pairs(lightingEntry.Lighting:GetChildren()) do
+			if child:IsA("ValueBase") then
+				self._tweenProps[child.Name] = child.Value
+			end
+		end
+
+		for _, child in pairs(lightingEntry.InLighting:GetChildren()) do
+			if not child:IsA("Sky") then
+				child:Clone().Parent = Lighting
+			end
+		end
+
+		self._tween = TweenService:Create(Lighting, FADE_INFO, self._tweenProps)
+		self._tween:Play()
+	end
 end
 
-function getLightingEntryOrWarn(name)
-	local entry = LightingSaves:FindFirstChild(name)
-	if entry == nil then
-		return warn("No lighting entry for", name)
+function MapController:_getLightingEntryOrWarn(name)
+	local entry = ReplicatedStorage.LightingSaves:FindFirstChild(name)
+	if entry then
+		return entry
 	end
 	
-	return entry
-end
-
-function tweenIslandColors(newMap)
-	local config = newMap:FindFirstChild("Configuration")
-	
-	if not config then
-		return warn("No map configuration for", newMap)
-	end
-	
-	local topDefault = Color3.fromRGB(80,109,84)
-	local baseDefault = Color3.fromRGB(108,88,75)
-	
-	local topNew = config:GetAttribute("IslandTopColor") or topDefault
-	local baseNew = config:GetAttribute("IslandBaseColor") or baseDefault
-
-	for _ ,part in next, Islands.Top:GetChildren() do
-		TweenService:Create(part, FADE_INFO, {Color = topNew}):Play()
-	end
-	
-	for _, part in next, Islands.Base:GetChildren() do
-		TweenService:Create(part, FADE_INFO, {Color = baseNew}):Play()
-	end
+	warn("No lighting entry for", name)
 end
 
 return MapController
