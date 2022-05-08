@@ -15,42 +15,18 @@ local GatekeepingService = Knit.CreateService({
 })
 
 local function banMessage(adminLevel)
-    local adminTier = GameEnum.AdminTierByValue[adminLevel]
+    local adminTier = GameEnum.AdminTiersByValue[adminLevel]
     return string.format(
         "You've been banned from this server by %s %s.", LitUtils.getIndefiniteArticle(adminTier), adminTier
     )
 end
 
 local function lockedServerMessage(adminLevel)
-    local adminTier = GameEnum.AdminTierByValue[adminLevel]
+    local adminTier = GameEnum.AdminTiersByValue[adminLevel]
     return string.format(
         "This server is locked by %s %s.", LitUtils.getIndefiniteArticle(adminTier), adminTier
     )
 end
-
--- function GatekeepingService:BanUser(userId, byUser)
---     Knit.Store:dispatch(actions.setUserBanned(userId, byUser, true))
--- end
-
--- function GatekeepingService:UnbanUser(userId, byUser)
---     Knit.Store:dispatch(actions.setUserBanned(userId, byUser, false))
--- end
-
--- function GatekeepingService:LockServer(userId)
---     Knit.Store:dispatch(actions.setServerLocked(userId, true))
--- end
-
--- function GatekeepingService:UnlockServer(userId)
---     Knit.Store:dispatch(actions.setServerLocked(userId, false))
--- end
-
--- function GatekeepingService:WhitelistUser(userId, byUser)
---     Knit.Store:dispatch(actions.setUserWhitelisted(userId, byUser, true))
--- end
-
--- function GatekeepingService:UnwhitelistUser(userId, byUser)
---     Knit.Store:dispatch(actions.setUserWhitelisted(userId, byUser, false))
--- end
 
 function GatekeepingService:KnitStart()
     Knit.Store.changed:connect(function(new, old)
@@ -80,12 +56,12 @@ function GatekeepingService:KnitStart()
         end
 
         local bannedBy = selectors.getUserBannedBy(state, player.UserId)
-        if bannedBy then
+        if selectors.canUserBeKickedBy(state, player.UserId, bannedBy or "none") then
             bannedMessage = banMessage(selectors.getAdmin(state, bannedBy))
         end
 
         if bannedMessage and lockedMessage then
-            player:Kick(string.format("%s\n...and %s\nWow!", lockedMessage, bannedMessage))
+            player:Kick(string.format("%s...and %s...Wow!", bannedMessage, lockedMessage:sub(1, 1):lower() .. lockedMessage:sub(2, -1)))
         elseif bannedMessage then
             player:Kick(bannedMessage)
         elseif lockedMessage then
