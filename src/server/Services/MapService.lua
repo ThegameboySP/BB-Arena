@@ -61,13 +61,10 @@ function MapService:KnitInit()
 
 	RunService.Heartbeat:Connect(function()
 		for _, player in pairs(Players:GetPlayers()) do
-			if self._teamMap[player.Team] then
-				-- TODO: is hasTag necessary? would adding/removing otherwise replicate every frame?
-				if CollectionService:HasTag(player, "FightingPlayer") then
-					CollectionService:AddTag(player, "FightingPlayer")
-				else
-					CollectionService:RemoveTag(player, "FightingPlayer")
-				end
+			if CollectionService:HasTag(player.Team, "FightingTeam") then
+				CollectionService:AddTag(player, "FightingPlayer")
+			else
+				CollectionService:RemoveTag(player, "FightingPlayer")
 			end
 		end
 	end)
