@@ -26,9 +26,6 @@ local LocalPlayer = game:GetService("Players").LocalPlayer
 function MapController:KnitInit()
 	local MapService = Knit.GetService("MapService")
 
-	-- Clear Studio lighting preset.
-	Lighting:ClearAllChildren()
-
 	MapService.PreMapChanged:Connect(function(mapName, oldMapName)
 		self:_tween(mapName)
 		self.PreMapChanged:Fire(mapName, oldMapName)
@@ -61,8 +58,19 @@ function MapController:_tween(mapName)
 
 	local lightingEntry = self:_getLightingEntryOrWarn(mapName)
 	if lightingEntry then
-		Lighting:ClearAllChildren()
-		self._skyboxTweener:TweenSkybox(lightingEntry:FindFirstChildWhichIsA("Sky", true):Clone(), FADE_INFO)
+		for _, child in pairs(Lighting:GetChildren()) do
+			if not child:IsA("Sky") then
+				child.Parent = nil
+			end
+		end
+
+		self._skyboxTweener:TweenSkybox(lightingEntry:FindFirstChildWhichIsA("Sky", true):Clone(), FADE_INFO, function()
+			for _, child in pairs(Lighting:GetChildren()) do
+				if child:IsA("Sky") then
+					child.Parent = nil
+				end
+			end
+		end)
 
 		local tweenProps = {}
 		for _, child in pairs(lightingEntry.Lighting:GetChildren()) do

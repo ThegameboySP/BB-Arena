@@ -23,13 +23,17 @@ function SkyboxTweener:Destroy()
     self._skyboxEffects:Destroy()
 end
 
-function SkyboxTweener:TweenSkybox(skybox, tweenInfo)
+function SkyboxTweener:TweenSkybox(skybox, tweenInfo, undoSky)
+    undoSky = undoSky or function() end
     self._promise:cancel()
 
     local oldSkybox = self._oldSkybox
     self._oldSkybox = skybox
 
     self._promise = self._fakeSkybox:SetSky(oldSkybox or skybox):andThen(function()
+        -- Should deparent sky before setting new skybox, or else the default sky is shown I think.
+        undoSky()
+
         skybox.Parent = self._lighting
         local root = self._fakeSkybox:GetRoot()
         root.ImageTransparency = 0
