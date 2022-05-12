@@ -5,6 +5,7 @@
 /Packages
 /ServerPackages
 /DevPackages
+/trashbin
 
 # Roblox Studio lock files
 /*.rbxlx.lock
