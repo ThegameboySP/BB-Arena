@@ -7,12 +7,7 @@ return function (_, soundIdOrSound, volume, looped)
 		local music = Instance.new("Sound")
 		music.Name = "CmdrMusic"
 		music.SoundId = "rbxassetid://" .. soundIdOrSound
-
-		if looped ~= nil then
-			music.Looped = looped
-		else
-			music.Looped = true
-		end
+		music.Looped = looped
 
 		music.Volume = math.clamp(0.5 + (volume or 0), 0, 2)
 		music.Parent = workspace
@@ -22,12 +17,7 @@ return function (_, soundIdOrSound, volume, looped)
 	elseif typeof(soundIdOrSound) == "Instance" then
 		local music = soundIdOrSound:Clone()
 		music.Name = "CmdrMusic"
-
-		if looped ~= nil then
-			music.Looped = looped
-		else
-			music.Looped = true
-		end
+		music.Looped = looped
 
 		music.Volume = math.clamp(music.Volume + (volume or 0), 0, 2)
 		music.Parent = workspace

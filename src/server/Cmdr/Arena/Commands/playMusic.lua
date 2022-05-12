@@ -20,6 +20,7 @@ return {
 			Name = "looped",
 			Description = "Whether to loop the music or not";
 			Optional = true;
+			Default = false;
 		}
 	};
 }
