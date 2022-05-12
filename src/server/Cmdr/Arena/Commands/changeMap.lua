@@ -1,5 +1,5 @@
 return {
-	Name = "ChangeMap";
+	Name = "changeMap";
 	Aliases = {"map"};
 	Description = "Changes the map.";
 	Group = "Admin";
@@ -7,7 +7,7 @@ return {
 		{
 			Type = "map",
 			Name = "map",
-			Description = "The name of the map."
+			Description = "The name of the map"
 		},
 	};
 }

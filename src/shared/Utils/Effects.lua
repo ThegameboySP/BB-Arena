@@ -19,10 +19,12 @@ function Effects.pipe(effects)
 
 				local resolvedContext
 				if context and subContext then
-					resolvedContext = table.clone(context)
-					
-					for key, value in pairs(subContext) do
-						resolvedContext[key] = value
+					if context ~= subContext then
+						resolvedContext = table.clone(context)
+						
+						for key, value in pairs(subContext) do
+							resolvedContext[key] = value
+						end
 					end
 				else
 					resolvedContext = subContext or context
@@ -578,6 +580,20 @@ function Effects.instance(getter, added, removed)
             conRemoved:Disconnect()
         end
     end
+end
+
+function Effects.getFromTag(tag)
+	return function(collectionService, add, remove, context)
+		local addedCon = collectionService:GetInstanceAddedSignal(tag):Connect(function(instance)
+			add(instance, context)
+		end)
+		local removedCon = collectionService:GetInstanceRemovedSignal(tag):Connect(remove)
+
+		return function()
+			addedCon:Disconnect()
+			removedCon:Disconnect()
+		end
+	end
 end
 
 function Effects.call(item, effect)
