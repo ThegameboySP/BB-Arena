@@ -71,6 +71,10 @@ function CmdrController:KnitStart()
 		    CmdrClient:Hide()
         end
 	end)
+
+	-- Set blank BeforeRun hook so commands can run.
+	-- We set this on the server so it doesn't matter.
+	CmdrClient.Registry:RegisterHook("BeforeRun", function() end)
 	
 	-- CmdrClient:HandleEvent("Wakeup", require(script.WakeupEvent))
 	-- CmdrClient:HandleEvent("Message", require(script.MessageEvent))
