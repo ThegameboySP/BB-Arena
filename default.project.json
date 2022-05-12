@@ -6,7 +6,7 @@
       "ReplicatedStorage": {
         "$className": "ReplicatedStorage",
         "Assets": {
-          "$path": "assets"
+          "$path": "assets.rbxmx"
         },
         "Packages": {
           "$path": "shared-packages.project.json"
