@@ -1,8 +1,6 @@
 local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CollectionService = game:GetService("CollectionService")
-local RunService = game:GetService("RunService")
 
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -21,7 +19,6 @@ local MapController = Knit.CreateController({
 
 local FADE_INFO = TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 local TIME_FADE_INFO = TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
-local LocalPlayer = game:GetService("Players").LocalPlayer
 
 function MapController:KnitInit()
 	local MapService = Knit.GetService("MapService")
@@ -37,17 +34,6 @@ function MapController:KnitInit()
 
 	MapService.CurrentMap:OnReady():andThen(function()
 		self:_tween(MapService.CurrentMap:Get().Name)
-	end)
-end
-
-function MapController:KnitStart()
-	-- Focus all render power onto the map, regardless of where you are.
-	RunService:BindToRenderStep("CamFocus", Enum.RenderPriority.Camera.Value, function()
-		if CollectionService:HasTag(LocalPlayer, "FightingPlayer") then
-            return
-        end
-        
-		workspace.CurrentCamera.Focus = CFrame.new(Vector3.new(0, 0, 0))
 	end)
 end
 
