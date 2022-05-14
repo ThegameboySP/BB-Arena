@@ -1,13 +1,13 @@
 return {
-    Name = "unban";
+    Name = "whitelist";
     Aliases = {};
-    Description = "Unbans UserIds.";
+    Description = "Makes UserId's an exception for server locking.";
     Group = "Admin";
     Args = {
         {
             Type = "playerIds",
             Name = "players";
-            Description = "Players to unban";
+            Description = "Players to whitelist";
         }
     }
 }

@@ -7,17 +7,18 @@ local function getUserBannedBy(state, userId)
 end
 
 local function canUserBeKickedBy(state, userId, kickingUserId)
-    local kickerAdmin = state.users.admins[kickingUserId]
-    if kickerAdmin == nil then
+    return getAdmin(state, kickingUserId) > getAdmin(state, userId)
+end
+
+local function canUserBeLockKicked(state, userId)
+    local lockedBy = state.users.serverLockedBy
+
+    local whitelistedBy = state.users.whitelisted[userId]
+    if getAdmin(state, whitelistedBy) >= getAdmin(state, lockedBy) then
         return false
     end
 
-    local whitelisted = state.users.whitelisted[userId]
-    if whitelisted and getAdmin(whitelisted) >= kickerAdmin then
-        return false
-    end
-
-    return kickerAdmin > getAdmin(state, userId)
+    return canUserBeKickedBy(state, userId, lockedBy)
 end
 
 local function isUserBanned(state, userId)
@@ -34,4 +35,5 @@ return {
     isUserBanned = isUserBanned;
     getUserBannedBy = getUserBannedBy;
     canUserBeKickedBy = canUserBeKickedBy;
+    canUserBeLockKicked = canUserBeLockKicked;
 }

@@ -5,6 +5,7 @@ local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 local LitUtils = require(ReplicatedStorage.Common.Utils.LitUtils)
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local actions = RoduxFeatures.actions
 local selectors = RoduxFeatures.selectors
 
 local GatekeepingService = Knit.CreateService({
@@ -51,12 +52,12 @@ function GatekeepingService:KnitStart()
         local lockedMessage
         local state = Knit.Store:getState()
 
-        if selectors.canUserBeKickedBy(state, player.UserId, state.users.serverLockedBy or "none") then
+        if selectors.canUserBeLockKicked(state, player.UserId, state.users.serverLockedBy) then
             lockedMessage = lockedServerMessage(selectors.getAdmin(state, state.users.serverLockedBy))
         end
 
         local bannedBy = selectors.getUserBannedBy(state, player.UserId)
-        if selectors.canUserBeKickedBy(state, player.UserId, bannedBy or "none") then
+        if selectors.canUserBeKickedBy(state, player.UserId, bannedBy) then
             bannedMessage = banMessage(selectors.getAdmin(state, bannedBy))
         end
 
@@ -66,6 +67,8 @@ function GatekeepingService:KnitStart()
             player:Kick(bannedMessage)
         elseif lockedMessage then
             player:Kick(lockedMessage)
+        else
+            Knit.Store:dispatch(actions.userJoined(player.UserId))
         end
     end
 
@@ -73,6 +76,12 @@ function GatekeepingService:KnitStart()
     for _, player in pairs(Players:GetPlayers()) do
         onPlayerAdded(player)
     end
+
+    Players.PlayerRemoving:Connect(function(player)
+        if Knit.Store:getState().users.activeUsers[player.UserId] then
+            Knit.Store:dispatch(actions.userLeft(player.UserId))
+        end
+    end)
 end
 
 return GatekeepingService

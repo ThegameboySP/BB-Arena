@@ -28,7 +28,7 @@ return Rodux.createReducer({
     end;
     users_setServerLocked = function(state, action)
         return Dictionary.merge(state, {
-            serverLockedBy = if action.isLocked then action.payload.userId else Llama.None;
+            serverLockedBy = if action.payload.isLocked then action.payload.userId else Llama.None;
         })
     end;
     users_setBanned = function(state, action)
@@ -36,9 +36,6 @@ return Rodux.createReducer({
             return Dictionary.mergeDeep(state, {
                 banned = {
                     [action.payload.userId] = action.payload.byUser;
-                };
-                whitelisted = {
-                    [action.payload.userId] = Llama.None;
                 };
             })
         else
@@ -53,11 +50,8 @@ return Rodux.createReducer({
         if action.payload.isWhitelisted then
             return Dictionary.mergeDeep(state, {
                 whitelisted = {
-                    [action.payload.userId] = true;
+                    [action.payload.userId] = action.payload.byUser;
                 };
-                banned = {
-                    [action.payload.userId] = Llama.None;
-                }
             })
         else
             return Dictionary.mergeDeep(state, {

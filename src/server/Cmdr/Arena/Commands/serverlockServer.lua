@@ -1,21 +1,16 @@
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local LOCKED_MESSAGE = "The server is locked!"
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local actions = RoduxFeatures.actions
 
 return function (context)
-	local gatekeeping = context:GetStore("Gatekeeping")
+	local store = context:GetStore("Common").Store
+    local state = store:getState()
 
-	if gatekeeping.ServerLockConnection == nil then
-		gatekeeping.ServerLockConnection = Players.PlayerAdded:Connect(function(player)
-			-- TODO
-			RunService.Heartbeat:Wait()
-			if (player:GetAttribute("AdminIndex") or 0) >= 1 then return end
-			player:Kick(LOCKED_MESSAGE)
-		end)
-
-        return "Locked server!"
+	store:dispatch(actions.setServerLocked(context.Executor.UserId, true))
+	if store:getState() == state then
+		return "Server is already locked."
 	end
 
-	return "Server already locked!"
+	return "Server successfully locked."
 end

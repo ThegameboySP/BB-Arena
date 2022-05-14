@@ -8,7 +8,10 @@ local function setAdmin(userId, admin, byUser)
     return function(store)
         local state = store:getState()
         
-        if byUser == nil or getAdmin(state, byUser) > admin then
+        if
+            byUser == nil or
+            (getAdmin(state, byUser) > admin and getAdmin(state, userId) < getAdmin(state, byUser))
+        then
             store:dispatch({
                 type = "users_setAdmin";
                 payload = {
@@ -32,12 +35,9 @@ end
 local function setUserWhitelisted(userId, byUser, isWhitelisted)
     return function(store)
         local state = store:getState()
-        local bannedBy = state.users.banned[userId]
+        local whitelistedBy = state.users.whitelisted[userId]
 
-        if
-            isWhitelisted ~= (not not state.users.whitelisted[userId])
-            and (not bannedBy or getAdmin(state, byUser) >= getAdmin(state, bannedBy))
-        then
+        if getAdmin(state, byUser) > getAdmin(state, whitelistedBy) then
             store:dispatch({
                 type = "users_setWhitelisted";
                 payload = {
