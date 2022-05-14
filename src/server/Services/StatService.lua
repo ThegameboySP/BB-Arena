@@ -114,7 +114,7 @@ function StatService:SetStat(userId, name, value)
 end
 
 function StatService:IncrementStat(userId, name, amount)
-    self:SetState(userId, name, self._stats[name][userId] + amount)
+    self:SetStat(userId, name, self._stats[name][userId] + amount)
 end
 
 return StatService

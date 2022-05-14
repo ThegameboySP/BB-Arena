@@ -12,7 +12,7 @@ return function(signal)
         function(character)
             local humanoid = character:FindFirstChild("Humanoid")
             
-            local con = humanoid.StateChanged:Connect(function(new)
+            local con = humanoid.StateChanged:Connect(function(_, new)
                 if new == Enum.HumanoidStateType.Dead then
                     local creatorValue = humanoid:WaitForChild("creator", 0.1)
                     local creator = creatorValue and creatorValue.Value
