@@ -3,7 +3,7 @@ local Spectators = game:GetService("Teams").Spectators
 local LocalPlayer = game:GetService("Players").LocalPlayer
 
 local function update()
-    pcall(function()
+    task.spawn(function()
         repeat task.wait() until pcall(function()
             StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, LocalPlayer.Team ~= Spectators)
         end)
