@@ -30,7 +30,7 @@ local MapService = Knit.CreateService({
 	
 	Maps = ServerStorage.Maps;
 	LightingSaves = ServerStorage.Plugin_LightingSaves;
-	mapParent = workspace;
+	mapParent = workspace.MapRoot;
 
 	PreMapChanged = Signal.new();
 	MapChanged = Signal.new();
