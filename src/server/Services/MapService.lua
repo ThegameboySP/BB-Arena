@@ -8,6 +8,9 @@ local RunService = game:GetService("RunService")
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 local Signal = require(game:GetService("ReplicatedStorage").Packages.Signal)
 local t = require(ReplicatedStorage.Packages.t)
+local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
+
+local Components = ReplicatedStorage.Common.Components
 
 local metaDefinition = t.strictInterface({
     Teams = t.map(t.string, t.BrickColor);
@@ -27,7 +30,6 @@ local MapService = Knit.CreateService({
 	
 	Maps = ServerStorage.Maps;
 	LightingSaves = ServerStorage.Plugin_LightingSaves;
-	startingMapName = ReplicatedStorage.Configuration:GetAttribute("StartingMapName");
 	mapParent = workspace;
 
 	PreMapChanged = Signal.new();
@@ -35,6 +37,7 @@ local MapService = Knit.CreateService({
 	
 	CurrentMap = nil;
 	
+	_clonerManager = ClonerManager.new("MapComponents");
 	_teamMap = {};
 })
 
@@ -55,10 +58,6 @@ function MapService:KnitInit()
 	self.LightingSaves.Name = "LightingSaves"
 	self.LightingSaves.Parent = ReplicatedStorage
 
-	if self.startingMapName then
-	    self:ChangeMap(self.startingMapName)
-    end
-
 	RunService.Heartbeat:Connect(function()
 		for _, player in pairs(Players:GetPlayers()) do
 			if CollectionService:HasTag(player.Team, "FightingTeam") then
@@ -68,6 +67,18 @@ function MapService:KnitInit()
 			end
 		end
 	end)
+end
+
+function MapService:RegisterComponent(class)
+	if class.realm ~= "client" then
+		self._clonerManager:Register(class)
+	end
+end
+
+function MapService:KnitStart()
+	for _, child in pairs(Components:GetChildren()) do
+		self:RegisterComponent(require(child))
+	end
 end
 
 function MapService:ChangeMap(mapName)
@@ -83,22 +94,31 @@ function MapService:ChangeMap(mapName)
     local meta = require(newMap:FindFirstChild("Meta") or error("No Meta under " .. mapName))
     assert(metaDefinition(meta))
 	
+	local oldMap = self.CurrentMap
+	if oldMap then
+		oldMap.Parent = self.Maps
+	end
+
+	-- Should reconcile teams before components run.
+	self:_reconcileTeams(meta.Teams)
+	self._teamMap = meta.Teams
+
+	self._clonerManager:Clear()
+	self._clonerManager:ServerInit(newMap)
+	self._clonerManager.Cloner:RunPrototypes(function(record)
+		return not record.parent:GetAttribute("Prototype_DisableRun")
+	end)
+	self._clonerManager:Flush()
+
 	local repFirst = newMap:FindFirstChild("ReplicateFirst")
 	if repFirst then
 		repFirst.Parent = self.mapParent
-	end
-
-    local oldMap = self.CurrentMap
-    if oldMap then
-		oldMap.Parent = self.Maps
 	end
 
 	self.CurrentMap = newMap
 	self.PreMapChanged:Fire(newMap, oldMap)
 	self.Client.PreMapChanged:FireAll(newMap.Name, oldMap and oldMap.Name or nil)
 
-    self:_reconcileTeams(meta.Teams)
-	self._teamMap = meta.Teams
 	newMap.Parent = self.mapParent
 
 	if repFirst then

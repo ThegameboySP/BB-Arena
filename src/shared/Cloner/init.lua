@@ -7,16 +7,16 @@ local function getAncestorPrototype(prototypesMap, instance)
             return current
         end
 
-        current = instance.Parent
+        current = current.Parent
     end
 end
 
 local Cloner = {}
 Cloner.__index = Cloner
 
-function Cloner.new(tags, prototypes, onCloneAdded, onCloneRemoved)
+function Cloner.new(matchedTagsByPrototype, onClonesAdded, onCloneRemoved)
     local self = setmetatable({
-        _onCloneAdded = onCloneAdded or function() end;
+        _onClonesAdded = onClonesAdded or function() end;
         _onCloneRemoved = onCloneRemoved or function() end;
 
         _prototypeToClone = {};
@@ -24,29 +24,26 @@ function Cloner.new(tags, prototypes, onCloneAdded, onCloneRemoved)
         _cloneRecordByClone = {};
     }, Cloner)
 
-    local matchedTagsByPrototype = {}
-    for _, prototype in pairs(prototypes) do
-        local matchedTags = {}
-
-        for _, tag in pairs(CollectionService:GetTags(prototype)) do
-            if tags[tag] then
-                matchedTags[tag] = true
-            end
-        end
-
-        if matchedTags[1] then
-            matchedTagsByPrototype[prototype] = matchedTags
-        end
-    end
-
     for prototype, matchedTags in pairs(matchedTagsByPrototype) do
-        self._prototypeRecordByPrototype[prototype] = table.freeze({
+        self._prototypeRecordByPrototype[prototype] = {
             prototype = prototype;
             tagsMap = table.freeze(matchedTags);
             parent = prototype.Parent;
-            ancestorPrototype = getAncestorPrototype(matchedTagsByPrototype, prototype);
-        })
+            descendantPrototypes = {};
+            ancestorPrototype = nil;
+        }
+    end
 
+    for prototype in pairs(matchedTagsByPrototype) do
+        local ancestor = getAncestorPrototype(matchedTagsByPrototype, prototype)
+        
+        if ancestor then
+            self._prototypeRecordByPrototype[prototype].ancestorPrototype = ancestor
+            table.insert(self._prototypeRecordByPrototype[ancestor].descendantPrototypes, prototype)
+        end
+    end
+
+    for prototype in pairs(matchedTagsByPrototype) do
         prototype.Parent = nil
     end
 
@@ -67,38 +64,52 @@ function Cloner:Destroy()
     table.clear(self)
 end
 
-function Cloner:RunPrototypes(selector)
-    local prototypes = {}
-
-    if type(selector) == "function" then
-        for prototype in pairs(self._prototypeRecordByPrototype) do
-            if selector(prototype) then
-                table.insert(prototypes, prototype)
-            end
-        end
-    elseif type(selector) == "table" then
-        prototypes = selector
+function Cloner:GetPrototypes(filter)
+    filter = filter or function()
+        return true
     end
 
+    local prototypes = {}
+    for prototype, record in pairs(self._prototypeRecordByPrototype) do
+        if filter(record) then
+            table.insert(prototypes, prototype)
+        end
+    end
+
+    return prototypes
+end
+
+function Cloner:RunPrototypes(selector)
+    local prototypes = selector
+    if type(selector) == "function" then
+        prototypes = self:GetPrototypes(selector)
+    end
+    
     local cloneRecords = {}
     for _, prototype in ipairs(prototypes) do
         if not self._prototypeToClone[prototype] then
-            local clone = prototype:Clone()
-            self._prototypeToClone[prototype] = clone
-            
-            local prototypeRecord = self._prototypeRecordByPrototype[prototype]
+            for _, thisPrototype in pairs({prototype, unpack(self._prototypeRecordByPrototype[prototype].descendantPrototypes)}) do
+                local clone = thisPrototype:Clone()
+                self._prototypeToClone[thisPrototype] = clone
+                
+                local prototypeRecord = self._prototypeRecordByPrototype[thisPrototype]
+    
+                for tag in pairs(prototypeRecord.tagsMap) do
+                    CollectionService:RemoveTag(clone, tag)
+                end
+                
+                local cloneRecord = table.freeze({
+                    prototypeRecord = prototypeRecord;
+                    clone = clone;
+                })
 
-            for tag in pairs(prototypeRecord.tagsMap) do
-                CollectionService:RemoveTag(clone, tag)
-            end
-            
-            table.insert(cloneRecords, table.freeze({
-                prototypeRecord = prototypeRecord;
-                clone = clone;
-            }))
+                self._cloneRecordByClone[clone] = cloneRecord
+                table.insert(cloneRecords, cloneRecord)
+            end            
         end
     end
 
+    local clonesAdded = {}
     for _, cloneRecord in ipairs(cloneRecords) do
         if cloneRecord.prototypeRecord.ancestorPrototype then
             cloneRecord.clone.Parent = self._prototypeToClone[cloneRecord.prototypeRecord.ancestorPrototype]
@@ -106,8 +117,13 @@ function Cloner:RunPrototypes(selector)
             cloneRecord.clone.Parent = cloneRecord.prototypeRecord.parent
         end
 
-        self._onCloneAdded(cloneRecord.clone, cloneRecord.prototypeRecord.tagsMap)
+        table.insert(clonesAdded, {
+            clone = cloneRecord.clone;
+            tagsMap = cloneRecord.prototypeRecord.tagsMap;
+        })
     end
+
+    self._onClonesAdded(clonesAdded)
 end
 
 function Cloner:ContainsClone(clone)
@@ -120,13 +136,21 @@ end
 
 function Cloner:DespawnClone(clone)
     if not self:ContainsClone(clone) then
-        error(("Cloner does not contain %s. Use :ContainsClone if needed."):format(clone:GetFullName()))
+        return
     end
 
     local cloneRecord = self._cloneRecordByClone[clone]
+    for _, descendantPrototype in pairs(cloneRecord.prototypeRecord.descendantPrototypes) do
+        local descendantClone = self._prototypeToClone[descendantPrototype]
+
+        if descendantClone then
+            self:DespawnClone(descendantClone)
+        end
+    end
+
     self._prototypeToClone[cloneRecord.prototypeRecord.prototype] = nil
     self._cloneRecordByClone[clone] = nil
-    clone:Destroy()
+    clone.Parent = nil
 
     self._onCloneRemoved(clone, cloneRecord.prototypeRecord.tagsMap)
 end
@@ -134,10 +158,18 @@ end
 function Cloner:GetPrototypeByClone(clone)
     local cloneRecord = self._cloneRecordByClone[clone]
     if cloneRecord == nil then
-        error(("Cloner does not contain %s. Use :ContainsPrototype if needed."):format(clone:GetFullName()))
+        error(("Cloner does not contain %s. Use :ContainsClone if needed."):format(clone:GetFullName()))
     end
 
     return cloneRecord.prototypeRecord.prototype
+end
+
+function Cloner:GetCloneByPrototype(clone)
+    if not self:ContainsPrototype(clone) then
+        error(("Cloner does not contain %s. Use :ContainsPrototype if needed."):format(clone:GetFullName()))
+    end
+
+    return self._prototypeToClone[clone]
 end
 
 return Cloner

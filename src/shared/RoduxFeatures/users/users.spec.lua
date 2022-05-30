@@ -48,7 +48,7 @@ return function()
             store:dispatch(actions.userJoined(1))
             store:dispatch(actions.userJoined(2))
     
-            store:dispatch(actions.setServerLocked(0, true))
+            store:dispatch(actions.setServerLocked(1, true))
             expect(#Dictionary.keys(store:getState().users.whitelisted)).to.equal(3)
         end)
 

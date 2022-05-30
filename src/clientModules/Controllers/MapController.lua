@@ -5,6 +5,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local SkyboxTweener = require(ReplicatedStorage.ClientModules.Presentation.SkyboxTweener)
+local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
+
+local Components = ReplicatedStorage.Common.Components
 
 local MapController = Knit.CreateController({
 	Name = "MapController";
@@ -15,12 +18,29 @@ local MapController = Knit.CreateController({
 	CurrentMap = nil;
 
  	_skyboxTweener = SkyboxTweener.new(Lighting);
+	_clonerManager = ClonerManager.new("MapComponents");
 })
 
 local FADE_INFO = TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 local TIME_FADE_INFO = TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 
 function MapController:KnitInit()
+	for _, child in pairs(Components:GetChildren()) do
+		self:RegisterComponent(require(child))
+	end
+end
+
+function MapController:RegisterComponent(class)
+	if class.realm ~= "server" then
+		self._clonerManager:Register(class)
+	end
+end
+
+function MapController:GetManager()
+	return self._clonerManager.Manager
+end
+
+function MapController:KnitStart()
 	local MapService = Knit.GetService("MapService")
 
 	MapService.PreMapChanged:Connect(function(mapName, oldMapName)
@@ -28,13 +48,20 @@ function MapController:KnitInit()
 		self.PreMapChanged:Fire(mapName, oldMapName)
 	end)
 
-	MapService.CurrentMap:Observe(function(map)
-		self:_onMapChanged(map)
-	end)
-
 	MapService.CurrentMap:OnReady():andThen(function()
 		self:_tween(MapService.CurrentMap:Get().Name)
 	end)
+end
+
+function MapController:onMapChanged(map)
+	local oldMap = self.CurrentMap
+	self.CurrentMap = map
+
+	self._clonerManager:Clear()
+	self._clonerManager:ClientInit(map)
+	self._clonerManager:Flush()
+
+	self.MapChanged:Fire(map, oldMap)
 end
 
 function MapController:_tween(mapName)
@@ -86,12 +113,6 @@ function MapController:_tween(mapName)
 			Lighting.ClockTime = lightingEntry.Lighting.ClockTime.Value
 		end
 	end
-end
-
-function MapController:_onMapChanged(map)
-	local oldMap = self.CurrentMap
-	self.CurrentMap = map
-	self.MapChanged:Fire(map, oldMap)
 end
 
 function MapController:_getLightingEntryOrWarn(name)

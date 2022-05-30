@@ -19,6 +19,9 @@ local TYPE_TO_DESTRUCT_METHOD = {
 	["Instance"] = function(task)
 		return task.Destroy
 	end;
+	["nil"] = function()
+		error("Task cannot be nil")
+	end;
 }
 
 function Bin.new()
@@ -40,7 +43,7 @@ function Bin:Destroy(...)
 		index = next(self)
 	end
 end
-Bin.Clean = Bin.Destroy
+Bin.DoCleaning = Bin.Destroy
 
 -- Adds a task to the bin.
 -- If using id argument and it already exists, the task will be cleaned, unless the old task is equal to the new.

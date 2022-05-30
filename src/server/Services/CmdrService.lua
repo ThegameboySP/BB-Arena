@@ -25,6 +25,7 @@ local CmdrService = Knit.CreateService({
 		Warning = Knit.CreateSignal();
 	};
 	
+	Cmdr = Cmdr;
 	_lockedCommands = {};
 })
 

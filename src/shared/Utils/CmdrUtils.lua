@@ -1,4 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
+
 local t = require(ReplicatedStorage.Packages.t)
 
 local CmdrUtils = {}
@@ -80,6 +82,59 @@ local ISchema = t.array(t.strictInterface({
 local IDef = t.strictInterface({
 	Validate = t.optional(t.callback);
 })
+
+function CmdrUtils.fightingTeamTo(cmdrType, params)
+	local wrappedCmdrType
+
+	return function(commandContext)
+		if wrappedCmdrType then
+			return wrappedCmdrType
+		end
+
+		local schema = {}
+		
+		local resolvedCmdrType = cmdrType
+		local Registry = commandContext.Cmdr.Registry
+		if type(cmdrType) == "string" then
+			resolvedCmdrType = Registry.Types[cmdrType]
+		end
+	
+		for _, team in pairs(CollectionService:GetTagged("FightingTeam")) do
+			table.insert(schema, {
+				Key = team.Name;
+				KeyType = Registry.Types.team;
+				KeyChecker = t.literal(team);
+				ValueType = resolvedCmdrType;
+				ValueChecker = function()
+					return true
+				end;
+			})
+		end
+
+		wrappedCmdrType = {}
+		wrappedCmdrType.Name = params.Name
+		wrappedCmdrType.Description = params.Description
+
+		wrappedCmdrType.Type = CmdrUtils.map(schema, {
+			Validate = function(team, value)
+				if not CollectionService:HasTag(team, "FightingTeam") then
+					return false, string.format("%q is not a fighting team", team.Name)
+				end
+
+				if params.Validate then
+					local ok, err = params.Validate(team, value)
+					if not ok then
+						return false, err
+					end
+				end
+				
+				return true
+			end;
+		})
+
+		return wrappedCmdrType
+	end;
+end
 
 function CmdrUtils.map(schema, def)
 	assert(ISchema(schema))
@@ -197,13 +252,32 @@ function CmdrUtils.map(schema, def)
 		end,
 
 		Parse = function(key, value)
-			-- Cannot return a single table since Cmdr removes order.
+			-- Cannot return a map since Cmdr expects an array from a listable type.
+			-- Cannot return a single array since Cmdr removes order as an implementation detail.
 			return {{
-				getParsedValue(cmdrTypes[key].Key, key),
-				getParsedValue(cmdrTypes[key].Value, value)
+				type = "map";
+				key = getParsedValue(cmdrTypes[key].Key, key),
+				value = getParsedValue(cmdrTypes[key].Value, value)
 			}}
 		end,
 	}
+end
+
+function CmdrUtils.transformType(value)
+	if type(value) == "table" and value[1] then
+		local valueType = value[1].type
+
+		if valueType == "map" then
+			local final = {}
+			for _, entry in pairs(value) do
+				final[entry.key] = entry.value
+			end
+
+			return final
+		end
+	end
+
+	return value
 end
 
 function CmdrUtils.getKeywords(array)
@@ -235,6 +309,10 @@ function getParsedValue(cmdrType, value)
 end
 
 function getAutocompleteValues(cmdrType, value)
+	if not cmdrType.Autocomplete then
+		return {}
+	end
+
 	local ret = table.pack(cmdrType.Transform(value))
 	if cmdrType.Validate and not cmdrType.Validate(table.unpack(ret, 1, ret.n)) then
 		return {}

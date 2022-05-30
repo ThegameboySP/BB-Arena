@@ -41,22 +41,21 @@ function CmdrController:KnitInit()
 	CmdrService.Warning:Connect(function(str)
 		CmdrNotifications:AddMessage(str, true, ERROR_COLOR)
 	end)
-end
-
-function CmdrController:KnitStart()
-    local CmdrService = Knit.GetService("CmdrService")
-    local value = CmdrService.CmdrLoaded
-    if not value:Get() then
-        value.Changed:Wait()
-    end
 
 	local CmdrClient = require(ReplicatedStorage.CmdrClient)
 	self.Cmdr = CmdrClient
 	
     local common = CmdrClient.Registry:GetStore("Common")
 	common.Store = Knit.Store
+end
 
-	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, Knit.GetService("MapService").MapInfo:Get())
+function CmdrController:KnitStart()
+	local CmdrClient = self.Cmdr
+
+	local MapService = Knit.GetService("MapService")
+	MapService.MapInfo:OnReady():await()
+
+	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, MapService.MapInfo:Get())
 	CmdrClient.Registry.Types.player = CmdrClient.Registry.Types.arenaPlayer
 	CmdrClient.Registry.Types.players = CmdrClient.Registry.Types.arenaPlayers
 	

@@ -23,9 +23,6 @@
       },
   
       "ServerScriptService": {
-        "Gamemodes": {
-          "$path": "gamemodes"
-        },
         "Packages": {
           "$path": "server-packages.project.json"
         },
