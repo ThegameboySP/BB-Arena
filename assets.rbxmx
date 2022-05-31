@@ -2,21 +2,21 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="Folder" referent="RBX8DE8868F4E804E129DF1310D96982424">
+	<Item class="Folder" referent="RBX1836C14ECE41459989984A7DEAD03AAA">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<string name="Name">Assets</string>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBXC54C19FB6B3C4007AE618AEB3CF742F2">
+		<Item class="Folder" referent="RBX83F9FCDAB82A4E9D91746FC86B63AC0D">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Prefabs</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="Model" referent="RBX0BE2C6B97BF74D80A260D9B184B636EE">
+			<Item class="Model" referent="RBXF6C1321F55724DC6AE0FB8582A8BB3BD">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<token name="LevelOfDetail">0</token>
@@ -42,12 +42,12 @@
 					</Vector3>
 					<string name="Name">Skybox</string>
 					<bool name="NeedsPivotMigration">false</bool>
-					<Ref name="PrimaryPart">RBX0242A26C8D474C47865304D151AEB498</Ref>
+					<Ref name="PrimaryPart">RBX4EA274833D9146D0A3CD64B113B19C59</Ref>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<OptionalCoordinateFrame name="WorldPivotData"></OptionalCoordinateFrame>
 				</Properties>
-				<Item class="Part" referent="RBXD40D027FB1CE4BF1B59A2140776BCB3B">
+				<Item class="Part" referent="RBX5EB4C2E4C7EF4447933B9CA369D31BBB">
 					<Properties>
 						<bool name="Anchored">true</bool>
 						<BinaryString name="AttributesSerialize"></BinaryString>
@@ -140,7 +140,7 @@
 							<Z>1</Z>
 						</Vector3>
 					</Properties>
-					<Item class="SpecialMesh" referent="RBXBCFB70F5AAF344B99114F8A6AB6301F6">
+					<Item class="SpecialMesh" referent="RBX7575F0632C6E4A8BB0A8DD81D0F40857">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<token name="LODX">2</token>
@@ -168,7 +168,7 @@
 							</Vector3>
 						</Properties>
 					</Item>
-					<Item class="Decal" referent="RBXA420FFFCA2A14779B32430453174FAA9">
+					<Item class="Decal" referent="RBX0642345597DD4DAF8C2DCF12219C7FF6">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Color3 name="Color3">
@@ -186,7 +186,7 @@
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Part" referent="RBX9C2F4E0AFDC14714A216CC81BE952A1D">
+				<Item class="Part" referent="RBX1F7FC45ED7414782B1A19972787D448A">
 					<Properties>
 						<bool name="Anchored">true</bool>
 						<BinaryString name="AttributesSerialize"></BinaryString>
@@ -279,7 +279,7 @@
 							<Z>1</Z>
 						</Vector3>
 					</Properties>
-					<Item class="SpecialMesh" referent="RBX06C865F05C3340DC8C34A35B6AC2F3C3">
+					<Item class="SpecialMesh" referent="RBXEBF027802C3546409BE4C8834AACA615">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<token name="LODX">2</token>
@@ -307,7 +307,7 @@
 							</Vector3>
 						</Properties>
 					</Item>
-					<Item class="Decal" referent="RBX8C9214CB658B410ABC1C6A7C1056BEA2">
+					<Item class="Decal" referent="RBX59EA6D8748C643868B56FEECAE3E2BFB">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Color3 name="Color3">
@@ -325,7 +325,7 @@
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Part" referent="RBX0242A26C8D474C47865304D151AEB498">
+				<Item class="Part" referent="RBX4EA274833D9146D0A3CD64B113B19C59">
 					<Properties>
 						<bool name="Anchored">true</bool>
 						<BinaryString name="AttributesSerialize"></BinaryString>
@@ -418,7 +418,7 @@
 							<Z>1</Z>
 						</Vector3>
 					</Properties>
-					<Item class="SpecialMesh" referent="RBXBAEA15DE9369449D8D3939290E920E2D">
+					<Item class="SpecialMesh" referent="RBXC350D7BD21F340608195D6D2813CF6A4">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<token name="LODX">2</token>
@@ -446,7 +446,7 @@
 							</Vector3>
 						</Properties>
 					</Item>
-					<Item class="Decal" referent="RBX89BCEF75FAD343CCAA3BBA7D96E6B928">
+					<Item class="Decal" referent="RBX1096557AA44046B1B0D2DDCC95B1DC44">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Color3 name="Color3">
@@ -464,7 +464,7 @@
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Part" referent="RBXE7B3E3D8301E403F9301AFD85C9696F5">
+				<Item class="Part" referent="RBX78AD20F5BA1F4BDF90018C2B324ED23E">
 					<Properties>
 						<bool name="Anchored">true</bool>
 						<BinaryString name="AttributesSerialize"></BinaryString>
@@ -557,7 +557,7 @@
 							<Z>1</Z>
 						</Vector3>
 					</Properties>
-					<Item class="SpecialMesh" referent="RBXEAE659C2C4904435BB73EEEC1FE0EB4B">
+					<Item class="SpecialMesh" referent="RBXA43F18A8276D4B79A178B097A0B79552">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<token name="LODX">2</token>
@@ -585,7 +585,7 @@
 							</Vector3>
 						</Properties>
 					</Item>
-					<Item class="Decal" referent="RBXFF08A233E741499AB2735CE502E3357A">
+					<Item class="Decal" referent="RBXE2D34D024F42423ABC1A87CF84A28AFE">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Color3 name="Color3">
@@ -603,7 +603,7 @@
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Part" referent="RBX21278AC909064928BB83AD240807FF9D">
+				<Item class="Part" referent="RBX8D95CE5CEAF14618A9C28FB31DE566FB">
 					<Properties>
 						<bool name="Anchored">true</bool>
 						<BinaryString name="AttributesSerialize"></BinaryString>
@@ -696,7 +696,7 @@
 							<Z>1</Z>
 						</Vector3>
 					</Properties>
-					<Item class="SpecialMesh" referent="RBXBA7373B46E4243B081E140407F5BF726">
+					<Item class="SpecialMesh" referent="RBX0BFC6FB0DD6F48578A96D67BB9913C9F">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<token name="LODX">2</token>
@@ -724,7 +724,7 @@
 							</Vector3>
 						</Properties>
 					</Item>
-					<Item class="Decal" referent="RBXF2FF621DDDD2473192CD3AB196516325">
+					<Item class="Decal" referent="RBXBC2ABBA055644C889DAD224213A84FCE">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Color3 name="Color3">
@@ -742,7 +742,7 @@
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Part" referent="RBX8112133ECE41470D92B8D506278E1BE6">
+				<Item class="Part" referent="RBX2C46ACF451984590A26B1145C67A46F4">
 					<Properties>
 						<bool name="Anchored">true</bool>
 						<BinaryString name="AttributesSerialize"></BinaryString>
@@ -835,7 +835,7 @@
 							<Z>1</Z>
 						</Vector3>
 					</Properties>
-					<Item class="SpecialMesh" referent="RBX9B8F6DF4DE5D4CC184C928C7B2E6899C">
+					<Item class="SpecialMesh" referent="RBXD8EB17B14AF24538BA4D9A4A3AE01FEE">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<token name="LODX">2</token>
@@ -863,7 +863,7 @@
 							</Vector3>
 						</Properties>
 					</Item>
-					<Item class="Decal" referent="RBX3654B8107CC740659B01D71543C146CB">
+					<Item class="Decal" referent="RBX20CC53E394164CA9A4094B1533C03FD7">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Color3 name="Color3">
@@ -883,14 +883,14 @@
 				</Item>
 			</Item>
 		</Item>
-		<Item class="Folder" referent="RBXC32B7E0BDC56479794F3102AC01B0BBC">
+		<Item class="Folder" referent="RBX77BD310D80124A2C8A7F3943439EDC2A">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Music</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="Sound" referent="RBXE450018F9311440A91B80738CBDA856C">
+			<Item class="Sound" referent="RBXB4FC6430FEFA418BBCB336C681646696">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -908,14 +908,14 @@
 					<float name="Volume">0.5</float>
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
-				<Item class="Folder" referent="RBX850AA89051F04ED38773172CC67C392B">
+				<Item class="Folder" referent="RBX2F9AE4137A374C339E891FB95C6129B2">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Info</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="StringValue" referent="RBX65CD9BDA8F5347BA8B68DDFCA369119F">
+					<Item class="StringValue" referent="RBX6492D4A7ED764A1BA0F32081C9AF66B0">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Title</string>
@@ -924,7 +924,7 @@
 							<string name="Value">Slow Broth (B)</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXCF408EB6762542C3B15B2CD5B57FED75">
+					<Item class="StringValue" referent="RBX4246B800AE184618BCB0FC26BE536105">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Album</string>
@@ -933,7 +933,7 @@
 							<string name="Value">Groove Attack</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX0B809AF21B404604B80BF1705489E48B">
+					<Item class="StringValue" referent="RBX5F6B90D2EDDA49228BA0DAAE3A08113F">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Genre</string>
@@ -942,7 +942,7 @@
 							<string name="Value">Jazz</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXA4915736AF47494BB3E474E53B717960">
+					<Item class="StringValue" referent="RBXE74A253B5DAC43ABAEB6307D0533F03A">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Library</string>
@@ -953,7 +953,7 @@
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Sound" referent="RBXF4BB80C11EB44125AAEDBAFE49040243">
+			<Item class="Sound" referent="RBX7EFA67242794441F901695353B309308">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -971,14 +971,14 @@
 					<float name="Volume">0.5</float>
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
-				<Item class="Folder" referent="RBX9070D6D9EFFD44FC8BF3C0D5D796DB9B">
+				<Item class="Folder" referent="RBX72C2F10C9BD2446B8D6F092A98ADEF03">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Info</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="StringValue" referent="RBXE1BA1377A4CE47DF98A5E290C98106B7">
+					<Item class="StringValue" referent="RBXB94A6B91B3CC4012862612A0235DB2C7">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Title</string>
@@ -987,7 +987,7 @@
 							<string name="Value">3-D Distortion</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXB62912DD6C4F4F62B0FAEFD5BE09817F">
+					<Item class="StringValue" referent="RBX9ADE99BD8C0E49E693C803C7C57C2F17">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Album</string>
@@ -996,7 +996,7 @@
 							<string name="Value">Trax 3</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX3FAE36DAE23944D09AB23C8E28BF6A46">
+					<Item class="StringValue" referent="RBX8D91F2B57A2345809A6732542D34FCCD">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Genre</string>
@@ -1005,7 +1005,7 @@
 							<string name="Value">Sound Elements/Atmospheres</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXF8910A472A074522AC8005B33FA7EDB3">
+					<Item class="StringValue" referent="RBX5CD363C7CF9A40F481D941E8A9A99C06">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Library</string>
@@ -1016,7 +1016,7 @@
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Sound" referent="RBX8473E91C60424607B470825521C61A4D">
+			<Item class="Sound" referent="RBXDCACD6BFD03A4A1EAA70D2BF047EC2ED">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1034,14 +1034,14 @@
 					<float name="Volume">0.5</float>
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
-				<Item class="Folder" referent="RBXD878C6BA917B481FBB40861CEEC61EAC">
+				<Item class="Folder" referent="RBX7BF9718EA5C946F9A28203CF51E39255">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Info</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="StringValue" referent="RBXA6E18026985D436695F25A3ABB9C67E6">
+					<Item class="StringValue" referent="RBXB79FB95996FA469C8BA2E9EFC4C584B8">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Title</string>
@@ -1050,7 +1050,7 @@
 							<string name="Value">Deep Blue</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX70F6286AB381408BBCBDF4D9579902FD">
+					<Item class="StringValue" referent="RBX36A3071BB9914073AE7FFD84C280E14C">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Album</string>
@@ -1059,7 +1059,7 @@
 							<string name="Value">Trax 3</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX564A32F0C4B14A28A5C2556A6AB6A589">
+					<Item class="StringValue" referent="RBX584986EA35F44A91962ED3F5BFE65E35">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Genre</string>
@@ -1068,7 +1068,7 @@
 							<string name="Value">Sound Elements/Atmospheres</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXB48D0AB65C5A4364983908FE012E3E47">
+					<Item class="StringValue" referent="RBXFB8DC94D15C34D67A6A01073DB2B97F6">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Library</string>
@@ -1079,7 +1079,7 @@
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Sound" referent="RBXC9B8E9D73D564C538A38AAED620DAD2E">
+			<Item class="Sound" referent="RBX1ACF4BF33A3847EEA092587EA49725B7">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1097,14 +1097,14 @@
 					<float name="Volume">0.5</float>
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
-				<Item class="Folder" referent="RBXF2DBE82D1D4644F2A59D767B9081D3B4">
+				<Item class="Folder" referent="RBX2BDE897182A44B34B4A2C9E89988D713">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Info</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="StringValue" referent="RBX3C00EB2C3E7B4D2AB3AB2298AD59353C">
+					<Item class="StringValue" referent="RBXDF219F65E8D4408BAE29EBEC3ED37B99">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Title</string>
@@ -1113,7 +1113,7 @@
 							<string name="Value">Rent A Loop</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX357179F4EC584F5D9AC7E79590841EFA">
+					<Item class="StringValue" referent="RBXA1588349C9574F5EB5D12E55885B6F72">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Album</string>
@@ -1122,7 +1122,7 @@
 							<string name="Value">Trax 3</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXE91B072207D04FE9A3E5EEB096EB6855">
+					<Item class="StringValue" referent="RBX5F7F054006D4419A8AB916ED8BE7F7B2">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Genre</string>
@@ -1131,7 +1131,7 @@
 							<string name="Value">Club/Electronica</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX1DC6793E37A6430FBCAE1E0E610710B5">
+					<Item class="StringValue" referent="RBXE103C642FCFA40B38C995AE58FEABD59">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Library</string>
@@ -1142,7 +1142,7 @@
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Sound" referent="RBX175C56A248744DC1A30A48F4572B0A91">
+			<Item class="Sound" referent="RBX189886699EF347488BB0367DE762227E">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1160,14 +1160,14 @@
 					<float name="Volume">0.5</float>
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
-				<Item class="Folder" referent="RBX78D5A6DB766F416D95200D4B7AABDA46">
+				<Item class="Folder" referent="RBX336DCCDC50864ABABAE03C9099ECF75A">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Info</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="StringValue" referent="RBXE63AA9C2C31640889DA27ED904ABCD53">
+					<Item class="StringValue" referent="RBXA0A3D8526AA8459182CBECB6E97AFF73">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Title</string>
@@ -1176,7 +1176,7 @@
 							<string name="Value">Soul Searching</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX265D7FF3859F4307B80DE92F411433DA">
+					<Item class="StringValue" referent="RBXB6F9857734CC4853B0DC90EA7A6C7C57">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Album</string>
@@ -1185,7 +1185,7 @@
 							<string name="Value">Trax 3</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXCC14E571FEA143419A658F093CAB7989">
+					<Item class="StringValue" referent="RBXF9EE6FB841314E01988EAFE99E807E37">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Genre</string>
@@ -1194,7 +1194,7 @@
 							<string name="Value">Club/Electronica</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXBFB0629998AD48A7BA0B067F6FD50ADA">
+					<Item class="StringValue" referent="RBX1814A238B6DA4681A87224391DA6A0AD">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Library</string>
@@ -1205,7 +1205,7 @@
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Sound" referent="RBXC419B09AB4F64CEE8963CEB91D6FDF4B">
+			<Item class="Sound" referent="RBX7178778CF8204FF7A94C6ACD706B8359">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1223,14 +1223,14 @@
 					<float name="Volume">0.5</float>
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
-				<Item class="Folder" referent="RBXA6029DD1D0DA414E91FDE49D95865A8F">
+				<Item class="Folder" referent="RBX89C311134D314ECF91AE04F2B6FCFA8C">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Info</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="StringValue" referent="RBX29ACD5C83FEE49CCA61B19DDF9293D97">
+					<Item class="StringValue" referent="RBX6E0E956DDFBA4C1986587D64E60AF591">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Title</string>
@@ -1239,7 +1239,7 @@
 							<string name="Value">Stereo Hichek</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX7B73BE0ADBBF4EEA9FA6C6102C6E6EEB">
+					<Item class="StringValue" referent="RBX40CF6DCB1D0E4D1292291374E37D8FC7">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Album</string>
@@ -1248,7 +1248,7 @@
 							<string name="Value">Trax 3</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXD8ADDF1285DC4A288E999554F3887C8A">
+					<Item class="StringValue" referent="RBX6979DC0B2B494792A3A8787277EE32A4">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Genre</string>
@@ -1257,7 +1257,7 @@
 							<string name="Value">Club/Electronica</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX986F013B08A74C31978BB63F393B97BF">
+					<Item class="StringValue" referent="RBX68767F0555F644798DDB8EF80EBBFC65">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Library</string>
@@ -1268,7 +1268,7 @@
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Sound" referent="RBXFC4BB8DABB7E4F69BEAA5EBFEA4E7651">
+			<Item class="Sound" referent="RBX335CDC0DF3DF459993430393A3647CAF">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1286,14 +1286,14 @@
 					<float name="Volume">0.5</float>
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
-				<Item class="Folder" referent="RBX8CA1E4E38AA3416586CB55F839CEDD6C">
+				<Item class="Folder" referent="RBX77C9BFADF0AF44268A5CF0F26C0F9991">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Info</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="StringValue" referent="RBXF117F275414B4A0587BFF15827D1C56F">
+					<Item class="StringValue" referent="RBX84E3A265768B4F6EA56576622930D353">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Title</string>
@@ -1302,7 +1302,7 @@
 							<string name="Value">Den of Thieves</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXA94AE94F2F634FB0A25DE1A501615AFE">
+					<Item class="StringValue" referent="RBXEC1E430D4776431983A57BDF73DADE61">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Album</string>
@@ -1311,7 +1311,7 @@
 							<string name="Value">ESCAPE THE MACHINE!</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBXF7645DA9EC98471BA984D6364929A25D">
+					<Item class="StringValue" referent="RBX722DA50829DF4E4497BD74185860EC6F">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Genre</string>
@@ -1320,7 +1320,7 @@
 							<string name="Value">Sound Elements/Atmospheres</string>
 						</Properties>
 					</Item>
-					<Item class="StringValue" referent="RBX003CFF16212A4AE7B183A45FDC95D2D8">
+					<Item class="StringValue" referent="RBX47CC4F5EBE3740B7A3B4FA697C78B2DD">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Library</string>
@@ -1331,15 +1331,556 @@
 					</Item>
 				</Item>
 			</Item>
+			<Item class="Sound" referent="RBX1F1327749F42493481F75C59566FC3FA">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="EmitterSize">10</float>
+					<bool name="Looped">false</bool>
+					<string name="Name">Detroit</string>
+					<bool name="PlayOnRemove">false</bool>
+					<float name="PlaybackSpeed">1</float>
+					<bool name="Playing">false</bool>
+					<token name="RollOffMode">0</token>
+					<Ref name="SoundGroup">null</Ref>
+					<Content name="SoundId"><url>rbxassetid://1841267170</url></Content>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<double name="TimePosition">0</double>
+					<float name="Volume">0.5</float>
+					<float name="xmlRead_MaxDistance_3">10000</float>
+				</Properties>
+				<Item class="Folder" referent="RBX0AEECE2012FB4F86AE409975AECCC4B9">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Info</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="StringValue" referent="RBXE4A49A7ED30B485E8247AA643A30537B">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Title</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Detroit</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXBF8AA03C31E14574AACA83B93E779BD7">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Album</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">RADIO PRODUCTION TOOLKIT</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX81DCFB4EF2044C018899D4B9A1D8AAF9">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Genre</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Club/Electronica</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXD353DB54136D40FC8B2212D4D2948112">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Library</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">KPM Main Series</string>
+						</Properties>
+					</Item>
+				</Item>
+				<Item class="ReverbSoundEffect" referent="RBX156BA7CF0F8E4F5184CAE9FEAA6E21FC">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="DecayTime">0.896000028</float>
+						<float name="Density">1</float>
+						<float name="Diffusion">0.469999999</float>
+						<float name="DryLevel">0</float>
+						<bool name="Enabled">true</bool>
+						<string name="Name">ReverbSoundEffect</string>
+						<int name="Priority">0</int>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="WetLevel">-2</float>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Sound" referent="RBXE521842EDE3A41D88E72BE41A1818C53">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="EmitterSize">10</float>
+					<bool name="Looped">false</bool>
+					<string name="Name">Electro-Progressive</string>
+					<bool name="PlayOnRemove">false</bool>
+					<float name="PlaybackSpeed">1</float>
+					<bool name="Playing">false</bool>
+					<token name="RollOffMode">0</token>
+					<Ref name="SoundGroup">null</Ref>
+					<Content name="SoundId"><url>rbxassetid://1844678418</url></Content>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<double name="TimePosition">0</double>
+					<float name="Volume">0.5</float>
+					<float name="xmlRead_MaxDistance_3">10000</float>
+				</Properties>
+				<Item class="Folder" referent="RBX7D9D04C6324D4E48B959403599507CD2">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Info</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="StringValue" referent="RBXC9A50823D3204169A810C489FC40E17E">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Title</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Electro-Progressive</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXE8D664C1FE854523828837E58586EDC9">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Album</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Trax 3</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXEDBDD9A7C66447D5B2A914D679F558D3">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Genre</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Club/Electronica</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX693C0EB23B9447DAA15190F0AEAD5301">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Library</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Selected Sound</string>
+						</Properties>
+					</Item>
+				</Item>
+				<Item class="DistortionSoundEffect" referent="RBXEF575909D1804D79AF3AD4EDC909D661">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="Enabled">true</bool>
+						<float name="Level">0.0900000036</float>
+						<string name="Name">DistortionSoundEffect</string>
+						<int name="Priority">0</int>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Sound" referent="RBX9996771B9F7E4D34AAF681683F1CA1A5">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="EmitterSize">10</float>
+					<bool name="Looped">false</bool>
+					<string name="Name">Frantik</string>
+					<bool name="PlayOnRemove">false</bool>
+					<float name="PlaybackSpeed">1</float>
+					<bool name="Playing">false</bool>
+					<token name="RollOffMode">0</token>
+					<Ref name="SoundGroup">null</Ref>
+					<Content name="SoundId"><url>rbxassetid://1841267386</url></Content>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<double name="TimePosition">0</double>
+					<float name="Volume">0.300000012</float>
+					<float name="xmlRead_MaxDistance_3">10000</float>
+				</Properties>
+				<Item class="Folder" referent="RBX72355311E7294004B7BE66036EC20FDC">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Info</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="StringValue" referent="RBX988A649C48C948CC9FE39222F0238454">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Title</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Frantik</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXDDDABEC64D924D84B3512D1D8B88C629">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Album</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">RADIO PRODUCTION TOOLKIT</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXD67C66B300CD48F6A7DE393032A75B11">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Genre</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Club/Electronica</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX42C2ABA9D8734725B160686600419C0A">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Library</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">KPM Main Series</string>
+						</Properties>
+					</Item>
+				</Item>
+				<Item class="DistortionSoundEffect" referent="RBX19E410F6DBAE4A6EADEAD2FB2C68E2C1">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="Enabled">true</bool>
+						<float name="Level">0.50999999</float>
+						<string name="Name">DistortionSoundEffect</string>
+						<int name="Priority">0</int>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ReverbSoundEffect" referent="RBXD94D23C2BC884BC2A370651C66FB82FB">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="DecayTime">0.497999996</float>
+						<float name="Density">0.370000005</float>
+						<float name="Diffusion">0.189999998</float>
+						<float name="DryLevel">0</float>
+						<bool name="Enabled">true</bool>
+						<string name="Name">ReverbSoundEffect</string>
+						<int name="Priority">1</int>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="WetLevel">-3</float>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Sound" referent="RBX66065395FD234A3F8459C59E9B85AA03">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="EmitterSize">10</float>
+					<bool name="Looped">false</bool>
+					<string name="Name">Black Neon</string>
+					<bool name="PlayOnRemove">false</bool>
+					<float name="PlaybackSpeed">1.03299999</float>
+					<bool name="Playing">false</bool>
+					<token name="RollOffMode">0</token>
+					<Ref name="SoundGroup">null</Ref>
+					<Content name="SoundId"><url>rbxassetid://1841267323</url></Content>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<double name="TimePosition">0</double>
+					<float name="Volume">0.5</float>
+					<float name="xmlRead_MaxDistance_3">10000</float>
+				</Properties>
+				<Item class="Folder" referent="RBX241E5854E51848A89037D51FBE726375">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Info</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="StringValue" referent="RBX326FE291300749A59A17725F7F984E4A">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Title</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Black Neon</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX405B62211E45473287C6731B593108DD">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Album</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">RADIO PRODUCTION TOOLKIT</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX9C99E3280376455AB0B6A35CBD76C9A4">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Genre</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Club/Electronica</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX7312F76D4E5247C7B0AC61DD89AD4A78">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Library</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">KPM Main Series</string>
+						</Properties>
+					</Item>
+				</Item>
+				<Item class="DistortionSoundEffect" referent="RBX1083685775134030A32DF02C0ABA3876">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="Enabled">true</bool>
+						<float name="Level">0.239999995</float>
+						<string name="Name">DistortionSoundEffect</string>
+						<int name="Priority">0</int>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Sound" referent="RBX6BC2F70C39F04569A8F67B6046E8FD82">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="EmitterSize">10</float>
+					<bool name="Looped">false</bool>
+					<string name="Name">Sports Bed 1</string>
+					<bool name="PlayOnRemove">false</bool>
+					<float name="PlaybackSpeed">1</float>
+					<bool name="Playing">false</bool>
+					<token name="RollOffMode">0</token>
+					<Ref name="SoundGroup">null</Ref>
+					<Content name="SoundId"><url>rbxassetid://1841036345</url></Content>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<double name="TimePosition">0</double>
+					<float name="Volume">0.5</float>
+					<float name="xmlRead_MaxDistance_3">10000</float>
+				</Properties>
+				<Item class="Folder" referent="RBXFDECBF86E50D4562A32BF54569964E4A">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Info</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="StringValue" referent="RBX99D2D2F72580442F914C79324B8CCABC">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Title</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Sports Bed 1</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX3CCFBC7AF96E4F38B79DFCFE4F348ACD">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Album</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">RADIO PRODUCTION BEDS, DRONES AND FX</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX33DFD2915176485DA39A1EBE66D276C1">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Genre</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Club/Electronica</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXBEEE03ABE4894DCBB8F9F8381A528E33">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Library</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">KPM Main Series</string>
+						</Properties>
+					</Item>
+				</Item>
+				<Item class="ChorusSoundEffect" referent="RBX520AA42E134844319A0202C0FAD1C23C">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<float name="Depth">0.569999993</float>
+						<bool name="Enabled">true</bool>
+						<float name="Mix">0.300000012</float>
+						<string name="Name">ChorusSoundEffect</string>
+						<int name="Priority">0</int>
+						<float name="Rate">0.5</float>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Sound" referent="RBX42B5EB8B6A424A7D9E139E232DCB5D07">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="EmitterSize">10</float>
+					<bool name="Looped">false</bool>
+					<string name="Name">Prototype Way</string>
+					<bool name="PlayOnRemove">false</bool>
+					<float name="PlaybackSpeed">1.03299999</float>
+					<bool name="Playing">false</bool>
+					<token name="RollOffMode">0</token>
+					<Ref name="SoundGroup">null</Ref>
+					<Content name="SoundId"><url>rbxassetid://1843274400</url></Content>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<double name="TimePosition">0</double>
+					<float name="Volume">0.5</float>
+					<float name="xmlRead_MaxDistance_3">10000</float>
+				</Properties>
+				<Item class="Folder" referent="RBX48779D74C0714ADD839E67A14216D751">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Info</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="StringValue" referent="RBX2C12494376B647AF9E9A4ACDECC7A898">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Title</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Prototype Way</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX9F881E87388B4E749FE20F07570F7E06">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Album</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">ELECTRO TENDANCY II</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXAF38A9EF0E5942EAB65652834406C412">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Genre</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Club/Electronica</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBX41D97FE6A2A342B795554F3970849D5A">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Library</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Justement Music</string>
+						</Properties>
+					</Item>
+				</Item>
+				<Item class="DistortionSoundEffect" referent="RBX86B57919BDFF4F119E7094CAD287716F">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="Enabled">true</bool>
+						<float name="Level">0</float>
+						<string name="Name">DistortionSoundEffect</string>
+						<int name="Priority">-1</int>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="EqualizerSoundEffect" referent="RBX7FA7E121C8A84FBCBFCE1F961F4334C0">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="Enabled">true</bool>
+						<float name="HighGain">3.70000005</float>
+						<float name="LowGain">0.100000001</float>
+						<float name="MidGain">0.100000001</float>
+						<string name="Name">EqualizerSoundEffect</string>
+						<int name="Priority">3</int>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="Sound" referent="RBXA58AD0738DDC432E824AF249E702B365">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="EmitterSize">10</float>
+					<bool name="Looped">false</bool>
+					<string name="Name">Starter Bass</string>
+					<bool name="PlayOnRemove">false</bool>
+					<float name="PlaybackSpeed">1</float>
+					<bool name="Playing">false</bool>
+					<token name="RollOffMode">0</token>
+					<Ref name="SoundGroup">null</Ref>
+					<Content name="SoundId"><url>rbxassetid://1843274572</url></Content>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<double name="TimePosition">0</double>
+					<float name="Volume">0.5</float>
+					<float name="xmlRead_MaxDistance_3">10000</float>
+				</Properties>
+				<Item class="Folder" referent="RBX4377E6A3ED3A4FB7A2E06B4D35C622A2">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Info</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="StringValue" referent="RBX54151722B7AE4B96BA16798976097C04">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Title</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Starter Bass</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXE358B52D404E4A2583162DB2381ADF25">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Album</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">ELECTRO TENDANCY II</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXED1C51DE68854E789EBE7526E9D8988A">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Genre</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Club/Electronica</string>
+						</Properties>
+					</Item>
+					<Item class="StringValue" referent="RBXCB1A1EE11B9C4F0198B45B90A5C816C1">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<string name="Name">Library</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<string name="Value">Justement Music</string>
+						</Properties>
+					</Item>
+				</Item>
+			</Item>
 		</Item>
-		<Item class="Folder" referent="RBX6B2F9ADFBD1640C88D07D402685610BD">
+		<Item class="Folder" referent="RBXA9D329E8F2EE4FF9B59530C40EC646B7">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Sounds</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="Sound" referent="RBXCDF6B2F246AC4EA39ABC29DA24F39A46">
+			<Item class="Sound" referent="RBX0C80A53FF2C14037AC58CA7A43AF264B">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1358,7 +1899,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXF749F9B42A5948DEB61059326CFCD1C0">
+			<Item class="Sound" referent="RBXA06B36CA3AED43A6BF96944830C03EB9">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1377,7 +1918,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX84674C9A26D042D3A2236AB73E92EB75">
+			<Item class="Sound" referent="RBX0F23201B19284A1C8B6A7BC138D493EF">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1396,7 +1937,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX3418F7DA1B8E4CDD897E963CF8F500CE">
+			<Item class="Sound" referent="RBX8A6E6565956B4264AE4C02BE389758D8">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1415,7 +1956,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXBA6BC5E3691C4190BFC48593A5E12B79">
+			<Item class="Sound" referent="RBX0D1B6B5E644B4154A8475340A2F4F0E5">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1434,7 +1975,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX3A967B9A569D4A88B6ED3A0A38F8E083">
+			<Item class="Sound" referent="RBX4986DCCF9E39405E9C06E3FC21995178">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1453,7 +1994,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX0ED31D464E56427C9ABBFE8408E54088">
+			<Item class="Sound" referent="RBX49E428C1B6104CDE881E1E28378A3E76">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1472,7 +2013,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXED33E4FFE08C428D8D6733FAF2BF7E3C">
+			<Item class="Sound" referent="RBX48F7B2AD09E44CECB64F215536DF94C9">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1491,7 +2032,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXFF1DED5295E04A0E92DB8DD76C9C89C3">
+			<Item class="Sound" referent="RBX96F0D7F693CD41E082D1DDCD4F03C26D">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1510,7 +2051,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX00A7C2F0C920454FAFD9115C8222E48F">
+			<Item class="Sound" referent="RBX90915CE12C0B4732A5BD5DC3B54740CD">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1529,7 +2070,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX4492EBDB232F4EA7B60B5737521800BE">
+			<Item class="Sound" referent="RBXBBAC0D32CEAE47B8AD8432AAD61A91B9">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -1548,7 +2089,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXCCCCCC192FC949829346836FAA0093F0">
+			<Item class="Sound" referent="RBX76140A555DD546CF97BD9145D529B981">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
