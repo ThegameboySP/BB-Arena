@@ -33,6 +33,7 @@ return {
             return {
                 Type = type(property:Get());
                 Name = "value";
+                Description = "Current value: " .. tostring(property:Get());
             }
         end;
     };

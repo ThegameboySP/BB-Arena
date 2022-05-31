@@ -4,7 +4,7 @@ local CollectionService = game:GetService("CollectionService")
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
-local GamemodeBinder = require(ReplicatedStorage.Common.Components.GamemodeBinder)
+local Binder = require(ReplicatedStorage.Common.Components.Binder)
 
 local GamemodeController = Knit.CreateController({
 	Name = "GamemodeController";
@@ -20,13 +20,13 @@ end
 function GamemodeController:onGamemodeStarted(gamemodeName)
     self.commonStore.currentGamemodeName = gamemodeName
 
-    local gamemodeBinder = ReplicatedStorage:FindFirstChild("GamemodeBinder")
-    if not gamemodeBinder then
+    local binder = ReplicatedStorage:FindFirstChild("Binder")
+    if not binder then
         error("Could not find gamemode binder")
     end
 
     self.clonerManager:Flush()
-    self.binder = self.clonerManager.Manager:AddComponent(gamemodeBinder, GamemodeBinder)
+    self.binder = self.clonerManager.Manager:AddComponent(binder, Binder)
 
     local gamemode = require(Gamemodes:FindFirstChild(gamemodeName))
     self.client = gamemode.client.new(self.binder)

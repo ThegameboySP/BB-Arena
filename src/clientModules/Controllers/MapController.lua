@@ -2,7 +2,8 @@ local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local Binder = require(ReplicatedStorage.Common.Components.Binder)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local SkyboxTweener = require(ReplicatedStorage.ClientModules.Presentation.SkyboxTweener)
 local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
@@ -60,6 +61,11 @@ function MapController:onMapChanged(map)
 	self._clonerManager:Clear()
 	self._clonerManager:ClientInit(map)
 	self._clonerManager:Flush()
+
+	local mapScript = map:FindFirstChild("MapScript")
+	if mapScript then
+		self._clonerManager.Manager:AddComponent(mapScript, Binder)
+	end
 
 	self.MapChanged:Fire(map, oldMap)
 end

@@ -5,8 +5,9 @@ local Teams = game:GetService("Teams")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
-local Signal = require(game:GetService("ReplicatedStorage").Packages.Signal)
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local Signal = require(ReplicatedStorage.Packages.Signal)
+local Binder = require(ReplicatedStorage.Common.Components.Binder)
 local t = require(ReplicatedStorage.Packages.t)
 local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
 
@@ -109,6 +110,11 @@ function MapService:ChangeMap(mapName)
 		return not record.parent:GetAttribute("Prototype_DisableRun")
 	end)
 	self._clonerManager:Flush()
+
+	local mapScript = newMap:FindFirstChild("MapScript")
+	if mapScript then
+		self._clonerManager.Manager:AddComponent(mapScript, Binder)
+	end
 
 	local repFirst = newMap:FindFirstChild("ReplicateFirst")
 	if repFirst then

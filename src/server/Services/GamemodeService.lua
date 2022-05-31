@@ -3,7 +3,7 @@ local CollectionService = game:GetService("CollectionService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local t = require(ReplicatedStorage.Packages.t)
-local GamemodeBinder = require(ReplicatedStorage.Common.Components.GamemodeBinder)
+local Binder = require(ReplicatedStorage.Common.Components.Binder)
 
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
@@ -79,9 +79,9 @@ function GamemodeService:SetGamemode(name, config)
     self:_runGamemodeProtoypes(definition)
 
     local binder = Instance.new("Folder")
-    binder.Name = "GamemodeBinder"
+    binder.Name = "Binder"
     binder.Parent = ReplicatedStorage
-    self.binder = self.MapService._clonerManager.Manager:AddComponent(binder, GamemodeBinder)
+    self.binder = self.MapService._clonerManager.Manager:AddComponent(binder, Binder)
 
     self.gamemodeProcess = gamemode.server.new(self, self.binder)
     self.gamemodeProcess:OnInit(config, CollectionService:GetTagged("FightingTeam"))
@@ -115,7 +115,7 @@ function GamemodeService:StopGamemode()
 
         self.gamemode = nil
 
-        self.MapService._clonerManager.Manager:RemoveComponent(self.binder.Instance, GamemodeBinder)
+        self.MapService._clonerManager.Manager:RemoveComponent(self.binder.Instance, Binder)
         self.binder.Instance.Parent = nil
         self.binder = nil
 
