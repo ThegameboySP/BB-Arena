@@ -1,45 +1,58 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 
-task.spawn(function()
-    local Settings = require(7564402844)
-    require(6101328137)(Settings)
-end)
+local Knit = require(ReplicatedStorage.Packages.Knit)
+local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
+local EventBus = require(ReplicatedStorage.Common.EventBus)
+local defaultGlobalValues = require(script.Parent.defaultGlobalValues)
 
-local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+local Configuration = ReplicatedStorage.Configuration
+local Services = script.Parent.Services
 
-Knit.AddServices(script.Parent.Services)
-
-Knit.Start()
-    :catch(warn)
-    :await()
-
-local startingMapName = ReplicatedStorage.Configuration:GetAttribute("StartingMapName")
-if startingMapName then
-    Knit.GetService("MapService"):ChangeMap(startingMapName)
+local function registerKnit()
+    local RemoteProperties = Instance.new("Folder")
+    RemoteProperties.Name = "RemoteProperties"
+    RemoteProperties.Parent = ReplicatedStorage
+    
+    Knit.globals = {}
+    for key, value in pairs(defaultGlobalValues) do
+        Knit.globals[key] = RemoteProperty.new(RemoteProperties, key)
+        Knit.globals[key]:Set(value)
+    end
+    
+    Knit.AddServices(Services)
+    
+    Knit.Start()
+        :catch(warn)
+        :await()
+    
+    local startingMapName = Configuration:GetAttribute("StartingMapName")
+    if startingMapName then
+        Knit.GetService("MapService"):ChangeMap(startingMapName)
+    end
 end
 
--- local MapService = Knit.GetService("MapService")
--- local GamemodeService = Knit.GetService("GamemodeService")
+local function registerTools()
+    task.spawn(function()
+        local Settings = require(7564402844)
+        require(6101328137)(Settings)
+    end)
+end
 
--- local function updateServices()
---     if MapService.queued.map then
---         MapService:changeMap(MapService.queued.map)
---     end
+local function spawnPlayers()
+    Players.PlayerAdded:Connect(function(player)
+        player:LoadCharacter()
+    end)
 
---     if GamemodeService.queued.gamemodeInfo then
---         GamemodeService:startGamemode(GamemodeService.queued.gamemodeInfo)
---     elseif GamemodeService.queued.stopGamemode then
---         GamemodeService:stopGamemode()
---     end
-    
---     if MapService.queued.map then
---         GamemodeService:onMapChanged()
---     end
+    EventBus.playerDied:Connect(function(player)
+        task.delay(Knit.globals.respawnTime:Get(), function()
+            player:LoadCharacter()
+        end)
+    end)
+end
 
---     table.clear(MapService.queued)
---     table.clear(GamemodeService.queued)
--- end
+registerTools()
+registerKnit()
+spawnPlayers()
 
--- game:GetService("RunService").Heartbeat:Connect(function()
---     updateServices()
--- end)
+workspace:SetAttribute("GameInitialized", true)

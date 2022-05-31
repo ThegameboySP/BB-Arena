@@ -1,6 +1,14 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
-local Spectators = game:GetService("Teams").Spectators
-local LocalPlayer = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local Teams = game:GetService("Teams")
+
+local Knit = require(ReplicatedStorage.Packages.Knit)
+Knit:OnStart():await()
+
+local spectatorsCanBuildTrowels = Knit.globals.spectatorsCanBuildTrowels
+local Spectators = Teams.Spectators
+local LocalPlayer = Players.LocalPlayer
 
 local function update()
     task.spawn(function()
@@ -15,9 +23,40 @@ local function update()
             if tool then
                 tool.Parent = LocalPlayer.Backpack
             end
+
+            if spectatorsCanBuildTrowels:Get() then
+                local trowel = LocalPlayer.Backpack:FindFirstChild("Trowel")
+                if trowel then
+                    trowel.Parent = LocalPlayer.Character
+                end
+            end
         end
     end
 end
 
+-- Trowels break if immediately equipped?
+local function deferredUpdate()
+    task.delay(0.2, update)
+end
+
 LocalPlayer:GetPropertyChangedSignal("Team"):Connect(update)
 update()
+spectatorsCanBuildTrowels.Changed:Connect(deferredUpdate)
+
+local connection
+local function onChildAdded(child)
+    if child:IsA("Backpack") then
+        if connection then
+            connection:Disconnect()
+        end
+        
+        connection = child.ChildAdded:Connect(deferredUpdate)
+        deferredUpdate()
+    end
+end
+LocalPlayer.ChildAdded:Connect(onChildAdded)
+
+local backpack = LocalPlayer:FindFirstChild("Backpack")
+if backpack then
+    onChildAdded(backpack)
+end
