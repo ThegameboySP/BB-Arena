@@ -76,9 +76,9 @@ function ControlPointsClient:OnInit(teams)
 		flash.Parent = controlPoint.Instance.FlagHead
 
 		local lastState
+		local function onControlPointUpdated()
+			local state = controlPoint.State.State
 
-        table.insert(self.connections, controlPoint.Changed:Connect(function()
-            local state = controlPoint.State.State
 			if 
 				(state == "Capping" or state == "Paused") and lastState == "Settled"
 				and controlPoint.State.CapturedBy == LocalPlayer.Team
@@ -99,7 +99,10 @@ function ControlPointsClient:OnInit(teams)
 
 			flash.Enabled = state == "Capping"
 			lastState = state
-        end))
+		end
+
+        table.insert(self.connections, controlPoint.Changed:Connect(onControlPointUpdated))
+		onControlPointUpdated()
 
 		local confettiHolder = Assets.ConfettiHolder:Clone()
 		local teamConfetti = confettiHolder:FindFirstChild("TeamConfetti")

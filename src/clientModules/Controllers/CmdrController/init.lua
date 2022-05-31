@@ -17,11 +17,12 @@ local CmdrController = Knit.CreateController({
 	Name = "CmdrController";
 	Cmdr = nil;
 	
-	canRun = function(player, group)
-		return require(canRun)(Knit.Store:getState().users.admins, player, group)
-	end;
 	_logs = {{}};
 })
+
+function CmdrController:CanRun(player, group)
+	return canRun(Knit.Store:getState().users.admins, player, group)
+end
 
 function CmdrController:KnitInit()
     local CmdrService = Knit.GetService("CmdrService")
