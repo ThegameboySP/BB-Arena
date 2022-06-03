@@ -34,25 +34,16 @@ function ControlPointsServer:OnScoresSet(teamScores)
     self.binder:SetState(delta)
 end
 
-function ControlPointsServer:OnMaxScoreSet(maxScore)
-    self.config.maxScore = maxScore
-
-    self.binder:SetState({
-        maxScore = maxScore;
-    })
+function ControlPointsServer:OnConfigChanged(config)
+    self.config = config
+    self.binder:SetState(config)
 end
 
 function ControlPointsServer:OnInit(config, fightingTeams)
-    self.config = config
-    self.binder:SetState({
-        maxScore = config.maxScore
-    })
+    self:OnConfigChanged(config)
 
     local replicatedRoot = Instance.new("Folder")
     replicatedRoot.Name = "ControlPointsValues"
-    for _, team in pairs(fightingTeams) do
-        replicatedRoot:SetAttribute(team.Name, 0)
-    end
 
     local healedEvent = Instance.new("RemoteEvent")
     healedEvent.Name = "Healed"

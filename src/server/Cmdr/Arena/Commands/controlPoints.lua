@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
+local ControlPoints = require(ReplicatedStorage.Common.Gamemodes.ControlPoints)
 
 return {
 	Name = "controlPoints";
@@ -7,11 +7,7 @@ return {
 	Description = "Starts Control Points, stopping the current gamemode.";
 	Group = "Admin";
 	Args = {
-		{
-			Type = CmdrUtils.constrainedInteger(1, math.huge);
-			Name = "maxScore";
-			Description = "The score a team needs to achieve to win the game.";
-		}
+		ControlPoints.definition.cmdrConfig.maxScore or error("No max score");
 	};
 
     Run = function(context, maxScore)

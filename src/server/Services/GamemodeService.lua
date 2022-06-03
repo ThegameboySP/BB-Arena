@@ -2,6 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
+local Llama = require(ReplicatedStorage.Packages.Llama)
+local Dictionary = Llama.Dictionary
 local t = require(ReplicatedStorage.Packages.t)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 
@@ -13,20 +15,19 @@ local GamemodeService = Knit.CreateService({
         CurrentGamemode = Knit.CreateProperty(nil);
     };
 
-    gamemode = nil;
+    CurrentGamemode = nil;
     gamemodeProcess = nil;
     binder = nil;
 })
 
 local gamemodeDefinition = t.strictInterface({
     stopOnMapChange = t.optional(t.boolean);
+    minTeams = t.integer;
     groupName = t.string;
-    config = t.callback;
-    supportsGamemode = t.callback;
+    config = t.table;
     stats = t.optional(t.table);
 
-    cmdrEvents = t.table;
-    cmdrCommandName = t.string;
+    cmdrConfig = t.table;
 });
 
 local function loadGamemodes(parent, callback)
@@ -52,29 +53,30 @@ function GamemodeService:KnitInit()
 end
 
 function GamemodeService:SetGamemode(name, config)
-    if self.gamemode and self.gamemode.definition.groupName == name then
+    if self.CurrentGamemode and self.CurrentGamemode.definition.groupName == name then
         return false, string.format("%q is already set", name)
     end
 
     local gamemode = self.gamemodes[name] or error(("No gamemode %q"):format(name))
     local definition = gamemode.definition
 
-    if definition.supportsGamemode then
-        local ok, err = definition.supportsGamemode(self.MapService.CurrentMap)
-        if not ok then
-            return false, err
-        end
+    if definition.minTeams > #CollectionService:GetTagged("FightingTeam") then
+        return false, string.format("%s needs at least %d teams to work", name, definition.minTeams)
     end
 
-    self:StopGamemode()
-    self.gamemode = gamemode
-    self.commonStore = Knit.GetService("CmdrService").Cmdr.Registry:GetStore("Common")
-    self.commonStore.currentGamemodeName = name
+    if not self.MapService.CurrentMap:FindFirstChild(definition.groupName) then
+        return false, string.format("Map does not support %s", name)
+    end
 
-    local ok, err = definition.config(config)
+    local ok, err = self:_checkConfig(config, gamemode)
     if not ok then
         return false, err
     end
+
+    self:StopGamemode()
+    self.CurrentGamemode = gamemode
+    self.commonStore = Knit.GetService("CmdrService").Cmdr.Registry:GetStore("Common")
+    self.commonStore.currentGamemodeName = name
 
     self:_runGamemodeProtoypes(definition)
 
@@ -104,7 +106,7 @@ function GamemodeService:StopGamemode()
         self.gamemodeProcess = nil
         
         local cloner = self.MapService._clonerManager.Cloner
-        local groupName = self.gamemode.definition.groupName
+        local groupName = self.CurrentGamemode.definition.groupName
         local prototypes = cloner:GetPrototypes(function(record)
             return record.parent.Name == groupName
         end)
@@ -113,7 +115,7 @@ function GamemodeService:StopGamemode()
             cloner:DespawnClone(cloner:GetCloneByPrototype(prototype))
         end
 
-        self.gamemode = nil
+        self.CurrentGamemode = nil
 
         self.MapService._clonerManager.Manager:RemoveComponent(self.binder.Instance, Binder)
         self.binder.Instance.Parent = nil
@@ -125,6 +127,23 @@ function GamemodeService:StopGamemode()
     end
 
     return false
+end
+
+function GamemodeService:_checkConfig(config, gamemode)
+    local definition = gamemode.definition
+
+    for k, v in pairs(config) do
+        if not definition.config[k] then
+            return false, "Unexpected key " .. k
+        end
+
+        local ok, err = definition.config[k](v)
+        if not ok then
+            return false, err
+        end
+    end
+
+    return true
 end
 
 function GamemodeService:FireGamemodeEvent(name, value)
@@ -141,12 +160,11 @@ end
 function GamemodeService:SetConfig(delta)
     if self.gamemodeProcess then
         local resolved = Dictionary.merge(self.config, delta)
-        local ok, err = self:_checkConfig(resolved)
+        local ok, err = self:_checkConfig(resolved, self.CurrentGamemode)
         if not ok then
             return false, err
         end
 
-        -- TODO
         self.gamemodeProcess:OnConfigChanged(resolved)
 
         return true

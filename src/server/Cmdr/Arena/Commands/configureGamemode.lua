@@ -20,7 +20,7 @@ return {
             local entries = context:GetStore(DATA)
             table.clear(entries)
 
-            for name, event in pairs(gamemode.definition.cmdrEvents) do
+            for name, event in pairs(gamemode.definition.cmdrConfig) do
                 table.insert(events, name)
                 entries[name] = event
             end
