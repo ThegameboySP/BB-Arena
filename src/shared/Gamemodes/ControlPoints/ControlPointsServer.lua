@@ -150,8 +150,14 @@ function ControlPointsServer:OnMapChanged(oldTeamToNewTeam)
         self.scores[newTeam] = self.scores[oldTeam] or 0
         self.scores[oldTeam] = nil
 
+        local oldValue = delta[oldTeam.Name .. "Score"]
+
+        -- Annoyingly, old and new team names can overlap between iterations.
+        if type(oldValue) ~= "number" then
+            delta[oldTeam.Name .. "Score"] = Llama.None
+        end
+
         delta[newTeam.Name .. "Score"] = math.floor(self.scores[newTeam])
-        delta[oldTeam.Name .. "Score"] = Llama.None
 
         self.teamToRate[newTeam] = 0
         self.teamToRate[oldTeam] = nil

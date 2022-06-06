@@ -7,11 +7,12 @@ local RunService = game:GetService("RunService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Signal = require(ReplicatedStorage.Packages.Signal)
-local Llama = require(ReplicatedStorage.Packages.Llama)
 
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 local t = require(ReplicatedStorage.Packages.t)
 local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
+
+local reconcileTeams = require(script.reconcileTeams)
 
 local Components = ReplicatedStorage.Common.Components
 
@@ -42,7 +43,6 @@ local MapService = Knit.CreateService({
 	ChangingMaps = false;
 	
 	_clonerManager = ClonerManager.new("MapComponents");
-	_teamMap = {};
 })
 
 function MapService:KnitInit()
@@ -107,7 +107,6 @@ function MapService:ChangeMap(mapName)
 
 	-- Should reconcile teams before components run.
 	local oldTeamToNewTeam = self:_reconcileTeams(meta.Teams)
-	self._teamMap = meta.Teams
 
 	self._clonerManager:Clear()
 	self._clonerManager:ServerInit(newMap)
@@ -148,68 +147,57 @@ function MapService:ChangeMap(mapName)
 	self.Client.CurrentMap:Set(newMap)
 end
 
-local function makeTeam(name, color)
-	local newTeam = Instance.new("Team")
-	CollectionService:AddTag(newTeam, "Map")
-	CollectionService:AddTag(newTeam, "FightingTeam")
-
-	newTeam.Name = name
-	newTeam.TeamColor = color
-	newTeam.AutoAssignable = false
-	
-	return newTeam
-end
-
-function MapService:_reconcileTeams(newTeamMap)
-    local newTeamByPlayersToSet = {}
-	local newTeams = {}
-	local existingTeamToNewTeam = {}
-	
-	for name, color in pairs(newTeamMap) do
-		local newTeam = makeTeam(name, color)
-		table.insert(newTeams, newTeam)
+function MapService:_reconcileTeams(newNameToColor)
+	local oldTeamMap = {}
+	for _, team in CollectionService:GetTagged("FightingTeam") do
+		oldTeamMap[team.Name] = {players = team:GetPlayers(), color = team.TeamColor}
 	end
-	
-	local newTeamIndex = 1
 
-	for name in pairs(self._teamMap) do
-		local existingTeam = Teams:FindFirstChild(name)
-		local newTeam = newTeams[newTeamIndex]
+    local reconciledTeams, newTeamsMap, untrackedPlayers = reconcileTeams(
+		CollectionService:GetTagged("FightingPlayer"), newNameToColor, oldTeamMap
+	)
 
-		if newTeam and existingTeam then
-			local players = existingTeam:GetPlayers()
-
-			if #players > 0 then
-				newTeamByPlayersToSet[newTeam] = players
-				newTeamIndex += 1
-			end
-
-			existingTeamToNewTeam[existingTeam] = newTeam
-		elseif existingTeam and not newTeam then
-			for _, player in existingTeam:GetPlayers() do
-				player.Team = Teams.Spectators
-				player:LoadCharacter()
-			end
-
-			existingTeamToNewTeam[existingTeam] = Llama.None
-		end
-		
-		if existingTeam then
-			existingTeam:Destroy()
-		end
+	for _, player in untrackedPlayers do
+		player.Team = Teams.Spectators
 	end
-	
-	for _, newTeam in pairs(newTeams) do
-		newTeam.Parent = Teams
+
+	local toRemove = {}
+	for name in oldTeamMap do
+		table.insert(toRemove, Teams:FindFirstChild(name))
 	end
-	
-	for newTeam, players in pairs(newTeamByPlayersToSet) do
-		for _, player in pairs(players) do
-			player.Team = newTeam
+
+	local toAdd = {}
+	for name, data in newTeamsMap do
+		local newTeam = Instance.new("Team")
+		CollectionService:AddTag(newTeam, "FightingTeam")
+		CollectionService:AddTag(newTeam, "Map")
+
+		newTeam.TeamColor = data.color
+		newTeam.Name = name
+
+		toAdd[name] = {
+			players = data.players;
+			team = newTeam;
+		}
+	end
+
+	local reconciledRobloxTeams = {}
+	for oldTeamName, newTeam in reconciledTeams do
+		reconciledRobloxTeams[Teams:FindFirstChild(oldTeamName)] = toAdd[newTeam.name].team
+	end
+
+	for _, data in toAdd do
+		data.team.Parent = Teams
+		for _, player in data.players do
+			player.Team = data.team
 		end
 	end
 
-	return table.freeze(existingTeamToNewTeam)
+	for _, team in toRemove do
+		team.Parent = nil
+	end
+
+	return reconciledRobloxTeams
 end
 
 return MapService
