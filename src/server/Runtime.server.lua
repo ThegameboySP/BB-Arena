@@ -20,6 +20,18 @@ local function registerKnit()
         Knit.globals[key]:Set(value)
     end
     
+    local notificationRemote = Instance.new("RemoteEvent")
+    notificationRemote.Name = "NotificationRemote"
+    notificationRemote.Parent = ReplicatedStorage
+    
+    Knit.hint = function(message, color, sender)
+        notificationRemote:FireAllClients(true, message, color, sender)
+    end
+
+    Knit.notification = function(message, color, sender)
+        notificationRemote:FireAllClients(false, message, color, sender)
+    end
+
     Knit.AddServices(Services)
     
     Knit.Start()

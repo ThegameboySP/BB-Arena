@@ -187,7 +187,7 @@ function ControlPointsServer:_connectOnCaptured()
 end
 
 function ControlPointsServer:finish(winningTeam)
-    self.service:AnnounceEvent(strings.wonGame:format(winningTeam.Name))
+    self.service:AnnounceEvent(strings.wonGame:format(winningTeam.Name), winningTeam.TeamColor.Color)
 	self.service:StopGamemode()
 end
 

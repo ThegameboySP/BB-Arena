@@ -6,7 +6,11 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
 
+local notificationGUI = require(ReplicatedStorage.ClientModules.UI.notificationGUI)
+local hintGUI = require(ReplicatedStorage.ClientModules.UI.hintGUI)
+
 local RemoteProperties = ReplicatedStorage:WaitForChild("RemoteProperties")
+local notificationRemote = ReplicatedStorage:WaitForChild("NotificationRemote")
 local Controllers = ReplicatedStorage.ClientModules.Controllers
 
 if not workspace:GetAttribute("GameInitialized") then
@@ -18,6 +22,17 @@ local function registerKnit()
     for _, child in pairs(RemoteProperties:GetChildren()) do
         Knit.globals[child.Name] = RemoteProperty.new(RemoteProperties, child.Name)
     end
+
+    Knit.notification = notificationGUI
+    Knit.hint = hintGUI
+    
+    notificationRemote.OnClientEvent:Connect(function(isHint, message, color, sender)
+        if isHint then
+            hintGUI(message, color, sender or "Nexus Arena")
+        else
+            notificationGUI(message, color, sender or "Nexus Arena")
+        end
+    end)
 
     Knit.AddControllers(Controllers)
 

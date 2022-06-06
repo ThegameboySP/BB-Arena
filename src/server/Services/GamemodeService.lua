@@ -215,12 +215,12 @@ function GamemodeService:GetManager()
     return self.MapService._clonerManager.Manager
 end
 
-function GamemodeService:SayEvent(msg)
-    print("say:", msg)
+function GamemodeService:SayEvent(msg, color)
+    Knit.hint(msg, color)
 end
 
-function GamemodeService:AnnounceEvent(msg)
-    warn("announce:", msg)
+function GamemodeService:AnnounceEvent(msg, color)
+    Knit.notification(msg, color)
 end
 
 return GamemodeService
