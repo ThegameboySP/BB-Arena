@@ -1,41 +1,43 @@
 local NIL_SYMBOL = "__nil"
 
 local deltaMiddleware = {
+    None = NIL_SYMBOL;
+
     outbound = function(nextFn)
         local lastValue
 
         return function(value, isInitializing)
-            local resolvedValue = value
-
-            if not isInitializing then
-                if type(value) == "table" then
-                    if type(lastValue) == "table" then
-                        resolvedValue = {}
-            
-                        for k, v in pairs(value) do
-                            if lastValue[k] ~= v then
-                                resolvedValue[k] = v
-                            end
-                        end
-            
-                        for k in pairs(lastValue) do
-                            if value[k] == nil then
-                                resolvedValue[k] = NIL_SYMBOL
-                            end
-                        end
-            
-                        if not next(resolvedValue) then
-                            return nil
-                        end
-                    end
-                end
-
-                lastValue = value
-
-                return nextFn(resolvedValue, isInitializing)
+            if isInitializing then
+                return nextFn(value, true)
             end
 
-            return nextFn(value, isInitializing)
+            local delta = value
+
+            if type(value) == "table" then
+                if type(lastValue) == "table" then
+                    delta = {}
+        
+                    for k, v in pairs(value) do
+                        if lastValue[k] ~= v then
+                            delta[k] = v
+                        end
+                    end
+        
+                    for k in pairs(lastValue) do
+                        if value[k] == nil then
+                            delta[k] = NIL_SYMBOL
+                        end
+                    end
+        
+                    if not next(delta) then
+                        return
+                    end
+                end
+            end
+
+            lastValue = value
+
+            return nextFn(delta, isInitializing)
         end
     end;
 
@@ -55,8 +57,6 @@ local deltaMiddleware = {
                         resolvedValue[k] = v
                     end
                 end
-
-                table.freeze(resolvedValue)
             end
 
             lastResolvedValue = resolvedValue
