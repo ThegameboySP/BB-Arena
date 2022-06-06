@@ -92,10 +92,36 @@ function ClonerManager:_addToQueue(instance, tag, params)
 end
 
 function ClonerManager:Flush()
-    self.Manager:BulkAddComponent(self._instanceQueue, self._classQueue, self._paramsQueue)
+    local components = self.Manager:BulkAddComponent(self._instanceQueue, self._classQueue, self._paramsQueue)
     table.clear(self._instanceQueue)
     table.clear(self._classQueue)
     table.clear(self._paramsQueue)
+
+    return components
+end
+
+function ClonerManager:ReplicateToClients(components)
+    local instances = {}
+    local tagMapsByInstance = {}
+
+    for _, component in components do
+        if getmetatable(component).noReplicate then
+            continue
+        end
+
+        if not tagMapsByInstance[component.Instance] then
+            tagMapsByInstance[component.Instance] = {}
+            table.insert(instances, {component.Instance, tagMapsByInstance[component.Instance]})
+        end
+
+        component:ForceReplicate()
+        tagMapsByInstance[component.Instance][tostring(component)] = true
+        self._replicatedComponents[component] = true
+    end
+
+    if instances[1] then
+        self._folder.Added:FireAllClients(instances)
+    end
 end
 
 function ClonerManager:ClientInit(root)
@@ -106,6 +132,11 @@ function ClonerManager:ClientInit(root)
 
         self._folder:WaitForChild("Added").OnClientEvent:Connect(function(instances)
             for _, entry in pairs(instances) do
+                if entry[1] == nil then
+                    warn("[Cloner manager]", "Instance doesn't exist in this realm:", entry[2])
+                    continue
+                end
+
                 for tag in pairs(entry[2]) do
                     self:_addToQueue(entry[1], tag, getConfig(entry[1], tag))
                 end
@@ -124,6 +155,8 @@ function ClonerManager:ServerInit(root)
     assert(self.Cloner == nil, "A cloner is already active")
     
     if not self._folder then
+        self._replicatedComponents = {}
+
         self._folder = Instance.new("Folder")
         self._folder.Name = self._namespace
         
@@ -157,30 +190,10 @@ function ClonerManager:ServerInit(root)
             onPlayerAdded(player)
         end
 
-        self.Manager.AddedComponents:Connect(function(components)
-            local instances = {}
-            local tagMapsByInstance = {}
-
-            for _, component in pairs(components) do
-                if getmetatable(component).noReplicate then
-                    continue
-                end
-
-                if not tagMapsByInstance[component.Instance] then
-                    tagMapsByInstance[component.Instance] = {}
-                    table.insert(instances, {component.Instance, tagMapsByInstance[component.Instance]})
-                end
-
-                tagMapsByInstance[component.Instance][tostring(component)] = true
-            end
-
-            if instances[1] then
-                self._folder.Added:FireAllClients(instances)
-            end
-        end)
-
         self.Manager.RemovingComponent:Connect(function(component)
-            if not getmetatable(component).noReplicate then
+            if self._replicatedComponents[component] then
+                self._replicatedComponents[component] = nil
+                
                 self._folder.Removed:FireAllClients(component.Instance, tostring(component))
             end
         end)

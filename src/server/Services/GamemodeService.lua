@@ -23,7 +23,8 @@ local GamemodeService = Knit.CreateService({
 local gamemodeDefinition = t.strictInterface({
     stopOnMapChange = t.optional(t.boolean);
     minTeams = t.integer;
-    groupName = t.string;
+    friendlyName = t.string;
+    nameId = t.string;
     config = t.table;
     stats = t.optional(t.table);
 
@@ -35,7 +36,8 @@ local function loadGamemodes(parent, callback)
 
     for _, child in pairs(parent:GetChildren()) do
         callback(child)
-        gamemodes[child.Name] = require(child)
+        local gamemode = require(child)
+        gamemodes[gamemode.definition.nameId] = gamemode
     end
 
     return gamemodes
@@ -50,27 +52,43 @@ function GamemodeService:KnitInit()
             error(("Gamemode %s definition error: %s"):format(module.Name, err))
         end
     end)
+
+    self.MapService.PreMapChanged:Connect(function(map, _, oldTeamToNewTeam)
+        if self.CurrentGamemode then
+            local definition = self.CurrentGamemode.definition
+            if definition.stopOnMapChange then
+                self:StopGamemode()
+                return
+            end
+    
+            if not definition.nameId or self:_mapSupportsGamemode(map, definition) then
+                self:_runGamemodeProtoypes(definition)
+                self.gamemodeProcess:OnMapChanged(oldTeamToNewTeam)
+            end
+        end
+    end)
 end
 
 function GamemodeService:SetGamemode(name, config)
-    if self.CurrentGamemode and self.CurrentGamemode.definition.groupName == name then
+    if self.CurrentGamemode and self.CurrentGamemode.definition.nameId == name then
         return false, string.format("%q is already set", name)
     end
 
     local gamemode = self.gamemodes[name] or error(("No gamemode %q"):format(name))
     local definition = gamemode.definition
 
-    if definition.minTeams > #CollectionService:GetTagged("FightingTeam") then
-        return false, string.format("%s needs at least %d teams to work", name, definition.minTeams)
+    do
+        local ok, err = self:_mapSupportsGamemode(self.MapService.CurrentMap, definition)
+        if not ok then
+            return false, err
+        end
     end
 
-    if not self.MapService.CurrentMap:FindFirstChild(definition.groupName) then
-        return false, string.format("Map does not support %s", name)
-    end
-
-    local ok, err = self:_checkConfig(config, gamemode)
-    if not ok then
-        return false, err
+    do
+        local ok, err = self:_checkConfig(config, gamemode)
+        if not ok then
+            return false, err
+        end
     end
 
     self:StopGamemode()
@@ -83,21 +101,41 @@ function GamemodeService:SetGamemode(name, config)
     local binder = Instance.new("Folder")
     binder.Name = "Binder"
     binder.Parent = ReplicatedStorage
-    self.binder = self.MapService._clonerManager.Manager:AddComponent(binder, Binder)
+    self.binder = Binder.new(binder)
 
     self.gamemodeProcess = gamemode.server.new(self, self.binder)
     self.gamemodeProcess:OnInit(config, CollectionService:GetTagged("FightingTeam"))
 
-    self.Client.CurrentGamemode:Set(name)
+    self.Client.CurrentGamemode:Set(definition.nameId)
 
     return true, string.format("Gamemode set to %q", name)
 end
 
+function GamemodeService:_mapSupportsGamemode(map, definition)
+    if definition.minTeams > #CollectionService:GetTagged("FightingTeam") then
+        return false, string.format("%s needs at least %d teams to work", definition.friendlyName, definition.minTeams)
+    end
+
+    if not map:FindFirstChild(definition.nameId) then
+        return false, string.format("Map does not support %s", definition.friendlyName)
+    end
+
+    return true
+end
+
 function GamemodeService:_runGamemodeProtoypes(definition)
     self.MapService._clonerManager.Cloner:RunPrototypes(function(record)
-        return record.parent.Name == definition.groupName
+        return record.parent.Name == definition.nameId
     end)
-    self.MapService._clonerManager:Flush()
+    local components = self.MapService._clonerManager:Flush()
+
+    task.spawn(function()
+        if self.MapService.ChangingMaps then
+            self.MapService.MapChanged:Wait()
+        end
+
+        self.MapService._clonerManager:ReplicateToClients(components)
+    end)
 end
 
 function GamemodeService:StopGamemode()
@@ -106,9 +144,9 @@ function GamemodeService:StopGamemode()
         self.gamemodeProcess = nil
         
         local cloner = self.MapService._clonerManager.Cloner
-        local groupName = self.CurrentGamemode.definition.groupName
+        local nameId = self.CurrentGamemode.definition.nameId
         local prototypes = cloner:GetPrototypes(function(record)
-            return record.parent.Name == groupName
+            return record.parent.Name == nameId
         end)
 
         for _, prototype in pairs(prototypes) do
@@ -117,8 +155,8 @@ function GamemodeService:StopGamemode()
 
         self.CurrentGamemode = nil
 
-        self.MapService._clonerManager.Manager:RemoveComponent(self.binder.Instance, Binder)
         self.binder.Instance.Parent = nil
+        self.binder:Destroy()
         self.binder = nil
 
         self.Client.CurrentGamemode:Set(nil)

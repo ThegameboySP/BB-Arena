@@ -1,7 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local Llama = require(ReplicatedStorage.Packages.Llama)
 local S_ControlPoint = require(ReplicatedStorage.Common.Components.S_ControlPoint)
+
 local strings = {
     wonGame = "The %s team has won the game!";
     centerCaptured = "%s just captured the center point!";
@@ -50,16 +52,18 @@ function ControlPointsServer:OnInit(config, fightingTeams)
     healedEvent.Parent = replicatedRoot
     replicatedRoot.Parent = ReplicatedStorage
 
-    local teamToRate = {}
+    self.teamToRate = {}
+
     for _, team in pairs(fightingTeams) do
-        teamToRate[team] = 0
+        self.teamToRate[team] = 0
+        self.scores[team] = 0
     end
 
-    local undo = self:_onPointCaptured(function(cp)
+    self.onCaptured = function(cp)
         local team = cp.State.CapturedBy
         local increase = cp.Config.IsCenter and 2 or 1
 
-        teamToRate[team] += increase
+        self.teamToRate[team] += increase
 
         for _, player in pairs(cp:GetPlayersInside()) do
             local char = player.Character
@@ -78,9 +82,11 @@ function ControlPointsServer:OnInit(config, fightingTeams)
         end
 
         return function()
-            teamToRate[team] -= increase
+            self.teamToRate[team] -= increase
         end
-    end)
+    end
+    
+    self.disconnectControlPoints = self:_connectOnCaptured()
 
     local con = self.UpdateEvent:Connect(function(dt)
         local delta = {}
@@ -90,8 +96,15 @@ function ControlPointsServer:OnInit(config, fightingTeams)
         local lowestTimeInSecondsToWin = math.huge
         local lowestTimeInSecondsToWinTeam
 
-        for team, rate in pairs(teamToRate) do
+        local isDirty = false
+
+        for team, rate in pairs(self.teamToRate) do
             local newScore = (self.scores[team] or 0) + rate * dt
+
+            if math.floor(self.scores[team]) ~= math.floor(newScore) then
+                isDirty = true
+            end
+
             delta[team.Name .. "Score"] = math.floor(newScore)
             self.scores[team] = newScore
 
@@ -118,23 +131,45 @@ function ControlPointsServer:OnInit(config, fightingTeams)
             delta.WinningName = lowestTimeInSecondsToWinTeam.Name
         end
 
-        self.binder:SetState(delta)
+        if isDirty then
+            self.binder:SetState(delta)
+        end
     end)
 
     self.destruct = function()
-        undo()
+        self.disconnectControlPoints()
         con:Disconnect()
         replicatedRoot:Destroy()
     end
 end
 
-function ControlPointsServer:_onPointCaptured(onCaptured)
+function ControlPointsServer:OnMapChanged(oldTeamToNewTeam)
+    local delta = {}
+
+    for oldTeam, newTeam in oldTeamToNewTeam do
+        self.scores[newTeam] = self.scores[oldTeam] or 0
+        self.scores[oldTeam] = nil
+
+        delta[newTeam.Name .. "Score"] = math.floor(self.scores[newTeam])
+        delta[oldTeam.Name .. "Score"] = Llama.None
+
+        self.teamToRate[newTeam] = 0
+        self.teamToRate[oldTeam] = nil
+    end
+
+    self.binder:SetState(delta)
+
+    self.disconnectControlPoints()
+    self.disconnectControlPoints = self:_connectOnCaptured()
+end
+
+function ControlPointsServer:_connectOnCaptured()
     local cons = {}
 
     for _, cp in pairs(self.service:GetManager():GetComponents(S_ControlPoint)) do
         local destruct
         table.insert(cons, cp.Captured:Connect(function()
-            destruct = onCaptured(cp)
+            destruct = self.onCaptured(cp)
         end))
 
         table.insert(cons, cp.Uncaptured:Connect(function()

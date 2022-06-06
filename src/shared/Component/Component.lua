@@ -73,6 +73,10 @@ function Component:extend(name, mergeWith)
     return new
 end
 
+function Component:ForceReplicate()
+    self.__remote:FireAllClients(self.State)
+end
+
 function Component:SetState(delta)
     local oldState = self.State
     local newState = table.clone(oldState)
@@ -81,7 +85,6 @@ function Component:SetState(delta)
     end
 
     self.State = table.freeze(newState)
-    self.Changed:Fire(newState, oldState)
 
     if IS_SERVER then
         local changed = {}
@@ -96,6 +99,8 @@ function Component:SetState(delta)
             self:__fireStateChanged(changed)
         end
     end
+
+    self.Changed:Fire(newState, oldState)
 end
 
 function Component:Destroy()

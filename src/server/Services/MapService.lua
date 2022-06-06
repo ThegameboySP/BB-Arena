@@ -7,6 +7,8 @@ local RunService = game:GetService("RunService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Signal = require(ReplicatedStorage.Packages.Signal)
+local Llama = require(ReplicatedStorage.Packages.Llama)
+
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 local t = require(ReplicatedStorage.Packages.t)
 local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
@@ -37,6 +39,7 @@ local MapService = Knit.CreateService({
 	MapChanged = Signal.new();
 	
 	CurrentMap = nil;
+	ChangingMaps = false;
 	
 	_clonerManager = ClonerManager.new("MapComponents");
 	_teamMap = {};
@@ -94,14 +97,16 @@ function MapService:ChangeMap(mapName)
 	
     local meta = require(newMap:FindFirstChild("Meta") or error("No Meta under " .. mapName))
     assert(metaDefinition(meta))
-	
+
+	self.ChangingMaps = true
+
 	local oldMap = self.CurrentMap
 	if oldMap then
 		oldMap.Parent = self.Maps
 	end
 
 	-- Should reconcile teams before components run.
-	self:_reconcileTeams(meta.Teams)
+	local oldTeamToNewTeam = self:_reconcileTeams(meta.Teams)
 	self._teamMap = meta.Teams
 
 	self._clonerManager:Clear()
@@ -109,7 +114,7 @@ function MapService:ChangeMap(mapName)
 	self._clonerManager.Cloner:RunPrototypes(function(record)
 		return not record.parent:GetAttribute("Prototype_DisableRun")
 	end)
-	self._clonerManager:Flush()
+	local componentsToReplicate = self._clonerManager:Flush()
 
 	local mapScript = newMap:FindFirstChild("MapScript")
 	if mapScript then
@@ -122,7 +127,7 @@ function MapService:ChangeMap(mapName)
 	end
 
 	self.CurrentMap = newMap
-	self.PreMapChanged:Fire(newMap, oldMap)
+	self.PreMapChanged:Fire(newMap, oldMap, oldTeamToNewTeam)
 	self.Client.PreMapChanged:FireAll(newMap.Name, oldMap and oldMap.Name or nil)
 
 	newMap.Parent = self.mapParent
@@ -135,6 +140,10 @@ function MapService:ChangeMap(mapName)
         task.spawn(player.LoadCharacter, player)
 	end
 	
+	self._clonerManager:ReplicateToClients(componentsToReplicate)
+
+	self.ChangingMaps = false
+
 	self.MapChanged:Fire(newMap)
 	self.Client.CurrentMap:Set(newMap)
 end
@@ -152,8 +161,9 @@ local function makeTeam(name, color)
 end
 
 function MapService:_reconcileTeams(newTeamMap)
-    local toSetToTeams = {}
+    local newTeamByPlayersToSet = {}
 	local newTeams = {}
+	local existingTeamToNewTeam = {}
 	
 	for name, color in pairs(newTeamMap) do
 		local newTeam = makeTeam(name, color)
@@ -161,21 +171,27 @@ function MapService:_reconcileTeams(newTeamMap)
 	end
 	
 	local newTeamIndex = 1
+
 	for name in pairs(self._teamMap) do
 		local existingTeam = Teams:FindFirstChild(name)
-		
 		local newTeam = newTeams[newTeamIndex]
+
 		if newTeam and existingTeam then
 			local players = existingTeam:GetPlayers()
+
 			if #players > 0 then
-				toSetToTeams[newTeam] = players
+				newTeamByPlayersToSet[newTeam] = players
 				newTeamIndex += 1
 			end
+
+			existingTeamToNewTeam[existingTeam] = newTeam
 		elseif existingTeam and not newTeam then
-			for _, player in pairs(existingTeam:GetPlayers()) do
+			for _, player in existingTeam:GetPlayers() do
 				player.Team = Teams.Spectators
 				player:LoadCharacter()
 			end
+
+			existingTeamToNewTeam[existingTeam] = Llama.None
 		end
 		
 		if existingTeam then
@@ -187,11 +203,13 @@ function MapService:_reconcileTeams(newTeamMap)
 		newTeam.Parent = Teams
 	end
 	
-	for newTeam, players in pairs(toSetToTeams) do
+	for newTeam, players in pairs(newTeamByPlayersToSet) do
 		for _, player in pairs(players) do
 			player.Team = newTeam
 		end
 	end
+
+	return table.freeze(existingTeamToNewTeam)
 end
 
 return MapService

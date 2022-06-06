@@ -4,10 +4,11 @@ local t = require(ReplicatedStorage.Packages.t)
 local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 
 return {
-    stopOnMapChange = true;
+    stopOnMapChange = false;
 	minTeams = 2;
 
-	groupName = "ControlPoints";
+	friendlyName = "Control Points";
+	nameId = "ControlPoints";
 	config = {
 		maxScore = t.numberMin(1);
 	};

@@ -56,7 +56,7 @@ local function registerKnit()
             GamemodeController:onGamemodeEnded()
         end
         
-        if queuedGamemodeName then
+        if queuedMap then
             GamemodeController:onMapChanged()
         end
 
