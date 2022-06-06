@@ -1,6 +1,7 @@
 local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
@@ -78,14 +79,17 @@ function MapController:_tween(mapName)
 	local lightingEntry = self:_getLightingEntryOrWarn(mapName)
 	if lightingEntry then
 		for _, child in pairs(Lighting:GetChildren()) do
-			if not child:IsA("Sky") then
+			if not child:IsA("Sky") and CollectionService:HasTag(child, "MapBound") then
 				child.Parent = nil
 			end
 		end
 
-		self._skyboxTweener:TweenSkybox(lightingEntry:FindFirstChildWhichIsA("Sky", true):Clone(), FADE_INFO, function()
+		local skybox = lightingEntry:FindFirstChildWhichIsA("Sky", true):Clone()
+		CollectionService:AddTag(skybox, "MapBound")
+		
+		self._skyboxTweener:TweenSkybox(skybox, FADE_INFO, function()
 			for _, child in pairs(Lighting:GetChildren()) do
-				if child:IsA("Sky") then
+				if child:IsA("Sky") and CollectionService:HasTag(child, "MapBound") then
 					child.Parent = nil
 				end
 			end
@@ -100,7 +104,9 @@ function MapController:_tween(mapName)
 
 		for _, child in pairs(lightingEntry.InLighting:GetChildren()) do
 			if not child:IsA("Sky") then
-				child:Clone().Parent = Lighting
+				local clone = child:Clone()
+				CollectionService:AddTag(clone, "MapBound")
+				clone.Parent = Lighting
 			end
 		end
 
