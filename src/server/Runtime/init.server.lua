@@ -6,6 +6,8 @@ local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
 local defaultGlobalValues = require(script.Parent.defaultGlobalValues)
 
+local loadTools = require(script.loadTools)
+
 local Configuration = ReplicatedStorage.Configuration
 local Services = script.Parent.Services
 
@@ -48,13 +50,6 @@ local function registerKnit()
     end
 end
 
-local function registerTools()
-    task.spawn(function()
-        local Settings = require(7564402844)
-        require(6101328137)(Settings)
-    end)
-end
-
 local function spawnPlayers()
     Players.PlayerAdded:Connect(function(player)
         player:LoadCharacter()
@@ -67,7 +62,7 @@ local function spawnPlayers()
     end)
 end
 
-registerTools()
+loadTools()
 registerKnit()
 spawnPlayers()
 
