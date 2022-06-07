@@ -58,6 +58,9 @@ function MapController:onMapChanged(map)
 	self.ClonerManager:Clear()
 	self.ClonerManager:ClientInit(map)
 	self.ClonerManager:Flush()
+	self.ClonerManager.Cloner:RunPrototypes(function()
+		return true
+	end)
 
 	local mapScript = map:FindFirstChild("MapScript")
 	if mapScript then
