@@ -183,7 +183,7 @@ end
 
 local findTrowelParams = OverlapParams.new()
 findTrowelParams.FilterType = Enum.RaycastFilterType.Whitelist
-findTrowelParams.MaxParts = 1
+findTrowelParams.MaxParts = math.huge
 
 local findPlayerParams = OverlapParams.new()
 findPlayerParams.FilterType = Enum.RaycastFilterType.Whitelist
@@ -222,51 +222,59 @@ do
 			if exploded == nil then return end
 
 			local parts = workspace:GetPartBoundsInRadius(exploded.Position, exploded.Size.X/2, findTrowelParams)
-			if parts[1] == nil then return end
 
-			local trowel = parts[1].Parent
-			local head = LocalPlayer.Character:FindFirstChild("Head")
+			local processedTrowels = {}
+			for _, part in parts do
+				local trowel = part.Parent
+				if processedTrowels[trowel] then
+					continue
+				end
 
-			local headPos = head.Position
-			local trowelCF = trowel.PhysicsFolder.PlaceCFrame.Value
-			local size, centerCF = getSize(trowel, headPos, trowelCF)
-			
-			local playerSide, oppositeSide, playerNormal = getSide(headPos, centerCF, size)
+				processedTrowels[trowel] = true
+				local head = LocalPlayer.Character:FindFirstChild("Head")
 
-			-- Player isn't on either side of the trowel.
-			if playerSide == nil then print 'no side' return end
-			
-			-- Explosion isn't on opposite side.
-			if not isAbove(exploded.Position, centerCF.Position, -playerNormal) then
-				print 'explosion not on opposite side'
-				return
+				local headPos = head.Position
+				local trowelCF = trowel.PhysicsFolder.PlaceCFrame.Value
+				local size, centerCF = getSize(trowel, headPos, trowelCF)
+				
+				local playerSide, oppositeSide, playerNormal = getSide(headPos, centerCF, size)
+
+				-- Player isn't on either side of the trowel.
+				if playerSide == nil then print 'no side' continue end
+				
+				-- Explosion isn't on opposite side.
+				if not isAbove(exploded.Position, centerCF.Position, -playerNormal) then
+					print 'explosion not on opposite side'
+					continue
+				end
+				
+				collisionPart.CFrame = centerCF
+				collisionPart.Size = Vector3.new(size.X + MAX_DIST*2, size.Y + 6, size.Z)
+				findPlayerParams.FilterDescendantsInstances = {LocalPlayer.Character}
+				
+				local playerParts = workspace:GetPartsInPart(collisionPart, findPlayerParams)
+				if playerParts[1] == nil then print 'player not in line' continue end
+				
+				local toTrowel = (centerCF.Position - headPos).Unit
+				local away = -Vector3.new(toTrowel.X, 0, toTrowel.Z).Unit
+				local playerDist = ((playerSide - headPos) * Vector3.new(1, 0, 1)).Magnitude
+
+				if playerDist > MAX_DIST then print 'max dist' continue end
+				
+				local bombForce = Knit.globals.dashingBombForce:Get()
+				
+				local explosionDist = (exploded.Position - oppositeSide).Magnitude
+				local mag =
+					(1 - math.clamp(playerDist/MAX_DIST - WIGGLE/MAX_DIST, 0, 1))
+					* (1 - math.clamp(explosionDist/MAX_DIST_EXPLOSION - WIGGLE_EXPLOSION/MAX_DIST_EXPLOSION, 0, 1))
+					* (bombForce * (size.X / TROWEL_LENGTH))
+				
+				head.AssemblyLinearVelocity += away * mag
+				
+				table.remove(trowels, table.find(trowels, trowel))
+				findTrowelParams.FilterDescendantsInstances = {unpack(trowels)}
+				break
 			end
-			
-			collisionPart.CFrame = centerCF
-			collisionPart.Size = Vector3.new(size.X + MAX_DIST*2, size.Y + 6, size.Z)
-			findPlayerParams.FilterDescendantsInstances = {LocalPlayer.Character}
-			
-			local playerParts = workspace:GetPartsInPart(collisionPart, findPlayerParams)
-			if playerParts[1] == nil then print 'player not in line' return end
-			
-			local toTrowel = (centerCF.Position - headPos).Unit
-			local away = -Vector3.new(toTrowel.X, 0, toTrowel.Z).Unit
-			local playerDist = ((playerSide - headPos) * Vector3.new(1, 0, 1)).Magnitude
-
-			if playerDist > MAX_DIST then print 'max dist' return end
-			
-			local bombForce = Knit.globals.dashingBombForce:Get()
-			
-			local explosionDist = (exploded.Position - oppositeSide).Magnitude
-			local mag =
-				(1 - math.clamp(playerDist/MAX_DIST - WIGGLE/MAX_DIST, 0, 1))
-				* (1 - math.clamp(explosionDist/MAX_DIST_EXPLOSION - WIGGLE_EXPLOSION/MAX_DIST_EXPLOSION, 0, 1))
-				* (bombForce * (size.X / TROWEL_LENGTH))
-			
-			head.AssemblyLinearVelocity += away * mag
-			
-			table.remove(trowels, table.find(trowels, trowel))
-			findTrowelParams.FilterDescendantsInstances = {unpack(trowels)}
 		end)
 	end, function() end)
 end
