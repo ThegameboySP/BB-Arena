@@ -47,6 +47,7 @@ function CmdrController:KnitInit()
 	self.Cmdr = CmdrClient
 	
     local common = CmdrClient.Registry:GetStore("Common")
+	common.Knit = Knit
 	common.Store = Knit.Store
 end
 

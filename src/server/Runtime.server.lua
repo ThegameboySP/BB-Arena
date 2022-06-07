@@ -32,6 +32,10 @@ local function registerKnit()
         notificationRemote:FireAllClients(false, message, color, sender)
     end
 
+    Knit.GetSingleton = function(name)
+        return Knit.GetService(name .. "Service")
+    end
+
     Knit.AddServices(Services)
     
     Knit.Start()

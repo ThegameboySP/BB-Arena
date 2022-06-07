@@ -14,7 +14,7 @@ local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
 
 local reconcileTeams = require(script.reconcileTeams)
 
-local Components = ReplicatedStorage.Common.Components
+local Components = require(ReplicatedStorage.Common.Components)
 
 local metaDefinition = t.strictInterface({
     Teams = t.map(t.string, t.BrickColor);
@@ -42,7 +42,7 @@ local MapService = Knit.CreateService({
 	CurrentMap = nil;
 	ChangingMaps = false;
 	
-	_clonerManager = ClonerManager.new("MapComponents");
+	ClonerManager = ClonerManager.new("MapComponents");
 })
 
 function MapService:KnitInit()
@@ -75,14 +75,39 @@ end
 
 function MapService:RegisterComponent(class)
 	if class.realm ~= "client" then
-		self._clonerManager:Register(class)
+		self.ClonerManager:Register(class)
 	end
 end
 
 function MapService:KnitStart()
-	for _, child in pairs(Components:GetChildren()) do
-		self:RegisterComponent(require(child))
+	for _, component in Components do
+		self:RegisterComponent(component)
 	end
+end
+
+function MapService:Regen(filter)
+	filter = filter or function()
+		return true
+	end
+
+	local prototypes = {}
+	local clones = {}
+
+	for _, component in self.ClonerManager.Manager:GetComponents(Components.RegenGroup) do
+		if filter(component.Instance) then
+			table.insert(clones, component.Instance)
+			table.insert(prototypes, self.ClonerManager.Cloner:GetPrototypeByClone(component.Instance))
+		end
+	end
+
+	for _, clone in clones do
+		self.ClonerManager.Cloner:DespawnClone(clone)
+	end
+
+	self.ClonerManager.Cloner:RunPrototypes(prototypes)
+	
+	local components = self.ClonerManager:Flush()
+	self.ClonerManager:ReplicateToClients(components)
 end
 
 function MapService:ChangeMap(mapName)
@@ -108,16 +133,16 @@ function MapService:ChangeMap(mapName)
 	-- Should reconcile teams before components run.
 	local oldTeamToNewTeam = self:_reconcileTeams(meta.Teams)
 
-	self._clonerManager:Clear()
-	self._clonerManager:ServerInit(newMap)
-	self._clonerManager.Cloner:RunPrototypes(function(record)
+	self.ClonerManager:Clear()
+	self.ClonerManager:ServerInit(newMap)
+	self.ClonerManager.Cloner:RunPrototypes(function(record)
 		return not record.parent:GetAttribute("Prototype_DisableRun")
 	end)
-	local componentsToReplicate = self._clonerManager:Flush()
+	local componentsToReplicate = self.ClonerManager:Flush()
 
 	local mapScript = newMap:FindFirstChild("MapScript")
 	if mapScript then
-		self._clonerManager.Manager:AddComponent(mapScript, Binder)
+		self.ClonerManager.Manager:AddComponent(mapScript, Binder)
 	end
 
 	local repFirst = newMap:FindFirstChild("ReplicateFirst")
@@ -139,7 +164,7 @@ function MapService:ChangeMap(mapName)
         task.spawn(player.LoadCharacter, player)
 	end
 	
-	self._clonerManager:ReplicateToClients(componentsToReplicate)
+	self.ClonerManager:ReplicateToClients(componentsToReplicate)
 
 	self.ChangingMaps = false
 

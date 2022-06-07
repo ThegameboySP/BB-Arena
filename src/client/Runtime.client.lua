@@ -9,6 +9,7 @@ local EventBus = require(ReplicatedStorage.Common.EventBus)
 local notificationGUI = require(ReplicatedStorage.ClientModules.UI.notificationGUI)
 local hintGUI = require(ReplicatedStorage.ClientModules.UI.hintGUI)
 
+local RespawnGui = ReplicatedStorage.UI.RespawnGui
 local RemoteProperties = ReplicatedStorage:WaitForChild("RemoteProperties")
 local notificationRemote = ReplicatedStorage:WaitForChild("NotificationRemote")
 local Controllers = ReplicatedStorage.ClientModules.Controllers
@@ -33,6 +34,10 @@ local function registerKnit()
             notificationGUI(message, color, sender or "Nexus Arena")
         end
     end)
+
+    Knit.GetSingleton = function(name)
+        return Knit.GetController(name .. "Controller")
+    end
 
     Knit.AddControllers(Controllers)
 
@@ -75,6 +80,8 @@ local function registerKnit()
             GamemodeController:onMapChanged()
         end
 
+        MapController.ClonerManager:Flush()
+
         queuedMap = nil
         queuedGamemodeName = nil
     end
@@ -87,7 +94,7 @@ end
 registerKnit()
 
 EventBus:GetPlayerDiedSignal(Players.LocalPlayer):Connect(function()
-    local gui = ReplicatedStorage.UI.RespawnGui:Clone()
+    local gui = RespawnGui:Clone()
     gui.Parent = Players.LocalPlayer.PlayerGui
 
     local duration = Knit.globals.respawnTime:Get()

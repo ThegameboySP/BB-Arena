@@ -1,6 +1,3 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Gamemodes = ReplicatedStorage.Common.Gamemodes
-
 local DATA = {}
 
 return {
@@ -10,17 +7,16 @@ return {
 	Group = "Admin";
 	Args = {
         function(context)
-            local currentGamemode = context:GetStore("Common").currentGamemodeName
+            local currentGamemode = context:GetStore("Common").Knit.GetSingleton("Gamemode").CurrentGamemode
             if currentGamemode == nil then
                 return
             end
     
-            local gamemode = require(Gamemodes:FindFirstChild(currentGamemode))
             local events = {}
             local entries = context:GetStore(DATA)
             table.clear(entries)
 
-            for name, event in pairs(gamemode.definition.cmdrConfig) do
+            for name, event in pairs(currentGamemode.definition.cmdrConfig) do
                 table.insert(events, name)
                 entries[name] = event
             end

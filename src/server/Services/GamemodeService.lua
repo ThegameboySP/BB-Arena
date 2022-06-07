@@ -5,7 +5,7 @@ local Knit = require(ReplicatedStorage.Packages.Knit)
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local Dictionary = Llama.Dictionary
 local t = require(ReplicatedStorage.Packages.t)
-local Binder = require(ReplicatedStorage.Common.Components.Binder)
+local Components = require(ReplicatedStorage.Common.Components)
 
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
@@ -93,15 +93,13 @@ function GamemodeService:SetGamemode(name, config)
 
     self:StopGamemode()
     self.CurrentGamemode = gamemode
-    self.commonStore = Knit.GetService("CmdrService").Cmdr.Registry:GetStore("Common")
-    self.commonStore.currentGamemodeName = name
 
     self:_runGamemodeProtoypes(definition)
 
     local binder = Instance.new("Folder")
     binder.Name = "Binder"
     binder.Parent = ReplicatedStorage
-    self.binder = Binder.new(binder)
+    self.binder = Components.Binder.new(binder)
 
     self.gamemodeProcess = gamemode.server.new(self, self.binder)
     self.gamemodeProcess:OnInit(config, CollectionService:GetTagged("FightingTeam"))
@@ -124,17 +122,17 @@ function GamemodeService:_mapSupportsGamemode(map, definition)
 end
 
 function GamemodeService:_runGamemodeProtoypes(definition)
-    self.MapService._clonerManager.Cloner:RunPrototypes(function(record)
+    self.MapService.ClonerManager.Cloner:RunPrototypes(function(record)
         return record.parent.Name == definition.nameId
     end)
-    local components = self.MapService._clonerManager:Flush()
+    local components = self.MapService.ClonerManager:Flush()
 
     task.spawn(function()
         if self.MapService.ChangingMaps then
             self.MapService.MapChanged:Wait()
         end
 
-        self.MapService._clonerManager:ReplicateToClients(components)
+        self.MapService.ClonerManager:ReplicateToClients(components)
     end)
 end
 
@@ -143,7 +141,7 @@ function GamemodeService:StopGamemode()
         self.gamemodeProcess:Destroy()
         self.gamemodeProcess = nil
         
-        local cloner = self.MapService._clonerManager.Cloner
+        local cloner = self.MapService.ClonerManager.Cloner
         local nameId = self.CurrentGamemode.definition.nameId
         local prototypes = cloner:GetPrototypes(function(record)
             return record.parent.Name == nameId
@@ -212,7 +210,7 @@ function GamemodeService:SetConfig(delta)
 end
 
 function GamemodeService:GetManager()
-    return self.MapService._clonerManager.Manager
+    return self.MapService.ClonerManager.Manager
 end
 
 function GamemodeService:SayEvent(msg, color)

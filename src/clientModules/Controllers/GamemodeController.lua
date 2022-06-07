@@ -10,15 +10,15 @@ local GamemodeController = Knit.CreateController({
 	Name = "GamemodeController";
     binder = nil;
     client = nil;
+
+    CurrentGamemode = nil;
 })
 
 function GamemodeController:KnitStart()
-    self.commonStore = Knit.GetController("CmdrController").Cmdr.Registry:GetStore("Common")
-    self.clonerManager = Knit.GetController("MapController")._clonerManager
+    self.clonerManager = Knit.GetController("MapController").ClonerManager
 end
 
 function GamemodeController:onGamemodeStarted(gamemodeName)
-    self.commonStore.currentGamemodeName = gamemodeName
     self.gamemodeName = gamemodeName
 
     local binder = ReplicatedStorage:FindFirstChild("Binder")
@@ -41,6 +41,8 @@ function GamemodeController:_startGamemodeClient(binder, gamemodeName)
     end
 
     local gamemode = require(Gamemodes:FindFirstChild(gamemodeName))
+    self.CurrentGamemode = gamemode
+
     self.client = gamemode.client.new(binder)
     self.client:OnInit(CollectionService:GetTagged("FightingTeam"))
 end
@@ -53,6 +55,7 @@ function GamemodeController:onGamemodeEnded()
         self.binder = nil
 
         self.gamemodeName = nil
+        self.CurrentGamemode = nil
     end
 end
 

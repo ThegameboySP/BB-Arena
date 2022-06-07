@@ -9,7 +9,7 @@ local Signal = require(ReplicatedStorage.Packages.Signal)
 local SkyboxTweener = require(ReplicatedStorage.ClientModules.Presentation.SkyboxTweener)
 local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
 
-local Components = ReplicatedStorage.Common.Components
+local Components = require(ReplicatedStorage.Common.Components)
 
 local MapController = Knit.CreateController({
 	Name = "MapController";
@@ -20,26 +20,22 @@ local MapController = Knit.CreateController({
 	CurrentMap = nil;
 
  	_skyboxTweener = SkyboxTweener.new(Lighting);
-	_clonerManager = ClonerManager.new("MapComponents");
+	ClonerManager = ClonerManager.new("MapComponents");
 })
 
 local FADE_INFO = TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 local TIME_FADE_INFO = TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 
 function MapController:KnitInit()
-	for _, child in pairs(Components:GetChildren()) do
-		self:RegisterComponent(require(child))
+	for _, component in Components do
+		self:RegisterComponent(component)
 	end
 end
 
 function MapController:RegisterComponent(class)
 	if class.realm ~= "server" then
-		self._clonerManager:Register(class)
+		self.ClonerManager:Register(class)
 	end
-end
-
-function MapController:GetManager()
-	return self._clonerManager.Manager
 end
 
 function MapController:KnitStart()
@@ -59,13 +55,13 @@ function MapController:onMapChanged(map)
 	local oldMap = self.CurrentMap
 	self.CurrentMap = map
 
-	self._clonerManager:Clear()
-	self._clonerManager:ClientInit(map)
-	self._clonerManager:Flush()
+	self.ClonerManager:Clear()
+	self.ClonerManager:ClientInit(map)
+	self.ClonerManager:Flush()
 
 	local mapScript = map:FindFirstChild("MapScript")
 	if mapScript then
-		self._clonerManager.Manager:AddComponent(mapScript, Binder)
+		self.ClonerManager.Manager:AddComponent(mapScript, Binder)
 	end
 
 	self.MapChanged:Fire(map, oldMap)

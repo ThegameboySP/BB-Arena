@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Llama = require(ReplicatedStorage.Packages.Llama)
-local S_ControlPoint = require(ReplicatedStorage.Common.Components.S_ControlPoint)
+local S_ControlPoint = require(ReplicatedStorage.Common.Components).S_ControlPoint
 
 local strings = {
     wonGame = "The %s team has won the game!";

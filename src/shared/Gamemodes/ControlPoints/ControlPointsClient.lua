@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
-local C_ControlPoint = require(ReplicatedStorage.Common.Components.C_ControlPoint)
+local Components = require(ReplicatedStorage.Common.Components)
 local ControlPointsGUI = ReplicatedStorage.UI.ControlPointsGUI
 local Sounds = ReplicatedStorage.Assets.Sounds
 local Assets = script.Parent.ControlPointsAssets
@@ -69,7 +69,7 @@ function ControlPointsClient:OnInit(teams)
 	local lastAlertedNormal = 0
 	local lastAlertedCenter = 0
 
-    for _, controlPoint in pairs(MapController:GetManager():GetComponents(C_ControlPoint)) do
+    for _, controlPoint in pairs(MapController.ClonerManager.Manager:GetComponents(Components.C_ControlPoint)) do
 		table.insert(controlPoints, controlPoint)
 
 		local flash = Assets.FlashParticles:Clone()
