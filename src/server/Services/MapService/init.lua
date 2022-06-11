@@ -112,12 +112,12 @@ end
 
 function MapService:ChangeMap(mapName)
 	if self.CurrentMap and self.CurrentMap.Name == mapName then
-        return
+        return false, ("Already playing on map: %q"):format(mapName)
     end
 
 	local newMap = self.Maps:FindFirstChild(mapName)
 	if newMap == nil then
-		error(("No map name called: %q"):format(mapName))
+		return false, ("No map name called: %q"):format(mapName)
 	end
 	
     local meta = require(newMap:FindFirstChild("Meta") or error("No Meta under " .. mapName))
@@ -194,6 +194,7 @@ function MapService:_reconcileTeams(newNameToColor)
 	local toAdd = {}
 	for name, data in newTeamsMap do
 		local newTeam = Instance.new("Team")
+		newTeam.AutoAssignable = false
 		CollectionService:AddTag(newTeam, "FightingTeam")
 		CollectionService:AddTag(newTeam, "Map")
 
