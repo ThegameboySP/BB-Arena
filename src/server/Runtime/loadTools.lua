@@ -1,3 +1,5 @@
+local ServerStorage = game:GetService("ServerStorage")
+
 local settings = {
 	-- GENERAL WEAPON SETTINGS --
 	SuperballFly = false,
@@ -19,11 +21,11 @@ local settings = {
 	-- EXPLOSION SETTINGS --
 	Explosions = {
 		DestroyTrowelWallsOverride = true; --If true, overrides Explosions.DestroyParts
-		DebrisTime = 10; -- must be >0 for parts to be added to debris collection
+		DebrisTime = 0; -- must be >0 for parts to be added to debris collection
 		FlingYou = false; -- Will fling your body parts!
 		LimbRemoval = false;
         FlingBombs = false;
-        FlingParts = false;
+        FlingParts = true;
 	},
 	
 	-- SPECIFIC WEAPON SETTINGS -- 
@@ -82,7 +84,7 @@ local settings = {
 
 local function loadTools()
     task.spawn(function()
-        require(6101328137)(settings)
+        require(ServerStorage.Toolset)(settings)
     end)
 end
 
