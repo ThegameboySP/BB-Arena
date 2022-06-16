@@ -1,5 +1,3 @@
-local ServerStorage = game:GetService("ServerStorage")
-
 local settings = {
 	-- GENERAL WEAPON SETTINGS --
 	SuperballFly = false,
@@ -84,7 +82,7 @@ local settings = {
 
 local function loadTools()
     task.spawn(function()
-        require(ServerStorage.Toolset)(settings)
+        require(6101328137)(settings)
     end)
 end
 
