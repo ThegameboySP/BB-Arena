@@ -29,7 +29,6 @@ local MapService = Knit.CreateService({
 		PreMapChanged = Knit.CreateSignal();
 		MapChanged = Knit.CreateSignal();
 		CurrentMap = Knit.CreateProperty(nil);
-		MapInfo = Knit.CreateProperty({})
 	};
 	
 	Maps = ServerStorage.Maps;
@@ -54,10 +53,10 @@ function MapService:KnitInit()
 	
     local mapInfo = {}
 	for _, map in pairs(self.Maps:GetChildren()) do
-        mapInfo[map.Name] = true
+        mapInfo[map.Name] = require(map:FindFirstChild("Meta"))
 	end
-	
-	self.Client.MapInfo:Set(mapInfo)
+
+	Knit.globals.mapInfo:Set(table.freeze(mapInfo))
 	
 	self.LightingSaves.Name = "LightingSaves"
 	self.LightingSaves.Parent = ReplicatedStorage

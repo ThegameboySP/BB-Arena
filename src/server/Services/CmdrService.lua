@@ -63,7 +63,7 @@ function CmdrService:_setupCmdr()
 		return not BLACKLISTED_COMMANDS[name]
 	end)
 	
-	registerArenaTypes(Cmdr.Registry, Knit.GetService("MapService").Client.MapInfo:Get())
+	registerArenaTypes(Cmdr.Registry, Knit.globals.mapInfo:Get())
 
 	Cmdr.Registry:RegisterCommandsIn(CmdrArena.Commands)
 	Cmdr.Registry:RegisterCommandsIn(CmdrCore.Commands)

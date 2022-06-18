@@ -54,10 +54,7 @@ end
 function CmdrController:KnitStart()
 	local CmdrClient = self.Cmdr
 
-	local MapService = Knit.GetService("MapService")
-	MapService.MapInfo:OnReady():await()
-
-	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, MapService.MapInfo:Get())
+	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, Knit.globals.mapInfo:Get())
 	CmdrClient.Registry.Types.player = CmdrClient.Registry.Types.arenaPlayer
 	CmdrClient.Registry.Types.players = CmdrClient.Registry.Types.arenaPlayers
 	

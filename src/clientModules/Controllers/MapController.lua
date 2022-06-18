@@ -109,14 +109,28 @@ function MapController:_tween(mapName)
 			end
 		end
 
-		local tween1 = TweenService:Create(Lighting, FADE_INFO, tweenProps)
-		local tween2 = TweenService:Create(Lighting, TIME_FADE_INFO, {ClockTime = lightingEntry.Lighting.ClockTime.Value})
-		tween1:Play()
-		tween2:Play()
+		local tweens = {}
+		table.insert(tweens, TweenService:Create(Lighting, FADE_INFO, tweenProps))
+		table.insert(tweens, TweenService:Create(Lighting, TIME_FADE_INFO, {ClockTime = lightingEntry.Lighting.ClockTime.Value}))
+
+		local meta = Knit.globals.mapInfo:Get()[mapName]
+
+		for _, part in CollectionService:GetTagged("IslandTop") do
+			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandTopColor}))
+		end
+
+		for _, part in CollectionService:GetTagged("IslandBase") do
+			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandBaseColor}))
+		end
+
+		for _, tween in tweens do
+			tween:Play()
+		end
 
 		self._lightingCleanupFn = function()
-			tween1:Cancel()
-			tween2:Cancel()
+			for _, tween in tweens do
+				tween:Cancel()
+			end
 
 			for key, value in pairs(tweenProps) do
 				Lighting[key] = value
