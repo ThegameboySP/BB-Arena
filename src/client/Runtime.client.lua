@@ -67,20 +67,20 @@ local function registerKnit()
 
     local function updateControllers()
         if queuedMap then
-            MapController:onMapChanged(queuedMap)
+            task.spawn(MapController.onMapChanged, MapController, queuedMap)
         end
 
         if queuedGamemodeName and queuedGamemodeName ~= "nil" then
-            GamemodeController:onGamemodeStarted(queuedGamemodeName)
+            task.spawn(GamemodeController.onGamemodeStarted, GamemodeController, queuedGamemodeName)
         elseif queuedGamemodeName == "nil" then
-            GamemodeController:onGamemodeEnded()
+            task.spawn(GamemodeController.onGamemodeEnded, GamemodeController)
         end
         
         if queuedMap then
-            GamemodeController:onMapChanged()
+            task.spawn(GamemodeController.onMapChanged, GamemodeController)
         end
 
-        MapController.ClonerManager:Flush()
+        task.spawn(MapController.ClonerManager.Flush, MapController.ClonerManager)
 
         queuedMap = nil
         queuedGamemodeName = nil
