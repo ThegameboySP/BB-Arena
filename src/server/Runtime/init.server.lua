@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -78,8 +79,35 @@ local function spawnPlayers()
     end)
 end
 
+local function warnIfSlow()
+    local lastUpdate = os.clock()
+    local lastWarn = 0
+
+    RunService.Heartbeat:Connect(function()
+        local timestamp = os.clock()
+
+        if (timestamp - lastWarn) <= 5 then
+            lastUpdate = timestamp
+            return
+        end
+
+        local elapsedTime = timestamp - lastUpdate
+        lastUpdate = timestamp
+
+        if elapsedTime > (1/20) then
+            warn(
+                (elapsedTime <= (1/5)) and "[Game]" or "[Game Critical]",
+                string.format("running at %.1f HZ", 1 / elapsedTime)
+            )
+
+            lastWarn = timestamp
+        end
+    end)
+end
+
 loadTools()
 registerKnit()
 spawnPlayers()
+warnIfSlow()
 
 workspace:SetAttribute("GameInitialized", true)
