@@ -56,9 +56,25 @@ local function spawnPlayers()
     end)
 
     EventBus.playerDied:Connect(function(player)
-        task.delay(Knit.globals.respawnTime:Get(), function()
+        local connections = {}
+        local thread = task.delay(Knit.globals.respawnTime:Get(), function()
+            for _, connection in ipairs(connections) do
+                connection:Disconnect()
+            end
+
             player:LoadCharacter()
         end)
+
+        local function disconnect()
+            task.cancel(thread)
+
+            for _, connection in ipairs(connections) do
+                connection:Disconnect()
+            end
+        end
+
+        table.insert(connections, player.AncestryChanged:Connect(disconnect))
+        table.insert(connections, player.CharacterAdded:Connect(disconnect))
     end)
 end
 
