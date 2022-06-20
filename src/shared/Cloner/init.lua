@@ -53,15 +53,22 @@ end
 function Cloner:Destroy()
     assert(next(self), "Cloner is already destroyed!")
 
-    for clone in pairs(self._cloneRecordByClone) do
-        self:DespawnClone(clone)
-    end
+    self:DespawnAll()
 
     for _, prototypeRecord in pairs(self._prototypeRecordByPrototype) do
         prototypeRecord.prototype.Parent = prototypeRecord.parent
     end
 
     table.clear(self)
+end
+
+-- Separate from Destroy so server can replicate deparenting clones before map change
+-- (or else automatic replication won't know to clear the old clones)
+function Cloner:DespawnAll()
+    local clonesToDestroy = table.clone(self._cloneRecordByClone)
+    for clone in pairs(clonesToDestroy) do
+        self:DespawnClone(clone)
+    end
 end
 
 function Cloner:GetPrototypes(filter)
@@ -81,6 +88,13 @@ end
 
 function Cloner:RunPrototypes(selector)
     local prototypes = selector
+    
+    if type(selector) == "nil" then
+        selector = function()
+            return true
+        end
+    end
+
     if type(selector) == "function" then
         prototypes = self:GetPrototypes(selector)
     end

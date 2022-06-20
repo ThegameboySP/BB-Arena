@@ -126,6 +126,13 @@ function MapService:ChangeMap(mapName)
 	self.ChangingMaps = true
 	self.MapScript = nil
 
+	-- Separate from Clear so server can replicate deparenting clones before map change
+	-- (or else automatic replication won't know to clear the old clones. Only clearing has the same
+	-- effect but with prototypes, since clearing also reparents the prototypes)
+	if self.ClonerManager.Cloner then
+		self.ClonerManager.Cloner:DespawnAll()
+	end
+
 	local oldMap = self.CurrentMap
 	if oldMap then
 		oldMap.Parent = self.Maps
