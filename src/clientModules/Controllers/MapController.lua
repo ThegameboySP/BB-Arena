@@ -18,6 +18,7 @@ local MapController = Knit.CreateController({
 	PreMapChanged = Signal.new();
 
 	CurrentMap = nil;
+	MapScript = nil;
 
  	_skyboxTweener = SkyboxTweener.new(Lighting);
 	ClonerManager = ClonerManager.new("MapComponents");
@@ -54,6 +55,7 @@ end
 function MapController:onMapChanged(map)
 	local oldMap = self.CurrentMap
 	self.CurrentMap = map
+	self.MapScript = nil
 
 	self.ClonerManager:Clear()
 	self.ClonerManager:ClientInit(map)
@@ -64,7 +66,7 @@ function MapController:onMapChanged(map)
 
 	local mapScript = map:FindFirstChild("MapScript")
 	if mapScript then
-		self.ClonerManager.Manager:AddComponent(mapScript, Binder)
+		self.MapScript = self.ClonerManager.Manager:AddComponent(mapScript, Binder)
 	end
 
 	self.MapChanged:Fire(map, oldMap)

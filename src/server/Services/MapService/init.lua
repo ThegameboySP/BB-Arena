@@ -40,6 +40,7 @@ local MapService = Knit.CreateService({
 	
 	CurrentMap = nil;
 	ChangingMaps = false;
+	MapScript = nil;
 	
 	ClonerManager = ClonerManager.new("MapComponents");
 })
@@ -123,6 +124,7 @@ function MapService:ChangeMap(mapName)
     assert(metaDefinition(meta))
 
 	self.ChangingMaps = true
+	self.MapScript = nil
 
 	local oldMap = self.CurrentMap
 	if oldMap then
@@ -141,7 +143,7 @@ function MapService:ChangeMap(mapName)
 
 	local mapScript = newMap:FindFirstChild("MapScript")
 	if mapScript then
-		self.ClonerManager.Manager:AddComponent(mapScript, Binder)
+		self.MapScript = self.ClonerManager.Manager:AddComponent(mapScript, Binder)
 	end
 
 	local repFirst = newMap:FindFirstChild("ReplicateFirst")
