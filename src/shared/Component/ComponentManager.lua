@@ -16,7 +16,7 @@ function Manager.new()
 end
 
 function Manager:_assertComponent(item)
-    if not type(item) == "table" or not item.new then
+    if type(item) ~= "table" or not item.new then
         error(("Expected component, got %s"):format(tostring(item)), 3)
     end
 end
@@ -31,8 +31,8 @@ function Manager:AddComponent(instance, class, params)
 
     local component = class.new(instance, params)
     self:_addComponent(instance, component, params)
-    component:OnInit()
-    component:OnStart()
+    task.spawn(component.OnInit, component)
+    task.spawn(component.OnStart, component)
     
     self.AddedComponents:Fire({component})
 
@@ -60,6 +60,8 @@ function Manager:_addComponent(instance, component, params)
 
     self._componentsByClass[class] = self._componentsByClass[class] or {}
     self._componentsByClass[class][component] = true
+
+    component.Manager = self
 end
 
 function Manager:BulkAddComponent(instances, classes, params)
@@ -76,12 +78,12 @@ function Manager:BulkAddComponent(instances, classes, params)
         local component = class.new(instance, params[i])
         self:_addComponent(instance, component, params[i])
         
-        component:OnInit()
+        task.spawn(component.OnInit, component)
         table.insert(added, component)
     end
 
     for _, component in ipairs(added) do
-        component:OnStart()
+        task.spawn(component.OnStart, component)
     end
 
     self.AddedComponents:Fire(added)
@@ -101,7 +103,8 @@ function Manager:RemoveComponent(instance, class)
 
     self._componentsByInstance[instance][class] = nil
     self._componentsByClass[class][component] = nil
-    component:Destroy()
+
+    task.spawn(component.Destroy, component)
 end
 
 function Manager:GetComponent(instance, class)

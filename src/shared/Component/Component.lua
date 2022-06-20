@@ -38,6 +38,7 @@ function Component:extend(name, mergeWith)
 
             __remote = nil;
             __initializedPlayers = {};
+            __toDestroy = {};
         }, new)
 
         if IS_SERVER then
@@ -52,10 +53,15 @@ function Component:extend(name, mergeWith)
             this.__remote.Name = "UpdateState"
             this.__remote.Parent = instance
         elseif CollectionService:HasTag(instance, "ServerComponent") then
-            this.__remote = instance:WaitForChild("UpdateState")
-            this.__remote.OnClientEvent:Connect(function(delta)
-                this:SetState(delta)
-            end)
+            this.__remote = instance:FindFirstChild("UpdateState")
+
+            if this.__remote == nil then
+                warn(string.format("UpdateState remote not found under %s for %s ", this.Instance:GetFullName(), tostring(this)))
+            else
+                this.__remote.OnClientEvent:Connect(function(delta)
+                    this:SetState(delta)
+                end)
+            end
         end
 
         return this
@@ -75,6 +81,30 @@ end
 
 function Component:ForceReplicate()
     self.__remote:FireAllClients(self.State)
+end
+
+function Component:RemoteEvent(name)
+    if IS_SERVER then
+        local remoteEvent = Instance.new("RemoteEvent")
+        remoteEvent.Name = name
+        remoteEvent.Parent = self.Instance
+        table.insert(self.__toDestroy, remoteEvent)
+
+        return remoteEvent
+    else
+        local remoteEvent = self.Instance:FindFirstChild(name)
+            or error(("No child named %s under %s"):format(name, self.Instance:GetFullName()))
+        
+        table.insert(self.__toDestroy, remoteEvent)
+
+        return remoteEvent
+    end
+end
+
+function Component:Signal()
+    local signal = Signal.new()
+    table.insert(self.__toDestroy, signal)
+    return signal
 end
 
 function Component:SetState(delta)
@@ -112,6 +142,10 @@ function Component:Destroy()
 
     if self.__remote then
         self.__remote:Destroy()
+    end
+    
+    for _, remote in self.__toDestroy do
+        remote:Destroy()
     end
 end
 

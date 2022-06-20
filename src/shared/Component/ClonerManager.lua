@@ -42,6 +42,7 @@ local function getConfig(instance, tag)
 end
 
 local ClonerManager = {}
+ClonerManager.ReplicatedRoot = ReplicatedStorage
 ClonerManager.__index = ClonerManager
 
 function ClonerManager.new(namespace)
@@ -128,7 +129,7 @@ function ClonerManager:ClientInit(root)
     assert(self.Cloner == nil, "A cloner is already active")
 
     if not self._folder then
-        self._folder = ReplicatedStorage:WaitForChild(self._namespace)
+        self._folder = self.ReplicatedRoot:WaitForChild(self._namespace)
 
         self._folder:WaitForChild("Added").OnClientEvent:Connect(function(instances)
             for _, entry in pairs(instances) do
@@ -144,7 +145,9 @@ function ClonerManager:ClientInit(root)
         end)
 
         self._folder:WaitForChild("Removed").OnClientEvent:Connect(function(instance, tag)
-            self.Manager:RemoveComponent(instance, self._registered[tag])
+            if self._registered[tag] then
+                self.Manager:RemoveComponent(instance, self._registered[tag])
+            end
         end)
     end
 
@@ -168,7 +171,7 @@ function ClonerManager:ServerInit(root)
         removed.Name = "Removed"
         removed.Parent = self._folder
 
-        self._folder.Parent = ReplicatedStorage
+        self._folder.Parent = self.ReplicatedRoot
 
         local function onPlayerAdded(player)
             local instances = {}
@@ -209,6 +212,10 @@ function ClonerManager:Clear()
     end
 
     self.Manager:Clear()
+
+    table.clear(self._instanceQueue)
+    table.clear(self._classQueue)
+    table.clear(self._paramsQueue)
 end
 
 function ClonerManager:Register(class)
