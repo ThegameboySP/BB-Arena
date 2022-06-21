@@ -1,12 +1,15 @@
 local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
 local Teams = game:GetService("Teams")
+
+local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local Spectators = Teams.Spectators
 local MapRoot = Workspace.MapRoot
 local SpectatorRegion = Workspace.SpectatorRegion
-local SpectatorSpawns = Workspace.SpectatorRegion.SpectatorSpawns:GetChildren()
 
 local onMap = RaycastParams.new()
 onMap.FilterDescendantsInstances = {MapRoot}
@@ -26,7 +29,7 @@ local function getGroundedCharacters(players, params)
         end
 
         local pos = character.PrimaryPart.Position
-        local result = Workspace:Raycast(pos, -Vector3.yAxis * 6, params)
+        local result = Workspace:Raycast(pos, -Vector3.yAxis * 20, params)
 
         if result then
             table.insert(groundedCharacters, character)
@@ -38,11 +41,10 @@ end
 
 RunService.Heartbeat:Connect(function()
     for _, character in getGroundedCharacters(CollectionService:GetTagged("FightingPlayer"), onSpectatorRegion) do
-        character.Humanoid.Health = 0
+        Knit.resetPlayer(Players:GetPlayerFromCharacter(character))
     end
 
     for _, character in getGroundedCharacters(Spectators:GetPlayers(), onMap) do
-        local spawn = SpectatorSpawns[math.random(#SpectatorSpawns)]
-        character:MoveTo(spawn.Position)
+        Knit.resetPlayer(Players:GetPlayerFromCharacter(character))
     end
 end)

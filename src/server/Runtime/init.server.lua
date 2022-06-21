@@ -8,6 +8,7 @@ local EventBus = require(ReplicatedStorage.Common.EventBus)
 local defaultGlobalValues = require(script.Parent.defaultGlobalValues)
 
 local loadTools = require(script.loadTools)
+local resetPlayer = require(script.resetPlayer)
 
 local Configuration = ReplicatedStorage.Configuration
 local Services = script.Parent.Services
@@ -34,6 +35,8 @@ local function registerKnit()
     Knit.notification = function(message, color, sender)
         notificationRemote:FireAllClients(false, message, color, sender)
     end
+
+    Knit.resetPlayer = resetPlayer
 
     Knit.GetSingleton = function(name)
         return Knit.GetService(name .. "Service")
