@@ -21,7 +21,7 @@ local CmdrController = Knit.CreateController({
 })
 
 function CmdrController:CanRun(player, group)
-	return canRun(Knit.Store:getState().users.admins, player, group)
+	return canRun.canRun(Knit.Store:getState().users.admins, player.UserId, group)
 end
 
 function CmdrController:KnitInit()

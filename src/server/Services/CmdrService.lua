@@ -30,14 +30,14 @@ local CmdrService = Knit.CreateService({
 })
 
 local BLACKLISTED_COMMANDS = {
-	kick = true;
-	thru = true;
-	respawn = true;
-	replace = true;
+	kick = true; -- already have a kick
+	thru = true; -- thru also defines a "t" alias, replacing team's alias
+	respawn = true; -- already have a respawn
+	replace = true; -- replace defines a "map" alias for some reason
 }
 
 function CmdrService:CanRun(player, group)
-	return canRun(Knit.Store:getState().users.admins, player, group)
+	return canRun.canRun(Knit.Store:getState().users.admins, player.UserId, group)
 end
 
 function CmdrService:KnitStart()
@@ -87,6 +87,21 @@ function CmdrService:_setupCmdr()
 			table.insert(context.State.Warnings, msg)
 		end
 	end)
+
+	Cmdr:RegisterHook("BeforeRun", function(context)
+		local locked = self._lockedCommands[context.Name]
+		if not locked or context.Executor == nil then
+			return
+		end
+		
+		local state = Knit.Store:getState()
+
+		local byAdmin = selectors.getAdmin(state, locked.userId)
+		if selectors.getAdmin(state, context.Executor.UserId) < byAdmin then
+			local tierName = GameEnum.AdminTiersByValue[byAdmin]
+			return string.format("This command is locked by %s %s.", LitUtils.getIndefiniteArticle(tierName), tierName)
+		end
+	end)
 	
 	Cmdr:RegisterHook("AfterRun", function(context)
 		self.Client.CommandExecuted:FireAll({
@@ -100,65 +115,56 @@ function CmdrService:_setupCmdr()
 		end
 	end)
 	
-	local lockedCommands = self._lockedCommands
-	Cmdr:RegisterHook("BeforeRun", function(context)
-		local locked = lockedCommands[context.Name]
-		if not locked then
-			return
-		end
-		
-		if context.Executor == nil then
-			return
-		end
-		
-		if selectors.canUserBeKickedBy(Knit.Store:getState(), context.Executor.UserId, locked.admin) then
-			local tierName = GameEnum.AdminTierByValue[locked.admin]
-			return string.format("This command is locked by %s %s.", LitUtils.getIndefiniteArticle(tierName), tierName)
-		end
-	end)
-	
 	-- Replicate to all clients.
 	CmdrArena.Hooks.Parent = CmdrReplicated
 	CmdrArena.registerTypes.Parent = CmdrReplicated
 	self.Client.CmdrLoaded:Set(true)
 end
 
-function CmdrService:SaveAdminTier(userId, adminTier)
+function CmdrService:LockCommand(commandName, byUserId)
+	commandName = commandName:lower()
 
-end
+	local command = self.Cmdr.Registry.Commands[commandName]
+	if command == nil then
+		return 0
+	end
 
-local BLACKLISTED_LOCKED_COMMANDS = {
-	help = true;
-	logs = true;
-}
-function CmdrService:LockCommand(commandName, executor)
-	if BLACKLISTED_LOCKED_COMMANDS[commandName:lower()] then
-		return false, "Cannot lock this command!"
+	-- If anyone can run this command, don't lock it.
+	if canRun.anyGroups[command.Group] then
+		return 1, string.format("Cannot lock %q: isn't admin bound.", commandName)
 	end
 	
 	local locked = self._lockedCommands[commandName]
-	local admin = executor:GetAttribute("AdminIndex") or 0
-	if locked and locked.admin >= admin then
-		return false, "Already locked!"
+	local admin = selectors.getAdmin(Knit.Store:getState(), byUserId)
+
+	if locked and selectors.getAdmin(Knit.Store:getState(), locked.userId) >= admin then
+		return 2, string.format("Cannot lock %q: already locked by an admin of equal or greater rank.", commandName)
 	end
 	
-	self._lockedCommands[commandName] = {admin = admin}
-	return true, "Locked!"
+	self._lockedCommands[commandName] = {userId = byUserId}
+
+	return 3, string.format("Locked %q.", commandName)
 end
 
-function CmdrService:UnlockCommand(commandName, executor)
+function CmdrService:UnlockCommand(commandName, byUserId)
+	commandName = commandName:lower()
+
 	local locked = self._lockedCommands[commandName]
-	local admin = executor:GetAttribute("AdminIndex") or 0
-	if locked and locked.admin > admin then
-		return false, ("Can't unlock a command locked by %s!"):format(GameEnum.AdminTierByValue[locked.admin])
+	if locked == nil then
+		return 0, string.format("Cannot unlock %q: command isn't locked.", commandName)
 	end
 
-	if self._lockedCommands[commandName] == nil then
-		return false, "Not locked!"
+	local admin = selectors.getAdmin(Knit.Store:getState(), byUserId)
+	local byAdmin = selectors.getAdmin(Knit.Store:getState(), locked.userId)
+
+	if locked and byAdmin > admin then
+		local tierName = GameEnum.AdminTiersByValue[byAdmin]
+		return 1, string.format("Cannot unlock %q: locked by %s %s.", commandName, LitUtils.getIndefiniteArticle(tierName), tierName)
 	end
 	
 	self._lockedCommands[commandName] = nil
-	return true, "Unlocked!"
+
+	return 2, string.format("Unlocked %q.", commandName)
 end
 
 function CmdrService:OnPlayerLoaded(player)
@@ -176,6 +182,11 @@ function CmdrService:OnPlayerLoaded(player)
 end
 
 function playerHandler(player)
+	-- 0 = unknown player, -1 = player1, -2 = player2, etc
+	if player.UserId <= 0 then
+		Knit.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Owner))
+	end
+
 	local getRank = Promise.promisify(player.GetRankInGroup)
 
 	-- TOB Ranktester and beyond gets admin.
