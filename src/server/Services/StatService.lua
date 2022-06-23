@@ -3,11 +3,8 @@ local Players = game:GetService("Players")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local t = require(ReplicatedStorage.Packages.t)
-local Llama = require(ReplicatedStorage.Packages.Llama)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
-
-local Dictionary = Llama.Dictionary
 
 local StatService = Knit.CreateService({
     Name = "StatService";
@@ -23,13 +20,13 @@ local StatService = Knit.CreateService({
 })
 
 function StatService:KnitInit()
-    self:RegisterStat("KOs", {default = 0})
-    self:RegisterStat("WOs", {default = 0})
+    self:RegisterStat("KOs", {default = 0, priority = 1, show = true})
+    self:RegisterStat("WOs", {default = 0, priority = 0, show = true})
 
     EventBus.fighterDied:Connect(function(victim, killer)
         self:IncrementStat(victim.UserId, "WOs", 1)
 
-        if killer then
+        if killer and killer ~= victim then
             self:IncrementStat(killer.UserId, "KOs", 1)
         end
     end)
@@ -47,7 +44,7 @@ function StatService:KnitStart()
                 end
             end
     
-            self.Client.InitStats:Fire(player, self:GetStats())
+            self.Client.InitStats:Fire(player, self:GetStats(), self._registeredStats)
             player:SetAttribute("StatsInitialized", true)
         end
     
@@ -68,13 +65,15 @@ end
 
 local checkConfig = t.strictInterface({
     default = t.any;
+    priority = t.number;
     domain = t.optional(t.string);
     persistent = t.optional(t.boolean);
+    show = t.optional(t.boolean);
 })
 
 function StatService:RegisterStat(name, config)
     self._registeredStats[name] = assert(checkConfig(config)) and config
-    self._stats = Dictionary.merge(self._stats, {[name] = {}})
+    self._stats[name] = {}
 end
 
 function StatService:GetStatNamesByDomain(domain)
@@ -102,19 +101,18 @@ function StatService:SetStat(userId, name, value)
         return
     end
 
-    local old = self._stats
-    self._stats = Dictionary.mergeDeep(self._stats, {
-        [name] = {[userId] = value}
-    })
+    local oldValue = self._stats[name][userId]
+    self._stats[name][userId] = value
 
     self.Client.StatSet:FireFilter(function(player)
         return player:GetAttribute("StatsInitialized") == true
     end, userId, name, value)
-    self.Changed:Fire(self._stats, old)
+
+    self.Changed:Fire(name, userId, value, oldValue)
 end
 
 function StatService:IncrementStat(userId, name, amount)
-    self:SetStat(userId, name, self._stats[name][userId] + amount)
+    self:SetStat(userId, name, (self._stats[name][userId] or 0) + amount)
 end
 
 return StatService

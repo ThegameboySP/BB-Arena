@@ -3,16 +3,6 @@ local Players = game:GetService("Players")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Signal = require(ReplicatedStorage.Packages.Signal)
-local Llama = require(ReplicatedStorage.Packages.Llama)
-local Dictionary = Llama.Dictionary
-
-local StatController = Knit.CreateController({
-	Name = "StatController";
-    _stats = {};
-    _leaderstats = {};
-
-    Changed = Signal.new();
-})
 
 local valueClassByType = {
     string = "StringValue";
@@ -25,6 +15,15 @@ local valueClassByType = {
 	BrickColor = "BrickColorValue";
 }
 
+local StatController = Knit.CreateController({
+	Name = "StatController";
+    _stats = {};
+    _leaderstats = {};
+    _loggedIn = {};
+
+    Changed = Signal.new();
+})
+
 local function mapToNumber(map)
     local tbl = {}
     for key, value in pairs(map) do
@@ -36,33 +35,28 @@ end
 
 function StatController:KnitInit()
     local StatService = Knit.GetService("StatService")
-    StatService.InitStats:Connect(function(stats)
-        for key, users in pairs(stats) do
-            stats[key] = mapToNumber(users)
+    StatService.InitStats:Connect(function(stats, registeredStats)
+        self._registeredStats = registeredStats
+
+        for key, value in pairs(stats) do
+            stats[key] = mapToNumber(value)
         end
 
-        local old = self._stats
         self._stats = stats
 
-        self:_render(stats, old)
-        self.Changed:Fire(stats, old)
+        self:_updateInit(stats)
     end)
 
     StatService.StatSet:Connect(function(userId, name, value)
-        local old = self._stats
-        self._stats = Dictionary.mergeDeep(self._stats, {
-            [name] = {[userId] = value}
-        })
+        local oldValue = self._stats[name][userId]
+        self._stats[name][userId] = value
 
-        self:_render(self._stats, old)
-        self.Changed:Fire(self._stats, old)
+        self:_update(userId, name, value)
+        self.Changed:Fire(name, userId, value, oldValue)
     end)
 
     local function onPlayerAdded(player)
-        local leaderstats = Instance.new("NumberValue")
-        leaderstats.Name = "leaderstats"
-        leaderstats.Parent = player
-        self._leaderstats[player.UserId] = leaderstats
+        self._loggedIn[player.UserId] = true
     end
 
     Players.PlayerAdded:Connect(onPlayerAdded)
@@ -71,6 +65,7 @@ function StatController:KnitInit()
     end
 
     Players.PlayerRemoving:Connect(function(player)
+        self._loggedIn[player.UserId] = nil
         self._leaderstats[player.UserId] = nil
     end)
 end
@@ -79,35 +74,51 @@ function StatController:GetStats()
     return self._stats
 end
 
-function StatController:_render(new, old)
-    for name, newStats in pairs(new) do
-        local oldStats = old[name] or {}
-
-        for userId, value in pairs(newStats) do
-            local playerStat = self._leaderstats[userId]:FindFirstChild(name)
-
-            if oldStats[userId] and playerStat.ClassName == valueClassByType[typeof(value)] then
-                playerStat.Value = value
-            else
-                if playerStat then
-                    playerStat.Parent = nil
-                end
-
-                local newPlayerStat = Instance.new(valueClassByType[typeof(value)])
-                newPlayerStat.Value = value
-                newPlayerStat.Name = name
-                newPlayerStat.Parent = self._leaderstats[userId]
-            end
-        end
+function StatController:_getOrMakeLeaderstats(userId)
+    if not self._loggedIn[userId] then
+        return
+    end
+    
+    local leaderstats = self._leaderstats[userId]
+    
+    if not leaderstats then
+        leaderstats = Instance.new("NumberValue")
+        leaderstats.Name = "leaderstats"
+        leaderstats.Parent = Players:GetPlayerByUserId(userId)
+        self._leaderstats[userId] = leaderstats
     end
 
-    for name, oldStats in pairs(old) do
-        local newStats = new[name] or {}
+    return leaderstats
+end
 
-        for userId in pairs(oldStats) do
-            if newStats[userId] == nil then
-                self._leaderstats[userId]:FindFirstChild(name).Parent = nil
+-- Priority TODO
+function StatController:_update(userId, name, value)
+    if self._registeredStats[name].show then
+        local leaderstats = self:_getOrMakeLeaderstats(userId)
+        local stat = leaderstats:FindFirstChild(name)
+
+        if not stat or stat.ClassName ~= valueClassByType[typeof(value)] then
+            if stat then
+                stat.Parent = nil
             end
+
+            stat = Instance.new(valueClassByType[typeof(value)])
+            stat.Name = name
+            stat.Parent = leaderstats
+        end
+
+        stat.Value = value
+    end
+end
+
+function StatController:_updateInit(stats)
+    for name, users in pairs(stats) do
+        if not self._registeredStats[name].show then
+            continue
+        end
+
+        for userId, value in pairs(users) do
+            self:_update(userId, name, value)
         end
     end
 end
