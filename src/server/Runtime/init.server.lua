@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
@@ -55,9 +56,14 @@ local function registerKnit()
 end
 
 local function spawnPlayers()
-    Players.PlayerAdded:Connect(function(player)
+    local function onPlayerAdded(player)
         player:LoadCharacter()
-    end)
+    end
+
+    Players.PlayerAdded:Connect(onPlayerAdded)
+    for _, player in ipairs(Players:GetPlayers()) do
+        task.spawn(onPlayerAdded, player)
+    end
 
     EventBus.playerDied:Connect(function(player)
         local connections = {}
@@ -107,6 +113,9 @@ local function warnIfSlow()
         end
     end)
 end
+
+-- Clear Studio lighting.
+Lighting:ClearAllChildren()
 
 loadTools()
 registerKnit()
