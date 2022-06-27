@@ -29,12 +29,16 @@ local function registerKnit()
     notificationRemote.Name = "NotificationRemote"
     notificationRemote.Parent = ReplicatedStorage
     
-    Knit.hint = function(message, color, sender)
-        notificationRemote:FireAllClients(true, message, color, sender)
+    Knit.hint = function(message, options)
+        options = options or {}
+        options.sender = options.sender or "Nexus Arena"
+        notificationRemote:FireAllClients(true, message, options)
     end
 
-    Knit.notification = function(message, color, sender)
-        notificationRemote:FireAllClients(false, message, color, sender)
+    Knit.notification = function(message, options)
+        options = options or {}
+        options.sender = options.sender or "Nexus Arena"
+        notificationRemote:FireAllClients(false, message, options)
     end
 
     Knit.resetPlayer = resetPlayer

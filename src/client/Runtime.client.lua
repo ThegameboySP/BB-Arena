@@ -27,11 +27,11 @@ local function registerKnit()
     Knit.notification = notificationGUI
     Knit.hint = hintGUI
     
-    notificationRemote.OnClientEvent:Connect(function(isHint, message, color, sender)
+    notificationRemote.OnClientEvent:Connect(function(isHint, message, options)
         if isHint then
-            hintGUI(message, color, sender or "Nexus Arena")
+            hintGUI(message, options)
         else
-            notificationGUI(message, color, sender or "Nexus Arena")
+            notificationGUI(message, options)
         end
     end)
 

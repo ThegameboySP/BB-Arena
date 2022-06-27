@@ -245,12 +245,12 @@ function GamemodeService:GetManager()
     return self.MapService.ClonerManager.Manager
 end
 
-function GamemodeService:SayEvent(msg, color)
-    Knit.hint(msg, color)
+function GamemodeService:SayEvent(msg, options)
+    Knit.hint(msg, options)
 end
 
-function GamemodeService:AnnounceEvent(msg, color)
-    Knit.notification(msg, color)
+function GamemodeService:AnnounceEvent(msg, options)
+    Knit.notification(msg, options)
 end
 
 return GamemodeService

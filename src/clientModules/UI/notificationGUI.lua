@@ -110,30 +110,36 @@ end
 Main.Close.MouseButton1Click:Connect(close)
 
 -- Message: string
--- Sender: player or string
--- Color: Color3 value
-return (function(Message, Color, Sender)
+-- Options.sender: player or string
+-- Options.color: Color3
+-- Options.stayOpen: boolean
+return (function(Message, Options)
+	Options = Options or {}
+
 	local seconds = (countWords(Message) * .3) + 1
 	timer += seconds
-    Color = Color or Color3.new(1, 1, 1)
+    local Color = Options.color or Color3.new(1, 1, 1)
 	
 	if c then 
 		c:Disconnect()
 	end
-	
+
 	tweenTransition(true)
 	
-	c = RunService.RenderStepped:Connect(function(step)
-		timer -= step
-		if timer<.2 then
-			close()
-		end
-	end)
+	if not Options.stayOpen then
+		c = RunService.RenderStepped:Connect(function(step)
+			timer -= step
+			if timer<.2 then
+				close()
+			end
+		end)
+	end
 	
+	local Sender = Options.sender
 	local SenderColor = (typeof(Sender) == "Instance" and Sender:IsA("Player")) and Sender.TeamColor.Color or Color3.new(1, 1, 1)
 	Sender = typeof(Sender) == "string" and Sender or tostring(Sender)
 	
-	Message = RichText.bold("[" .. RichText.color(Sender, SenderColor) .. "]: ") .. RichText.color(Message, Color) .. "\n"
+	Message = RichText.bold("[" .. RichText.color(Sender, SenderColor) .. "]:\n") .. RichText.color(Message, Color) .. "\n"
 	
 	CurrentMessage = CurrentMessage .. Message
 	
