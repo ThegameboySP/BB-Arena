@@ -4,6 +4,9 @@
 		"**/*.spec.lua"
     ],
 	"tree": {
-		"$path": "ServerPackages"
+		"$path": "ServerPackages",
+		"MockDataStoreService": {
+			"$path": "modules/MockDataStoreService.rbxmx"
+		}
 	}
 }

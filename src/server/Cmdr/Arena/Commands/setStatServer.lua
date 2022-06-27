@@ -18,8 +18,8 @@ return function(context, players, name, value)
     if results[1] then
         for _, player in pairs(players) do
             local userId = player.UserId
-            local oldValue = StatService:GetStats()[results[1]][userId]
-            StatService:SetStat(userId, results[1], value)
+            local oldValue = StatService.Stats:GetUserStat(results[1], userId)
+            StatService.Stats:Set(userId, results[1], value)
 
             context:Reply(string.format("%s %q %s -> %s", tostring(player), results[1], tostring(oldValue), tostring(value)))
         end

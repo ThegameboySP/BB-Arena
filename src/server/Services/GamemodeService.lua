@@ -1,10 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local Dictionary = Llama.Dictionary
 local t = require(ReplicatedStorage.Packages.t)
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local Components = require(ReplicatedStorage.Common.Components)
 
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
@@ -14,6 +16,9 @@ local GamemodeService = Knit.CreateService({
     Client = {
         CurrentGamemode = Knit.CreateProperty(nil);
     };
+
+    GamemodeStarted = Signal.new();
+    GamemodeOver = Signal.new();
 
     CurrentGamemode = nil;
     gamemodeProcess = nil;
@@ -45,11 +50,23 @@ end
 
 function GamemodeService:KnitInit()
     self.MapService = Knit.GetService("MapService")
+    self.StatService = Knit.GetService("StatService")
 
     self.gamemodes = loadGamemodes(Gamemodes, function(module)
-        local ok, err = gamemodeDefinition(require(module).definition)
+        local definition = require(module).definition
+        local ok, err = gamemodeDefinition(definition)
         if not ok then
             error(("Gamemode %s definition error: %s"):format(module.Name, err))
+        end
+
+        for name, data in pairs(definition.stats or {}) do
+            local clonedData = table.clone(data)
+            clonedData.domain = definition.nameId
+            clonedData.showOnGamemode = data.show
+            clonedData.name = name
+            clonedData.show = false
+            
+            self.StatService:RegisterStat(clonedData)
         end
     end)
 
@@ -94,6 +111,10 @@ function GamemodeService:SetGamemode(name, config)
     self:StopGamemode()
     self.CurrentGamemode = gamemode
 
+    for _, registeredStat in pairs(self.StatService:GetRegisteredStatsByDomain(name)) do
+        self.StatService:SetStatVisibility(registeredStat.name, registeredStat.showOnGamemode)
+    end
+
     self:_runGamemodeProtoypes(definition)
 
     local binder = Instance.new("Folder")
@@ -105,6 +126,7 @@ function GamemodeService:SetGamemode(name, config)
     self.gamemodeProcess:OnInit(config, CollectionService:GetTagged("FightingTeam"))
 
     self.Client.CurrentGamemode:Set(definition.nameId)
+    self.GamemodeStarted:Fire(definition)
 
     return true, string.format("Gamemode set to %q", name)
 end
@@ -136,7 +158,7 @@ function GamemodeService:_runGamemodeProtoypes(definition)
     end)
 end
 
-function GamemodeService:StopGamemode()
+function GamemodeService:StopGamemode(completedSuccessfully)
     if self.gamemodeProcess then
         self.gamemodeProcess:Destroy()
         self.gamemodeProcess = nil
@@ -158,6 +180,16 @@ function GamemodeService:StopGamemode()
         self.binder = nil
 
         self.Client.CurrentGamemode:Set(nil)
+
+        self.GamemodeOver:Fire({cancelled = not completedSuccessfully})
+
+        for _, registeredStat in pairs(self.StatService:GetRegisteredStatsByDomain(nameId)) do
+            for _, player in pairs(Players:GetPlayers()) do
+                self.StatService.Stats:Set(player.UserId, registeredStat.name, registeredStat.default)
+            end
+
+            self.StatService:SetStatVisibility(registeredStat.name, false)
+        end
 
         return true
     end

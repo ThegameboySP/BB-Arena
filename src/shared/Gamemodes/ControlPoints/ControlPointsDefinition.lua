@@ -4,7 +4,7 @@ local t = require(ReplicatedStorage.Packages.t)
 local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 
 return {
-    stopOnMapChange = false;
+    stopOnMapChange = true;
 	minTeams = 2;
 
 	friendlyName = "Control Points";
@@ -26,14 +26,16 @@ return {
 	};
 
 	stats = {
-		secondsDefending = {
+		CP_secondsDefending = {
 			default = 0;
 		};
-		secondsAttacking = {
+		CP_secondsAttacking = {
 			default = 0;
 		};
-		pointsCaptured = {
+		CP_pointsCaptures = {
 			default = 0;
+			friendlyName = "Captures";
+			show = true;
 		}
 	};
 }

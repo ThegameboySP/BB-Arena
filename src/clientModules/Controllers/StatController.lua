@@ -55,6 +55,11 @@ function StatController:KnitInit()
         self.Changed:Fire(name, userId, value, oldValue)
     end)
 
+    StatService.SetStatVisibility:Connect(function(name, visible)
+        self._registeredStats[name].show = visible
+        self:_setStatVisibility(name, visible)
+    end)
+
     local function onPlayerAdded(player)
         self._loggedIn[player.UserId] = true
     end
@@ -93,9 +98,12 @@ end
 
 -- Priority TODO
 function StatController:_update(userId, name, value)
-    if self._registeredStats[name].show then
+    local registeredStat = self._registeredStats[name]
+
+    if registeredStat.show then
+        local resolvedName = registeredStat.friendlyName or name
         local leaderstats = self:_getOrMakeLeaderstats(userId)
-        local stat = leaderstats:FindFirstChild(name)
+        local stat = leaderstats:FindFirstChild(resolvedName)
 
         if not stat or stat.ClassName ~= valueClassByType[typeof(value)] then
             if stat then
@@ -103,11 +111,29 @@ function StatController:_update(userId, name, value)
             end
 
             stat = Instance.new(valueClassByType[typeof(value)])
-            stat.Name = name
+            stat.Name = resolvedName
+            stat:SetAttribute("InternalName", name)
+
             stat.Parent = leaderstats
         end
 
         stat.Value = value
+    end
+end
+
+function StatController:_setStatVisibility(name, visible)
+    if visible then
+        for userId, value in pairs(self._stats[name]) do
+            self:_update(userId, name, value)
+        end
+    else
+        for _, leaderstat in pairs(self._leaderstats) do
+            for _, stat in pairs(leaderstat:GetChildren()) do
+                if stat:GetAttribute("InternalName") == name then
+                    stat.Parent = nil
+                end
+            end
+        end
     end
 end
 
