@@ -42,16 +42,9 @@ local function serialize(state)
 end
 
 local function initState()
-    local admins = table.clone(defaultPermissions.Admins)
-
-    local ownerId = game.PrivateServerOwnerId
-	if ownerId then
-        admins[ownerId] = GameEnum.AdminTiers.Admin
-	end
-
     return {
         users = {
-            admins = admins;
+            admins = table.clone(defaultPermissions.Admins);
         }
     }
 end

@@ -12,6 +12,7 @@ local BBLService = Knit.CreateService({
 
     _statsToFlush = {};
     _isOfficial = false;
+    _tracking = false;
 })
 
 function BBLService:KnitInit()
@@ -21,18 +22,23 @@ function BBLService:KnitInit()
 
     self.stats = self.StatService:NewStatScope()
 
-    self.GamemodeService.GamemodeStarted:Connect(function()
+    self.GamemodeService.GamemodeStarted:Connect(function(definition)
         self.stats:Clear()
+
+        if definition.nameId == "ControlPoints" then
+            self._tracking = true
+        end
     end)
 
     self.GamemodeService.GamemodeOver:Connect(function(event)
-        if event.cancelled or not self._isOfficial then
+        if event.cancelled or not self._tracking or not self._isOfficial then
             return
         end
 
         self:_flushStatsToDataStore(self.stats:Get())
 
         self._isOfficial = false
+        self._tracking = false
     end)
 end
 

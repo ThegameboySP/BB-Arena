@@ -41,6 +41,13 @@ function CmdrService:CanRun(player, group)
 end
 
 function CmdrService:KnitStart()
+	local ownerId = game.PrivateServerOwnerId
+	if ownerId then
+        if selectors.getAdmin(Knit.Store:getState(), ownerId) < GameEnum.AdminTiers.Admin then
+			Knit.Store:dispatch(actions.setAdmin(ownerId, GameEnum.AdminTiers.Admin))
+		end
+	end
+
 	self:_setupCmdr()
 
 	Players.PlayerAdded:Connect(playerHandler)
@@ -72,7 +79,7 @@ function CmdrService:_setupCmdr()
 	Cmdr.Registry.Types.players = Cmdr.Registry.Types.arenaPlayers
 	
 	Cmdr.Registry:RegisterHook("BeforeRun", function(context)
-		if not self:CanRun(context.Executor, context.Group) then
+		if context.Executor and not self:CanRun(context.Executor, context.Group) then
 			local msg = "You don't have permission to run this command."
 			
 			if context.Executor then
@@ -192,7 +199,7 @@ function playerHandler(player)
 	-- TOB Ranktester and beyond gets admin.
 	getRank(player, 3397136):andThen(function(role)
 		if role >= 11 then
-			if (Knit.Store:getState().users.admins[player.UserId] or 0) < GameEnum.AdminTiers.Admin then
+			if selectors.getAdmin(Knit.Store:getState(), player.UserId) < GameEnum.AdminTiers.Admin then
 				Knit.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Admin))
 			end
 		end
