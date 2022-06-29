@@ -1,11 +1,8 @@
 local CollectionService = game:GetService("CollectionService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 local Teams = game:GetService("Teams")
-
-local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local Spectators = Teams.Spectators
 local MapRoot = Workspace.MapRoot
@@ -39,12 +36,16 @@ local function getGroundedCharacters(players, params)
     return groundedCharacters
 end
 
-RunService.Heartbeat:Connect(function()
-    for _, character in getGroundedCharacters(CollectionService:GetTagged("FightingPlayer"), onSpectatorRegion) do
-        Knit.resetPlayer(Players:GetPlayerFromCharacter(character))
-    end
+local function preventTeamInterference(Root)
+    RunService.Heartbeat:Connect(function()
+        for _, character in getGroundedCharacters(CollectionService:GetTagged("FightingPlayer"), onSpectatorRegion) do
+            Root.resetPlayer(Players:GetPlayerFromCharacter(character))
+        end
+    
+        for _, character in getGroundedCharacters(Spectators:GetPlayers(), onMap) do
+            Root.resetPlayer(Players:GetPlayerFromCharacter(character))
+        end
+    end)
+end
 
-    for _, character in getGroundedCharacters(Spectators:GetPlayers(), onMap) do
-        Knit.resetPlayer(Players:GetPlayerFromCharacter(character))
-    end
-end)
+return preventTeamInterference

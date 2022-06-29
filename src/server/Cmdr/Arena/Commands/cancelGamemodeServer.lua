@@ -1,5 +1,5 @@
 return function(context)
-    local GamemodeService = context:GetStore("Common").Knit.GetService("GamemodeService")
+    local GamemodeService = context:GetStore("Common").Root:GetService("GamemodeService")
     local ok = GamemodeService:StopGamemode()
 
     return

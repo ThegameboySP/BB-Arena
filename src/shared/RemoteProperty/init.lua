@@ -123,7 +123,7 @@ end
 
 function RemoteProperty:Observe(callback)
     local con = self.Changed:Connect(callback)
-    if self._value then
+    if self._value ~= nil then
         callback(self._value, nil)
     end
 

@@ -1,5 +1,5 @@
 return function(context)
-    local ok = context:GetStore("Common").Knit.GetService("BBLService"):_flushStatsToDataStore()
+    local ok = context:GetStore("Common").Root:GetService("BBLService"):_flushStatsToDataStore()
 
     return
         ok

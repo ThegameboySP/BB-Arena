@@ -1,6 +1,3 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Knit = require(ReplicatedStorage.Packages.Knit)
-
 local usersSelectors = require(script.Parent.usersSelectors)
 local getAdmin = usersSelectors.getAdmin
 
@@ -19,15 +16,6 @@ local function setAdmin(userId, admin, byUser)
                     admin = admin;
                 };
             })
-        end
-    end
-end
-
-local function saveAdmin(userId, admin, byUser)
-    return function(store)
-        if getAdmin(store:getState(), byUser) > admin then
-            Knit.GetService("CmdrService"):SaveAdmin(userId, admin, byUser)
-            store:dispatch(setAdmin(userId, admin, byUser))
         end
     end
 end
@@ -117,7 +105,6 @@ local function userLeft(userId)
 end
 
 return {
-    saveAdmin = saveAdmin;
     setAdmin = setAdmin;
     setServerLocked = setServerLocked;
     setUserBanned = setUserBanned;

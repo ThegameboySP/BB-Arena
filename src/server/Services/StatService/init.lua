@@ -1,18 +1,18 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local t = require(ReplicatedStorage.Packages.t)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
 
 local PlayerStats = require(script.PlayerStats)
 
-local StatService = Knit.CreateService({
+local StatService = {
     Name = "StatService";
     Client = {
-        InitStats = Knit.CreateSignal();
-        StatSet = Knit.CreateSignal();
-        SetStatVisibility = Knit.CreateSignal();
+        InitStats = Root.remoteEvent();
+        StatSet = Root.remoteEvent();
+        SetStatVisibility = Root.remoteEvent();
     };
 
     Stats = PlayerStats.new();
@@ -20,13 +20,13 @@ local StatService = Knit.CreateService({
     _statObjects = setmetatable({}, {__mode = "k"});
     _replicatedValues = {};
     _registeredStats = {};
-})
+}
 
 local PLAYER_FILTER = function(player)
     return player:GetAttribute("StatsInitialized") == true
 end
 
-function StatService:KnitInit()
+function StatService:OnInit()
     self._statObjects[self.Stats] = true
 
     self.Stats.Changed:Connect(function(userId, name, value)
@@ -57,7 +57,7 @@ function StatService:KnitInit()
     end)
 end
 
-function StatService:KnitStart()
+function StatService:OnStart()
     -- Defer so services can register their stats before initial replication.
     task.defer(function()
         local function onPlayerAdded(player)
@@ -73,7 +73,7 @@ function StatService:KnitStart()
                 end
             end
     
-            self.Client.InitStats:Fire(player, self.Stats:Get(), self._registeredStats)
+            self.Client.InitStats:FireClient(player, self.Stats:Get(), self._registeredStats)
             player:SetAttribute("StatsInitialized", true)
         end
     

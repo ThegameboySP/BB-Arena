@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 
 return function(context, key, value)
-    local GamemodeService = context:GetStore("Common").Knit.GetService("GamemodeService")
+    local GamemodeService = context:GetStore("Common").Root:GetService("GamemodeService")
 
     local resolvedValue = CmdrUtils.transformType(value)
 

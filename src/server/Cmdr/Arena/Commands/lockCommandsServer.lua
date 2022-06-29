@@ -1,5 +1,5 @@
 return function(context, commands)
-    local CmdrService = context:GetStore("Common").Knit.GetService("CmdrService")
+    local CmdrService = context:GetStore("Common").Root:GetService("CmdrService")
     local userId = context.Executor.UserId
 
     for _, commandName in ipairs(commands) do

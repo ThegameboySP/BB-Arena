@@ -3,7 +3,7 @@ local ScriptContext = game:GetService("ScriptContext")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
 
@@ -14,20 +14,22 @@ local RespawnGui = ReplicatedStorage.UI.RespawnGui
 local RemoteProperties = ReplicatedStorage:WaitForChild("RemoteProperties")
 local notificationRemote = ReplicatedStorage:WaitForChild("NotificationRemote")
 local clientErrorRemote = ReplicatedStorage:WaitForChild("ClientErrorRemote")
+
 local Controllers = ReplicatedStorage.ClientModules.Controllers
+local Scripts = ReplicatedStorage.ClientModules.Scripts
 
 if not workspace:GetAttribute("GameInitialized") then
     workspace:GetAttributeChangedSignal("GameInitialized"):Wait()
 end
 
-local function registerKnit()
-    Knit.globals = {}
+local function registerRoot()
+    Root.globals = {}
     for _, child in pairs(RemoteProperties:GetChildren()) do
-        Knit.globals[child.Name] = RemoteProperty.new(RemoteProperties, child.Name)
+        Root.globals[child.Name] = RemoteProperty.new(RemoteProperties, child.Name)
     end
 
-    Knit.notification = notificationGUI
-    Knit.hint = hintGUI
+    Root.notification = notificationGUI
+    Root.hint = hintGUI
     
     notificationRemote.OnClientEvent:Connect(function(isHint, message, options)
         if isHint then
@@ -41,23 +43,19 @@ local function registerKnit()
         clientErrorRemote:FireServer(...)
     end)
 
-    Knit.GetSingleton = function(name)
-        return Knit.GetController(name .. "Controller")
-    end
+    Root:RegisterServicesIn(Controllers)
 
-    Knit.AddControllers(Controllers)
-
-    Knit.Start()
+    Root:Start()
         :catch(function(err)
             task.spawn(error, tostring(err))
         end)
         :await()
 
-    local MapService = Knit.GetService("MapService")
-    local GamemodeService = Knit.GetService("GamemodeService")
+    local MapService = Root:GetServerService("MapService")
+    local GamemodeService = Root:GetServerService("GamemodeService")
 
-    local MapController = Knit.GetController("MapController")
-    local GamemodeController = Knit.GetController("GamemodeController")
+    local MapController = Root:GetService("MapController")
+    local GamemodeController = Root:GetService("GamemodeController")
 
     local queuedMap
     MapService.CurrentMap:Observe(function(map)
@@ -99,13 +97,20 @@ local function registerKnit()
     end)
 end
 
-registerKnit()
+local function runScripts()
+    for _, script in ipairs(Scripts:GetChildren()) do
+        require(script)(Root)
+    end
+end
+
+registerRoot()
+runScripts()
 
 EventBus:GetPlayerDiedSignal(Players.LocalPlayer):Connect(function()
     local gui = RespawnGui:Clone()
     gui.Parent = Players.LocalPlayer.PlayerGui
 
-    local duration = Knit.globals.respawnTime:Get()
+    local duration = Root.globals.respawnTime:Get()
     local con = RunService.Heartbeat:Connect(function(dt)
         duration = math.max(0, duration - dt)
         gui.TextLabel.Text = string.format("Respawn in: %d", duration + 1)

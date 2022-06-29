@@ -1,19 +1,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
 
+local Root = require(ReplicatedStorage.Common.Root)
 local LitUtils = require(ReplicatedStorage.Common.Utils.LitUtils)
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local actions = RoduxFeatures.actions
 local selectors = RoduxFeatures.selectors
 
-local GatekeepingService = Knit.CreateService({
+local GatekeepingService = {
     Name = "GatekeepingService";
     Client = {};
 
     serverLockedBy = nil;
-})
+}
 
 local function banMessage(adminLevel)
     local adminTier = GameEnum.AdminTiersByValue[adminLevel]
@@ -29,8 +29,8 @@ local function lockedServerMessage(adminLevel)
     )
 end
 
-function GatekeepingService:KnitStart()
-    Knit.Store.changed:connect(function(new, old)
+function GatekeepingService:OnStart()
+    Root.Store.changed:connect(function(new, old)
         if new.users == old.users then
             return
         end
@@ -50,7 +50,7 @@ function GatekeepingService:KnitStart()
     local function onPlayerAdded(player)
         local bannedMessage
         local lockedMessage
-        local state = Knit.Store:getState()
+        local state = Root.Store:getState()
 
         if selectors.canUserBeLockKicked(state, player.UserId, state.users.serverLockedBy) then
             lockedMessage = lockedServerMessage(selectors.getAdmin(state, state.users.serverLockedBy))
@@ -68,7 +68,7 @@ function GatekeepingService:KnitStart()
         elseif lockedMessage then
             player:Kick(lockedMessage)
         else
-            Knit.Store:dispatch(actions.userJoined(player.UserId))
+            Root.Store:dispatch(actions.userJoined(player.UserId))
         end
     end
 
@@ -78,8 +78,8 @@ function GatekeepingService:KnitStart()
     end
 
     Players.PlayerRemoving:Connect(function(player)
-        if Knit.Store:getState().users.activeUsers[player.UserId] then
-            Knit.Store:dispatch(actions.userLeft(player.UserId))
+        if Root.Store:getState().users.activeUsers[player.UserId] then
+            Root.Store:dispatch(actions.userLeft(player.UserId))
         end
     end)
 end

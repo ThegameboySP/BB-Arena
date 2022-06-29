@@ -4,8 +4,9 @@ local CollectionService = game:GetService("CollectionService")
 local Teams = game:GetService("Teams")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
@@ -23,17 +24,17 @@ local metaDefinition = t.strictInterface({
     IslandBaseColor = t.Color3;
 })
 
-local MapService = Knit.CreateService({
+local MapService = {
 	Name = "MapService";
 	Client = {
-		PreMapChanged = Knit.CreateSignal();
-		MapChanged = Knit.CreateSignal();
-		CurrentMap = Knit.CreateProperty(nil);
+		PreMapChanged = Root.remoteEvent();
+		MapChanged = Root.remoteEvent();
+		CurrentMap = Root.remoteProperty(nil);
 	};
 	
 	Maps = ServerStorage.Maps;
 	LightingSaves = ServerStorage.Plugin_LightingSaves;
-	mapParent = workspace.MapRoot;
+	mapParent = Workspace.MapRoot;
 
 	PreMapChanged = Signal.new();
 	MapChanged = Signal.new();
@@ -43,9 +44,9 @@ local MapService = Knit.CreateService({
 	MapScript = nil;
 	
 	ClonerManager = ClonerManager.new("MapComponents");
-})
+}
 
-function MapService:KnitInit()
+function MapService:OnInit()
 	for _, child in pairs(self.mapParent:GetChildren()) do
 		if CollectionService:HasTag(child, "Map") then
 			child.Parent = self.Maps
@@ -57,7 +58,7 @@ function MapService:KnitInit()
         mapInfo[map.Name] = require(map:FindFirstChild("Meta"))
 	end
 
-	Knit.globals.mapInfo:Set(table.freeze(mapInfo))
+	Root.globals.mapInfo:Set(table.freeze(mapInfo))
 	
 	self.LightingSaves.Name = "LightingSaves"
 	self.LightingSaves.Parent = ReplicatedStorage
@@ -73,15 +74,15 @@ function MapService:KnitInit()
 	end)
 end
 
-function MapService:RegisterComponent(class)
-	if class.realm ~= "client" then
-		self.ClonerManager:Register(class)
+function MapService:OnStart()
+	for _, component in Components do
+		self:RegisterComponent(component)
 	end
 end
 
-function MapService:KnitStart()
-	for _, component in Components do
-		self:RegisterComponent(component)
+function MapService:RegisterComponent(class)
+	if class.realm ~= "client" then
+		self.ClonerManager:Register(class)
 	end
 end
 
@@ -160,7 +161,7 @@ function MapService:ChangeMap(mapName)
 
 	self.CurrentMap = newMap
 	self.PreMapChanged:Fire(newMap, oldMap, oldTeamToNewTeam)
-	self.Client.PreMapChanged:FireAll(newMap.Name, oldMap and oldMap.Name or nil)
+	self.Client.PreMapChanged:FireAllClients(newMap.Name, oldMap and oldMap.Name or nil)
 
 	newMap.Parent = self.mapParent
 

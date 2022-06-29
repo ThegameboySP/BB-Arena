@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local Effects = require(ReplicatedStorage.Common.Utils.Effects)
-local Knit = require(ReplicatedStorage.Packages.Knit)
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -198,8 +197,8 @@ local WIGGLE_EXPLOSION = 8
 local TROWEL_LENGTH = 12
 
 
-do
-	local collisionPart = Instance.new("Part")
+local function trowelDashing(Root)
+    local collisionPart = Instance.new("Part")
 	
 	local trowels = {}
 
@@ -261,7 +260,7 @@ do
 
 				if playerDist > MAX_DIST then print 'max dist' continue end
 				
-				local bombForce = Knit.globals.dashingBombForce:Get()
+				local bombForce = Root.globals.dashingBombForce:Get()
 				
 				local explosionDist = (exploded.Position - oppositeSide).Magnitude
 				local mag =
@@ -278,3 +277,5 @@ do
 		end)
 	end, function() end)
 end
+
+return trowelDashing

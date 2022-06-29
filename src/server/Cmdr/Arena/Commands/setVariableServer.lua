@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 
 return function(_, key, value)
-    Knit.globals[key]:Set(value)
+    Root.globals[key]:Set(value)
 end

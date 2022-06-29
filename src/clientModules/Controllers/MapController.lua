@@ -3,7 +3,7 @@ local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local SkyboxTweener = require(ReplicatedStorage.ClientModules.Presentation.SkyboxTweener)
@@ -11,7 +11,7 @@ local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
 
 local Components = require(ReplicatedStorage.Common.Components)
 
-local MapController = Knit.CreateController({
+local MapController = {
 	Name = "MapController";
 
 	MapChanged = Signal.new();
@@ -22,12 +22,12 @@ local MapController = Knit.CreateController({
 
  	_skyboxTweener = SkyboxTweener.new(Lighting);
 	ClonerManager = ClonerManager.new("MapComponents");
-})
+}
 
 local FADE_INFO = TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 local TIME_FADE_INFO = TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 
-function MapController:KnitInit()
+function MapController:OnInit()
 	for _, component in Components do
 		self:RegisterComponent(component)
 	end
@@ -39,16 +39,16 @@ function MapController:RegisterComponent(class)
 	end
 end
 
-function MapController:KnitStart()
-	local MapService = Knit.GetService("MapService")
+function MapController:OnStart()
+	local MapService = Root:GetServerService("MapService")
 
 	MapService.PreMapChanged:Connect(function(mapName, oldMapName)
 		self:_tween(mapName)
 		self.PreMapChanged:Fire(mapName, oldMapName)
 	end)
 
-	MapService.CurrentMap:OnReady():andThen(function()
-		self:_tween(MapService.CurrentMap:Get().Name)
+	MapService.CurrentMap:Observe(function(currentMap)
+		self:_tween(currentMap.Name)
 	end)
 end
 
@@ -115,7 +115,7 @@ function MapController:_tween(mapName)
 		table.insert(tweens, TweenService:Create(Lighting, FADE_INFO, tweenProps))
 		table.insert(tweens, TweenService:Create(Lighting, TIME_FADE_INFO, {ClockTime = lightingEntry.Lighting.ClockTime.Value}))
 
-		local meta = Knit.globals.mapInfo:Get()[mapName]
+		local meta = Root.globals.mapInfo:Get()[mapName]
 
 		for _, part in CollectionService:GetTagged("IslandTop") do
 			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandTopColor}))

@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 
 return function(context, key, value)
-    local MapService = context:GetStore("Common").Knit.GetService("MapService")
+    local MapService = context:GetStore("Common").Root:GetService("MapService")
     local mapScript = MapService.MapScript
 
     if mapScript == nil or not mapScript.Options or not mapScript.Options[key] then

@@ -1,5 +1,5 @@
 return function(context, players)
-    local StatService = context:GetStore("Common").Knit.GetService("StatService")
+    local StatService = context:GetStore("Common").Root:GetService("StatService")
 
     local registeredStats = StatService:GetRegisteredStats()
     local stats = StatService.Stats

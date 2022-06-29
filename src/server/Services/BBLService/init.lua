@@ -2,22 +2,22 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local DataStoreService = require(ServerScriptService.Packages.MockDataStoreService)
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 
 local mergeStats = require(script.mergeStats)
 
-local BBLService = Knit.CreateService({
-    Name = "BBLService";
+local BBLService = {
+    Name = "BBlService";
     Client = {};
 
     _statsToFlush = {};
     _isOfficial = false;
     _tracking = false;
-})
+}
 
-function BBLService:KnitInit()
-    self.StatService = Knit.GetService("StatService")
-    self.GamemodeService = Knit.GetService("GamemodeService")
+function BBLService:OnInit()
+    self.StatService = Root:GetService("StatService")
+    self.GamemodeService = Root:GetService("GamemodeService")
     self.StatsStore = DataStoreService:GetDataStore("_bbl-stats")
 
     self.stats = self.StatService:NewStatScope()

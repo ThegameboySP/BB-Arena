@@ -25,8 +25,8 @@ return function (context, mapName)
 	end
 
 	local _, err = context:GetStore("Common")
-		.Knit
-		.GetService("MapService")
+		.Root
+		:GetService("MapService")
 		:ChangeMap(mapName)
 	
 	return err

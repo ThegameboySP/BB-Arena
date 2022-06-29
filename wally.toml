@@ -7,7 +7,6 @@ exclude = ["examples"]
 
 [dependencies]
 t = "osyrisrblx/t@3.0.0"
-Knit = "sleitnick/knit@1.4.5"
 Signal = "sleitnick/signal@1.1.0"
 Promise = "evaera/promise@4.0.0"
 Rodux = "roblox/rodux@3.0.0"

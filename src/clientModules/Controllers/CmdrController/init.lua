@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
 local CmdrReplicated = ReplicatedStorage:WaitForChild("CmdrReplicated")
@@ -13,19 +13,20 @@ local LOCAL_PLAYER = Players.LocalPlayer
 local ERROR_COLOR = Color3.fromRGB(255, 112, 112)
 local IS_STUDIO = game:GetService("RunService"):IsStudio()
 
-local CmdrController = Knit.CreateController({
+local CmdrController = {
 	Name = "CmdrController";
 	Cmdr = nil;
 	
 	_logs = {{}};
-})
+}
 
 function CmdrController:CanRun(player, group)
-	return canRun.canRun(Knit.Store:getState().users.admins, player.UserId, group)
+	return canRun.canRun(Root.Store:getState().users.admins, player.UserId, group)
 end
 
-function CmdrController:KnitInit()
-    local CmdrService = Knit.GetService("CmdrService")
+function CmdrController:OnInit()
+    local CmdrService = Root:GetServerService("CmdrService")
+	
 	CmdrService.CommandExecuted:Connect(function(context)
 		local len = #self._logs
 		local latestPage = self._logs[len]
@@ -47,14 +48,14 @@ function CmdrController:KnitInit()
 	self.Cmdr = CmdrClient
 	
     local common = CmdrClient.Registry:GetStore("Common")
-	common.Knit = Knit
-	common.Store = Knit.Store
+	common.Root = Root
+	common.Store = Root.Store
 end
 
-function CmdrController:KnitStart()
+function CmdrController:OnStart()
 	local CmdrClient = self.Cmdr
 
-	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, Knit.globals.mapInfo:Get())
+	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, Root.globals.mapInfo:Get())
 	CmdrClient.Registry.Types.player = CmdrClient.Registry.Types.arenaPlayer
 	CmdrClient.Registry.Types.players = CmdrClient.Registry.Types.arenaPlayers
 	

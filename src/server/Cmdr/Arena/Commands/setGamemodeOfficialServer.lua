@@ -1,5 +1,5 @@
 return function(context, isOfficial)
-    local BBLService = context:GetStore("Common").Knit.GetService("BBLService")
+    local BBLService = context:GetStore("Common").Root:GetService("BBLService")
 
     BBLService:SetGamemodeOfficial(isOfficial)
 

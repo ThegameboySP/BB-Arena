@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 
 return {
     Name = "setVariable";
@@ -13,7 +13,7 @@ return {
     Args = {
         function(context)
             local values = {}
-            for name in pairs(Knit.globals) do
+            for name in pairs(Root.globals) do
                 table.insert(values, name)
             end
 
@@ -28,7 +28,7 @@ return {
 				return
 			end
 
-            local property = Knit.globals[arg1:GetValue()]
+            local property = Root.globals[arg1:GetValue()]
 
             return {
                 Type = type(property:Get());

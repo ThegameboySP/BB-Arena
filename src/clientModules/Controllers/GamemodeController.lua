@@ -3,19 +3,19 @@ local CollectionService = game:GetService("CollectionService")
 
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
-local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 
-local GamemodeController = Knit.CreateController({
+local GamemodeController = {
 	Name = "GamemodeController";
     binder = nil;
     client = nil;
 
     CurrentGamemode = nil;
-})
+}
 
-function GamemodeController:KnitStart()
-    self.clonerManager = Knit.GetController("MapController").ClonerManager
+function GamemodeController:OnStart()
+    self.clonerManager = Root:GetService("MapController").ClonerManager
 end
 
 function GamemodeController:onGamemodeStarted(gamemodeName)

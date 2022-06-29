@@ -9,7 +9,7 @@ return {
     Group = "Admin";
     Args = {
         function(context)
-            local MapSingleton = context:GetStore("Common").Knit.GetSingleton("Map")
+            local MapSingleton = context:GetStore("Common").Root:GetSingleton("Map")
             local manager = MapSingleton.ClonerManager.Manager
 
             local instances = {}

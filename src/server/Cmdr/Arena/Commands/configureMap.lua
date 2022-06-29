@@ -7,7 +7,7 @@ return {
 	Group = "Admin";
 	Args = {
         function(context)
-            local mapScript = context:GetStore("Common").Knit.GetSingleton("Map").MapScript
+            local mapScript = context:GetStore("Common").Root:GetSingleton("Map").MapScript
             if mapScript == nil or not mapScript.Options then
                 return
             end

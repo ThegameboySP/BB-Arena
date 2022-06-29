@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local Components = require(ReplicatedStorage.Common.Components)
 local ControlPointsGUI = ReplicatedStorage.UI.ControlPointsGUI
 local Sounds = ReplicatedStorage.Assets.Sounds
@@ -63,7 +63,7 @@ end
 function ControlPointsClient:OnInit(teams)
 	self.teams = teams
 
-    local MapController = Knit.GetController("MapController")
+    local MapController = Root:GetService("MapController")
 	local controlPoints = {}
 
 	local lastAlertedNormal = 0

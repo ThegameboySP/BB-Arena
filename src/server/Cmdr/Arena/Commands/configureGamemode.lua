@@ -7,7 +7,7 @@ return {
 	Group = "Admin";
 	Args = {
         function(context)
-            local currentGamemode = context:GetStore("Common").Knit.GetSingleton("Gamemode").CurrentGamemode
+            local currentGamemode = context:GetStore("Common").Root:GetSingleton("Gamemode").CurrentGamemode
             if currentGamemode == nil then
                 return
             end

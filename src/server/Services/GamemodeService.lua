@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local Dictionary = Llama.Dictionary
 local t = require(ReplicatedStorage.Packages.t)
@@ -11,10 +11,10 @@ local Components = require(ReplicatedStorage.Common.Components)
 
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
-local GamemodeService = Knit.CreateService({
+local GamemodeService = {
     Name = "GamemodeService";
     Client = {
-        CurrentGamemode = Knit.CreateProperty(nil);
+        CurrentGamemode = Root.remoteProperty(nil);
     };
 
     GamemodeStarted = Signal.new();
@@ -23,7 +23,7 @@ local GamemodeService = Knit.CreateService({
     CurrentGamemode = nil;
     gamemodeProcess = nil;
     binder = nil;
-})
+}
 
 local gamemodeDefinition = t.strictInterface({
     stopOnMapChange = t.optional(t.boolean);
@@ -48,9 +48,9 @@ local function loadGamemodes(parent, callback)
     return gamemodes
 end
 
-function GamemodeService:KnitInit()
-    self.MapService = Knit.GetService("MapService")
-    self.StatService = Knit.GetService("StatService")
+function GamemodeService:OnInit()
+    self.MapService = Root:GetService("MapService")
+    self.StatService = Root:GetService("StatService")
 
     self.gamemodes = loadGamemodes(Gamemodes, function(module)
         local definition = require(module).definition
@@ -246,11 +246,11 @@ function GamemodeService:GetManager()
 end
 
 function GamemodeService:SayEvent(msg, options)
-    Knit.hint(msg, options)
+    Root.hint(msg, options)
 end
 
 function GamemodeService:AnnounceEvent(msg, options)
-    Knit.notification(msg, options)
+    Root.notification(msg, options)
 end
 
 return GamemodeService

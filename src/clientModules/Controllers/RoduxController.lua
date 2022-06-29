@@ -1,13 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
-local RoduxController = Knit.CreateController({
+local RoduxController = {
 	Name = "RoduxController";
-})
+}
 
 local function stringIndicesToNumber(map)
     local numberMap = {}
@@ -28,11 +28,11 @@ local function deserialize(state)
     return state
 end
 
-function RoduxController:KnitInit()
-    local RoduxService = Knit.GetService("RoduxService")
+function RoduxController:OnInit()
+    local RoduxService = Root:GetServerService("RoduxService")
 
     RoduxService.InitState:Connect(function(state)
-        Knit.Store = Rodux.Store.new(
+        Root.Store = Rodux.Store.new(
             RoduxFeatures.reducer,
             deserialize(state),
             { Rodux.thunkMiddleware }
@@ -40,7 +40,7 @@ function RoduxController:KnitInit()
     end)
 
     RoduxService.ActionDispatched:Connect(function(action)
-        Knit.Store:dispatch(action)
+        Root.Store:dispatch(action)
     end)
 end
 

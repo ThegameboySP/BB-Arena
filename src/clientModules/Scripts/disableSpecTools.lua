@@ -3,10 +3,9 @@ local StarterGui = game:GetService("StarterGui")
 local Players = game:GetService("Players")
 local Teams = game:GetService("Teams")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
-Knit:OnStart():await()
+local Root = require(ReplicatedStorage.Common.Root)
 
-local spectatorsCanBuildTrowels = Knit.globals.spectatorsCanBuildTrowels
+local spectatorsCanBuildTrowels = Root.globals.spectatorsCanBuildTrowels
 local Spectators = Teams.Spectators
 local LocalPlayer = Players.LocalPlayer
 
@@ -39,24 +38,28 @@ local function deferredUpdate()
     task.delay(0.2, update)
 end
 
-LocalPlayer:GetPropertyChangedSignal("Team"):Connect(update)
-update()
-spectatorsCanBuildTrowels.Changed:Connect(deferredUpdate)
+local function disableSpecTools()
+    LocalPlayer:GetPropertyChangedSignal("Team"):Connect(update)
+    update()
+    spectatorsCanBuildTrowels.Changed:Connect(deferredUpdate)
 
-local connection
-local function onChildAdded(child)
-    if child:IsA("Backpack") then
-        if connection then
-            connection:Disconnect()
+    local connection
+    local function onChildAdded(child)
+        if child:IsA("Backpack") then
+            if connection then
+                connection:Disconnect()
+            end
+            
+            connection = child.ChildAdded:Connect(deferredUpdate)
+            deferredUpdate()
         end
-        
-        connection = child.ChildAdded:Connect(deferredUpdate)
-        deferredUpdate()
+    end
+    LocalPlayer.ChildAdded:Connect(onChildAdded)
+
+    local backpack = LocalPlayer:FindFirstChild("Backpack")
+    if backpack then
+        onChildAdded(backpack)
     end
 end
-LocalPlayer.ChildAdded:Connect(onChildAdded)
 
-local backpack = LocalPlayer:FindFirstChild("Backpack")
-if backpack then
-    onChildAdded(backpack)
-end
+return disableSpecTools

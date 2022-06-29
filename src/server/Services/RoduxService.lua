@@ -2,22 +2,20 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-
-local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 
-local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local actions = RoduxFeatures.actions
 local defaultPermissions = require(ServerScriptService.Server.defaultPermissions)
 
-local RoduxService = Knit.CreateService({
+local RoduxService = {
     Name = "RoduxService";
     Client = {
-        ActionDispatched = Knit.CreateSignal();
-        InitState = Knit.CreateSignal();
+        ActionDispatched = Root.remoteEvent();
+        InitState = Root.remoteEvent();
     };
-})
+}
 
 local function numberIndicesToString(map)
     local strMap = {}
@@ -49,17 +47,17 @@ local function initState()
     }
 end
 
-function RoduxService:KnitInit()
-    Knit.Store = Rodux.Store.new(
+function RoduxService:OnInit()
+    Root.Store = Rodux.Store.new(
         RoduxFeatures.reducer,
         nil,
         { Rodux.thunkMiddleware, self:_makeNetworkMiddleware() }
     )
 
-    Knit.Store:dispatch(actions.merge(initState()))
+    Root.Store:dispatch(actions.merge(initState()))
 
     local function onPlayerAdded(player)
-        self.Client.InitState:Fire(player, serialize(Knit.Store:getState()))
+        self.Client.InitState:FireClient(player, serialize(Root.Store:getState()))
         player:SetAttribute("RoduxStateInitialized", true)
     end
 

@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local valueClassByType = {
@@ -15,14 +15,14 @@ local valueClassByType = {
 	BrickColor = "BrickColorValue";
 }
 
-local StatController = Knit.CreateController({
+local StatController = {
 	Name = "StatController";
     _stats = {};
     _leaderstats = {};
     _loggedIn = {};
 
     Changed = Signal.new();
-})
+}
 
 local function mapToNumber(map)
     local tbl = {}
@@ -33,8 +33,23 @@ local function mapToNumber(map)
     return tbl
 end
 
-function StatController:KnitInit()
-    local StatService = Knit.GetService("StatService")
+function StatController:OnInit()
+    local function onPlayerAdded(player)
+        self._loggedIn[player.UserId] = true
+    end
+
+    Players.PlayerAdded:Connect(onPlayerAdded)
+    for _, player in pairs(Players:GetPlayers()) do
+        onPlayerAdded(player)
+    end
+
+    Players.PlayerRemoving:Connect(function(player)
+        self._loggedIn[player.UserId] = nil
+        self._leaderstats[player.UserId] = nil
+    end)
+
+    local StatService = Root:GetServerService("StatService")
+    
     StatService.InitStats:Connect(function(stats, registeredStats)
         self._registeredStats = registeredStats
 
@@ -58,20 +73,6 @@ function StatController:KnitInit()
     StatService.SetStatVisibility:Connect(function(name, visible)
         self._registeredStats[name].show = visible
         self:_setStatVisibility(name, visible)
-    end)
-
-    local function onPlayerAdded(player)
-        self._loggedIn[player.UserId] = true
-    end
-
-    Players.PlayerAdded:Connect(onPlayerAdded)
-    for _, player in pairs(Players:GetPlayers()) do
-        onPlayerAdded(player)
-    end
-
-    Players.PlayerRemoving:Connect(function(player)
-        self._loggedIn[player.UserId] = nil
-        self._leaderstats[player.UserId] = nil
     end)
 end
 

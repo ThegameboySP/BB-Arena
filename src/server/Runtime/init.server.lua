@@ -1,9 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TestService = game:GetService("TestService")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 
-local Knit = require(ReplicatedStorage.Packages.Knit)
+local Root = require(ReplicatedStorage.Common.Root)
 local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
 local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerName)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
@@ -14,16 +15,22 @@ local resetPlayer = require(script.resetPlayer)
 
 local Configuration = ReplicatedStorage.Configuration
 local Services = script.Parent.Services
+local Scripts = script.Parent.Scripts
 
-local function registerKnit()
+-- RunService:IsRunMode() always returns true even when hitting Play, so it's useless here.
+if TestService.ExecuteWithStudioRun and RunService:IsStudio() then
+    return
+end
+
+local function registerRoot()
     local RemoteProperties = Instance.new("Folder")
     RemoteProperties.Name = "RemoteProperties"
     RemoteProperties.Parent = ReplicatedStorage
     
-    Knit.globals = {}
+    Root.globals = {}
     for key, value in pairs(defaultGlobalValues) do
-        Knit.globals[key] = RemoteProperty.new(RemoteProperties, key)
-        Knit.globals[key]:Set(value)
+        Root.globals[key] = RemoteProperty.new(RemoteProperties, key)
+        Root.globals[key]:Set(value)
     end
     
     local notificationRemote = Instance.new("RemoteEvent")
@@ -38,33 +45,35 @@ local function registerKnit()
         warn("[Game Critical]", getFullPlayerName(client) .. " errored:", message .. "\n" .. stackTrace)
     end)
     
-    Knit.hint = function(message, options)
+    Root.hint = function(message, options)
         options = options or {}
         options.sender = options.sender or "Nexus Arena"
         notificationRemote:FireAllClients(true, message, options)
     end
 
-    Knit.notification = function(message, options)
+    Root.notification = function(message, options)
         options = options or {}
         options.sender = options.sender or "Nexus Arena"
         notificationRemote:FireAllClients(false, message, options)
     end
 
-    Knit.resetPlayer = resetPlayer
+    Root.resetPlayer = resetPlayer
 
-    Knit.GetSingleton = function(name)
-        return Knit.GetService(name .. "Service")
-    end
-
-    Knit.AddServices(Services)
+    Root:RegisterServicesIn(Services)
     
-    Knit.Start()
+    Root:Start()
         :catch(warn)
         :await()
     
     local startingMapName = Configuration:GetAttribute("StartingMapName")
     if startingMapName then
-        Knit.GetService("MapService"):ChangeMap(startingMapName)
+        Root:GetService("MapService"):ChangeMap(startingMapName)
+    end
+end
+
+local function runScripts()
+    for _, script in ipairs(Scripts:GetChildren()) do
+        require(script)(Root)
     end
 end
 
@@ -80,7 +89,7 @@ local function spawnPlayers()
 
     EventBus.playerDied:Connect(function(player)
         local connections = {}
-        local thread = task.delay(Knit.globals.respawnTime:Get(), function()
+        local thread = task.delay(Root.globals.respawnTime:Get(), function()
             for _, connection in ipairs(connections) do
                 connection:Disconnect()
             end
@@ -131,7 +140,8 @@ end
 Lighting:ClearAllChildren()
 
 loadTools()
-registerKnit()
+registerRoot()
+runScripts()
 spawnPlayers()
 warnIfSlow()
 

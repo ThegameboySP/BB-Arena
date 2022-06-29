@@ -9,7 +9,7 @@ local function mapStatNames(stats)
 end
 
 return function(context, players, name, value)
-    local StatService = context:GetStore("Common").Knit.GetService("StatService")
+    local StatService = context:GetStore("Common").Root:GetService("StatService")
 
     local statNames = mapStatNames(StatService:GetRegisteredStats())
     local fuzzyFinder = context.Cmdr.Util.MakeFuzzyFinder(statNames)
