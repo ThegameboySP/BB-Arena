@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ScriptContext = game:GetService("ScriptContext")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
@@ -12,6 +13,7 @@ local hintGUI = require(ReplicatedStorage.ClientModules.UI.hintGUI)
 local RespawnGui = ReplicatedStorage.UI.RespawnGui
 local RemoteProperties = ReplicatedStorage:WaitForChild("RemoteProperties")
 local notificationRemote = ReplicatedStorage:WaitForChild("NotificationRemote")
+local clientErrorRemote = ReplicatedStorage:WaitForChild("ClientErrorRemote")
 local Controllers = ReplicatedStorage.ClientModules.Controllers
 
 if not workspace:GetAttribute("GameInitialized") then
@@ -35,6 +37,10 @@ local function registerKnit()
         end
     end)
 
+    ScriptContext.Error:Connect(function(...)
+        clientErrorRemote:FireServer(...)
+    end)
+
     Knit.GetSingleton = function(name)
         return Knit.GetController(name .. "Controller")
     end
@@ -42,7 +48,9 @@ local function registerKnit()
     Knit.AddControllers(Controllers)
 
     Knit.Start()
-        :catch(warn)
+        :catch(function(err)
+            task.spawn(error, tostring(err))
+        end)
         :await()
 
     local MapService = Knit.GetService("MapService")

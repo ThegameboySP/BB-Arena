@@ -5,6 +5,7 @@ local Players = game:GetService("Players")
 
 local Knit = require(ReplicatedStorage.Packages.Knit)
 local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
+local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerName)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
 local defaultGlobalValues = require(script.Parent.defaultGlobalValues)
 
@@ -28,6 +29,14 @@ local function registerKnit()
     local notificationRemote = Instance.new("RemoteEvent")
     notificationRemote.Name = "NotificationRemote"
     notificationRemote.Parent = ReplicatedStorage
+
+    local clientErrorRemote = Instance.new("RemoteEvent")
+    clientErrorRemote.Name = "ClientErrorRemote"
+    clientErrorRemote.Parent = ReplicatedStorage
+
+    clientErrorRemote.OnServerEvent:Connect(function(client, message, stackTrace)
+        warn("[Game Critical]", getFullPlayerName(client) .. " errored:", message .. "\n" .. stackTrace)
+    end)
     
     Knit.hint = function(message, options)
         options = options or {}
