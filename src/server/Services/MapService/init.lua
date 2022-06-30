@@ -49,7 +49,12 @@ local MapService = {
 function MapService:OnInit()
 	for _, child in pairs(self.mapParent:GetChildren()) do
 		if CollectionService:HasTag(child, "Map") then
-			child.Parent = self.Maps
+			-- The client can sometimes log in fast enough for the map to be automatically replicated.
+			-- This can mess up prototypes since they're deparented when invisible to the client, then when
+			-- it comes into scope again the client tries to locally run them.
+			-- So we clone any maps that were under Workspace. Not pretty.
+			child:Clone().Parent = self.Maps
+			child.Parent = nil
 		end
 	end
 	

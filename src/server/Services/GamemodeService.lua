@@ -132,6 +132,10 @@ function GamemodeService:SetGamemode(name, config)
 end
 
 function GamemodeService:_mapSupportsGamemode(map, definition)
+    if map == nil then
+        return false, "There is no active map."
+    end
+    
     if definition.minTeams > #CollectionService:GetTagged("FightingTeam") then
         return false, string.format("%s needs at least %d teams to work", definition.friendlyName, definition.minTeams)
     end
