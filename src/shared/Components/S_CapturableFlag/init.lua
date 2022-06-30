@@ -21,6 +21,7 @@ local S_CapturableFlag = Component:extend("CapturableFlag", {
 		PauseSeconds = t.number;
 		Radius = t.number;
 		NoBottomCollision = t.optional(t.boolean);
+		BottomCollisionHeight = t.optional(t.number);
 	});
 
 	checkInstance = t.children({
@@ -72,7 +73,7 @@ function S_CapturableFlag:OnStart()
 		end
 	end
 	
-	self._radiusPart, self._pos, self._height = makeInstances(self.Instance, self.Config.Radius, self.Config.NoBottomCollision)
+	self._radiusPart, self._pos, self._height = makeInstances(self.Instance, self.Config.Radius, self.Config.NoBottomCollision, self.Config.BottomCollisionHeight)
 	self._radiusPart.Parent = self.Instance
 	self.bin:Add(self._radiusPart)
 
