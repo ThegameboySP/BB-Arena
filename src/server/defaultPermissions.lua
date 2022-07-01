@@ -39,4 +39,9 @@ return {
 		[1738869060] = AdminTiers.Admin; -- Eiina_L (alt account)
 		[547145830] = AdminTiers.Admin; -- matito6
 	};
+
+	-- All Owners are Referees automatically.
+	Referees = {
+		[34279992] = true; -- Boy4u2
+	};
 }

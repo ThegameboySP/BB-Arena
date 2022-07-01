@@ -42,6 +42,7 @@ end
 local function initState()
     return {
         users = {
+            referees = table.clone(defaultPermissions.Referees);
             admins = table.clone(defaultPermissions.Admins);
         }
     }

@@ -1,3 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+
 local usersSelectors = require(script.Parent.usersSelectors)
 local getAdmin = usersSelectors.getAdmin
 
@@ -14,6 +18,25 @@ local function setAdmin(userId, admin, byUser)
                 payload = {
                     userId = userId;
                     admin = admin;
+                };
+            })
+        end
+    end
+end
+
+local function setReferee(userId, isReferee, byUser)
+    return function(store)
+        local state = store:getState()
+        
+        if
+            byUser == nil or
+            (getAdmin(state, byUser) >= GameEnum.AdminTiers.Owner)
+        then
+            store:dispatch({
+                type = "users_setReferee";
+                payload = {
+                    userId = userId;
+                    isReferee = isReferee;
                 };
             })
         end
@@ -106,6 +129,7 @@ end
 
 return {
     setAdmin = setAdmin;
+    setReferee = setReferee;
     setServerLocked = setServerLocked;
     setUserBanned = setUserBanned;
     setUserWhitelisted = setUserWhitelisted;

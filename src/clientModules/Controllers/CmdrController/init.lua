@@ -21,7 +21,7 @@ local CmdrController = {
 }
 
 function CmdrController:CanRun(player, group)
-	return canRun.canRun(Root.Store:getState().users.admins, player.UserId, group)
+	return canRun.canRun(Root.Store:getState().users, player.UserId, group)
 end
 
 function CmdrController:OnInit()

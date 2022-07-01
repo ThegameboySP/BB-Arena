@@ -9,6 +9,7 @@ return Rodux.createReducer({
     banned = {};
     whitelisted = {};
     admins = {};
+    referees = {};
     activeUsers = {};
 }, {
     users_joined = function(state, action)
@@ -24,6 +25,11 @@ return Rodux.createReducer({
     users_setAdmin = function(state, action)
         return Dictionary.mergeDeep(state, {
             admins = {[action.payload.userId] = action.payload.admin};
+        })
+    end;
+    users_setReferee = function(state, action)
+        return Dictionary.mergeDeep(state, {
+            referee = {[action.payload.userId] = action.isReferee or Llama.None};
         })
     end;
     users_setServerLocked = function(state, action)

@@ -13,7 +13,7 @@ local anyGroups = table.freeze({
 	Utility = true;
 })
 
-local function canRun(admins, userId, group)
+local function canRun(permissions, userId, group)
 	if userId == nil then
         return true
     end
@@ -26,14 +26,20 @@ local function canRun(admins, userId, group)
 		return IS_STUDIO
 	end
 
+	local playerAdmin = permissions.admins[userId] or 0
+
+	if group == "Referee" then
+		return
+			(permissions.referees[userId] and playerAdmin >= GameEnum.AdminTiers.Admin)
+			or (not permissions.referees[userId] and playerAdmin >= GameEnum.AdminTiers.Owner)
+	end
+
 	local requiredAdmin = 0
 	if group == "Admin" or group == "DefaultAdmin" then
 		requiredAdmin = GameEnum.AdminTiers.Admin
 	elseif group == "Owner" or group == "DefaultDebug" then
 		requiredAdmin = GameEnum.AdminTiers.Owner
 	end
-
-	local playerAdmin = admins[userId] or 0
 
 	return playerAdmin >= requiredAdmin
 end
