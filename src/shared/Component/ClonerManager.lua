@@ -228,6 +228,7 @@ function ClonerManager:Register(class)
     end
 
     self._registered[tostring(class)] = class
+    self.Manager:Register(class)
 end
 
 return ClonerManager

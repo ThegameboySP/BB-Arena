@@ -37,6 +37,7 @@ function Component:extend(name, mergeWith)
             Changed = Signal.new();
 
             __remote = nil;
+            __remotes = {};
             __initializedPlayers = {};
             __toDestroy = {};
         }, new)
@@ -85,17 +86,30 @@ end
 
 function Component:RemoteEvent(name)
     if IS_SERVER then
-        local remoteEvent = Instance.new("RemoteEvent")
+        local remoteEvent = self.__remotes[name]
+        if remoteEvent then
+            return remoteEvent
+        end
+
+        remoteEvent = Instance.new("RemoteEvent")
         remoteEvent.Name = name
         remoteEvent.Parent = self.Instance
+
         table.insert(self.__toDestroy, remoteEvent)
+        self.__remotes[name] = remoteEvent
 
         return remoteEvent
     else
-        local remoteEvent = self.Instance:FindFirstChild(name)
+        local remoteEvent = self.__remotes[name]
+        if remoteEvent then
+            return remoteEvent
+        end
+
+        remoteEvent = self.Instance:FindFirstChild(name)
             or error(("No child named %s under %s"):format(name, self.Instance:GetFullName()))
         
         table.insert(self.__toDestroy, remoteEvent)
+        self.__remotes[name] = remoteEvent
 
         return remoteEvent
     end
@@ -144,8 +158,8 @@ function Component:Destroy()
         self.__remote:Destroy()
     end
     
-    for _, remote in self.__toDestroy do
-        remote:Destroy()
+    for _, item in ipairs(self.__toDestroy) do
+        item:Destroy()
     end
 end
 

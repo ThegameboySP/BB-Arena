@@ -1,3 +1,5 @@
+local Players = game:GetService("Players")
+
 local General = {}
 
 function General.isValidCharacter(char)
@@ -11,6 +13,47 @@ function General.isValidCharacter(char)
     end
 
     return hum.Health > 0
+end
+
+function General.getCharacter(instance)
+	local node = instance
+
+	while node do
+		local hum = node:FindFirstChild("Humanoid")
+		if hum then
+			return node, hum
+		end
+
+		node = node.Parent
+	end
+
+	return nil
+end
+
+function General.getCharacterFromHitbox(instance)
+	local parent = instance.Parent
+	if parent then
+		local hum = parent:FindFirstChild("Humanoid")
+		if hum then
+			return parent, hum
+		end
+	end
+
+	return nil
+end
+
+function General.getPlayerFromHitbox(instance)
+	local character = General.getCharacterFromHitbox(instance)
+	if character then
+		return Players:GetPlayerFromCharacter(character), character
+	end
+end
+
+function General.getPlayer(instance)
+	local character = General.getPlayer(instance)
+	if character then
+		return Players:GetPlayerFromCharacter(character), character
+	end
 end
 
 function General.weld(p0, p1)

@@ -12,17 +12,27 @@ function Manager.new()
 
         _componentsByInstance = {};
         _componentsByClass = {};
+        _classesByName = {};
     }, Manager)
 end
 
-function Manager:_assertComponent(item)
+function Manager:_assetClass(item)
     if type(item) ~= "table" or not item.new then
         error(("Expected component, got %s"):format(tostring(item)), 3)
     end
 end
 
-function Manager:AddComponent(instance, class, params)
-    self:_assertComponent(class)
+function Manager:_resolveClass(item)
+    if type(item) == "table" then
+        return item
+    elseif type(item) == "string" then
+        return self._classesByName[item]
+    end
+end
+
+function Manager:AddComponent(instance, identifier, params)
+    local class = self:_resolveClass(identifier)
+    self:_assetClass(class)
 
     local existingComponent = self:GetComponent(instance, class)
     if existingComponent then
@@ -68,8 +78,8 @@ function Manager:BulkAddComponent(instances, classes, params)
     local added = {}
 
     for i, instance in ipairs(instances) do
-        local class = classes[i]
-        self:_assertComponent(class)
+        local class = self:_resolveClass(classes[i])
+        self:_assetClass(class)
 
         if self:GetComponent(instance, class) then
             self:RemoveComponent(instance, class)
@@ -77,9 +87,11 @@ function Manager:BulkAddComponent(instances, classes, params)
 
         local component = class.new(instance, params[i])
         self:_addComponent(instance, component, params[i])
-        
-        task.spawn(component.OnInit, component)
         table.insert(added, component)
+    end
+
+    for _, component in ipairs(added) do
+        task.spawn(component.OnInit, component)
     end
 
     for _, component in ipairs(added) do
@@ -91,8 +103,9 @@ function Manager:BulkAddComponent(instances, classes, params)
     return added
 end
 
-function Manager:RemoveComponent(instance, class)
-    self:_assertComponent(class)
+function Manager:RemoveComponent(instance, identifier)
+    local class = self:_resolveClass(identifier)
+    self:_assetClass(class)
 
     local component = self:GetComponent(instance, class)
     if not component then
@@ -107,8 +120,9 @@ function Manager:RemoveComponent(instance, class)
     task.spawn(component.Destroy, component)
 end
 
-function Manager:GetComponent(instance, class)
-    self:_assertComponent(class)
+function Manager:GetComponent(instance, identifier)
+    local class = self:_resolveClass(identifier)
+    self:_assetClass(class)
 
     local components = self._componentsByInstance[instance]
     if components == nil then
@@ -118,8 +132,9 @@ function Manager:GetComponent(instance, class)
     return components[class]
 end
 
-function Manager:GetComponents(class)
-    self:_assertComponent(class)
+function Manager:GetComponents(identifier)
+    local class = self:_resolveClass(identifier)
+    self:_assetClass(class)
 
     local components = self._componentsByClass[class]
     if components == nil then
@@ -140,6 +155,14 @@ function Manager:Clear()
             self:RemoveComponent(instance, class)
         end
     end
+end
+
+function Manager:Register(class)
+    if self._classesByName[tostring(class)] then
+        error(("Duplicate component class %q"):format(tostring(class)))
+    end
+
+    self._classesByName[tostring(class)] = class
 end
 
 return Manager

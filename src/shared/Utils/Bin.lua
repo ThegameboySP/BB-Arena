@@ -86,6 +86,13 @@ function Bin:AddId<table, taskId>(task, id)
 	return task, taskId
 end
 
+function Bin:Get(id)
+	local entry = self[id]
+	if entry then
+		return entry.task
+	end
+end
+
 -- Declarative sugar for adding multiple tasks in a go.
 function Bin:GiveTasks<Bin, table>(tasks: table)
 	local ids = {}
