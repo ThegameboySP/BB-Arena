@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Components = require(ReplicatedStorage.Common.Components)
+local RichText = require(ReplicatedStorage.Common.Utils.RichText)
 
 local CTFServer = {}
 CTFServer.__index = CTFServer
@@ -86,9 +87,29 @@ function CTFServer:addPointToTeam(team, amount)
     self.scores[team] = score + amount
 end
 
+local function formatWonGame(winningTeam, teamToScore)
+    local scores = {}
+    for team, score in pairs(teamToScore) do
+        table.insert(scores, {team = team, score = score})
+    end
+
+    table.sort(scores, function(a, b)
+        return a.score > b.score
+    end)
+
+    local scoreStrings = {}
+    for _, data in ipairs(scores) do
+        table.insert(scoreStrings, string.format("%s team: %d", data.team.Name, data.score))
+    end
+
+    return
+        RichText.color(string.format("The %s team has won the game!\n", winningTeam.Name), winningTeam.TeamColor.Color)
+        .. RichText.color(table.concat(scoreStrings, "\n"), Color3.new(1, 1, 1))
+end
+
 function CTFServer:finish(winningTeam)
-    self.service:AnnounceEvent(("The %s team has won the game!"):format(winningTeam.Name), {
-        color = winningTeam.TeamColor.Color;
+    self.service:AnnounceEvent(formatWonGame(winningTeam, self.scores), {
+        stayOpen = true;
     })
 	self.service:StopGamemode()
 end

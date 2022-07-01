@@ -66,12 +66,13 @@ function ControlPointsClient:OnInit(teams)
     local MapController = Root:GetService("MapController")
 	local controlPoints = {}
 
-	local lastAlertedNormal = 0
-	local lastAlertedCenter = 0
+	local lastAlerted = 0
 
     for _, controlPoint in pairs(MapController.ClonerManager.Manager:GetComponents(Components.C_ControlPoint)) do
 		table.insert(controlPoints, controlPoint)
 
+		local isInvisible = controlPoint.Instance.FlagHead.Transparency == 1
+		
 		local flash = Assets.FlashParticles:Clone()
 		flash.Parent = controlPoint.Instance.FlagHead
 
@@ -84,20 +85,21 @@ function ControlPointsClient:OnInit(teams)
 				and controlPoint.State.CapturedBy == LocalPlayer.Team
 				and controlPoint.State.CapturingGroup ~= LocalPlayer.Team
 			then
-				if controlPoint.Config.IsCenter then
-					if os.clock() - lastAlertedCenter > 15 then
-						lastAlertedCenter = os.clock()
+				if (os.clock() - lastAlerted) > 30 then
+					lastAlerted = os.clock()
+
+					if controlPoint.Config.IsCenter then
 						playSound(Sounds.CP_BadCenterCapturing)
-					end
-				else
-					if os.clock() - lastAlertedNormal > 15 then
-						lastAlertedNormal = os.clock()
+					else
 						playSound(Sounds.CP_BadCapturing)
 					end
 				end
 			end
 
-			flash.Enabled = state == "Capping"
+			if not isInvisible then
+				flash.Enabled = state == "Capping"
+			end
+			
 			lastState = state
 		end
 

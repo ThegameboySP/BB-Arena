@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local Llama = require(ReplicatedStorage.Packages.Llama)
 local S_ControlPoint = require(ReplicatedStorage.Common.Components).S_ControlPoint
+local RichText = require(ReplicatedStorage.Common.Utils.RichText)
 
 local strings = {
     wonGame = "The %s team has won the game!";
@@ -73,6 +73,8 @@ function ControlPointsServer:OnInit(config, fightingTeams)
 
             hum.Health = hum.MaxHealth
             healedEvent:FireAllClients(char)
+
+            self.service.StatService:IncrementStat(player.UserId, "CP_pointsCaptures", 1)
         end
 
         if cp.Config.IsCenter then
@@ -89,6 +91,33 @@ function ControlPointsServer:OnInit(config, fightingTeams)
     self.disconnectControlPoints = self:_connectOnCaptured()
 
     local con = self.UpdateEvent:Connect(function(dt)
+        for _, cp in pairs(self.service:GetManager():GetComponents(S_ControlPoint)) do
+            local capturedTeam = cp.State.CapturedBy
+
+            local players = cp:GetPlayersInside()
+
+            local defendingPlayers = {}
+            local attackingPlayers = {}
+
+            for _, player in pairs(players) do
+                if player.Team == capturedTeam then
+                    table.insert(defendingPlayers, player)
+                else
+                    table.insert(attackingPlayers, player)
+                end
+            end
+
+            if defendingPlayers[1] and attackingPlayers[1] then
+                for _, player in pairs(defendingPlayers) do
+                    self.service.StatService:IncrementStat(player.UserId, "CP_secondsDefending", dt)
+                end
+            else
+                for _, player in pairs(attackingPlayers) do
+                    self.service.StatService:IncrementStat(player.UserId, "CP_secondsAttacking", dt)
+                end
+            end
+        end
+
         local delta = {}
         local highestScore = 0
         local highestTeams = {}
@@ -144,29 +173,29 @@ function ControlPointsServer:OnInit(config, fightingTeams)
 end
 
 function ControlPointsServer:OnMapChanged(oldTeamToNewTeam)
-    local delta = {}
+    -- local delta = {}
 
-    for oldTeam, newTeam in oldTeamToNewTeam do
-        self.scores[newTeam] = self.scores[oldTeam] or 0
-        self.scores[oldTeam] = nil
+    -- for oldTeam, newTeam in oldTeamToNewTeam do
+    --     self.scores[newTeam] = self.scores[oldTeam] or 0
+    --     self.scores[oldTeam] = nil
 
-        local oldValue = delta[oldTeam.Name .. "Score"]
+    --     local oldValue = delta[oldTeam.Name .. "Score"]
 
-        -- Annoyingly, old and new team names can overlap between iterations.
-        if type(oldValue) ~= "number" then
-            delta[oldTeam.Name .. "Score"] = Llama.None
-        end
+    --     -- Annoyingly, old and new team names can overlap between iterations.
+    --     if type(oldValue) ~= "number" then
+    --         delta[oldTeam.Name .. "Score"] = Llama.None
+    --     end
 
-        delta[newTeam.Name .. "Score"] = math.floor(self.scores[newTeam])
+    --     delta[newTeam.Name .. "Score"] = math.floor(self.scores[newTeam])
 
-        self.teamToRate[newTeam] = 0
-        self.teamToRate[oldTeam] = nil
-    end
+    --     self.teamToRate[newTeam] = 0
+    --     self.teamToRate[oldTeam] = nil
+    -- end
 
-    self.binder:SetState(delta)
+    -- self.binder:SetState(delta)
 
-    self.disconnectControlPoints()
-    self.disconnectControlPoints = self:_connectOnCaptured()
+    -- self.disconnectControlPoints()
+    -- self.disconnectControlPoints = self:_connectOnCaptured()
 end
 
 function ControlPointsServer:_connectOnCaptured()
@@ -192,11 +221,32 @@ function ControlPointsServer:_connectOnCaptured()
     end
 end
 
+local function formatWonGame(winningTeam, teamToScore)
+    local scores = {}
+    for team, score in pairs(teamToScore) do
+        table.insert(scores, {team = team, score = score})
+    end
+
+    table.sort(scores, function(a, b)
+        return a.score > b.score
+    end)
+
+    local scoreStrings = {}
+    for _, data in ipairs(scores) do
+        table.insert(scoreStrings, string.format("%s team: %d", data.team.Name, data.score))
+    end
+
+    return
+        RichText.color(string.format("The %s team has won the game!\n", winningTeam.Name), winningTeam.TeamColor.Color)
+        .. RichText.color(table.concat(scoreStrings, "\n"), Color3.new(1, 1, 1))
+end
+
 function ControlPointsServer:finish(winningTeam)
-    self.service:AnnounceEvent(strings.wonGame:format(winningTeam.Name), {
-        color = winningTeam.TeamColor.Color
+    self.service:AnnounceEvent(formatWonGame(winningTeam, self.scores), {
+        stayOpen = true;
     })
-	self.service:StopGamemode()
+
+	self.service:StopGamemode(true)
 end
 
 return ControlPointsServer
