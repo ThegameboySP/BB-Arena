@@ -101,13 +101,18 @@ function Cloner:RunPrototypes(selector)
     
     local cloneRecords = {}
     for _, prototype in ipairs(prototypes) do
-        if not self._prototypeToClone[prototype] then
-            for _, thisPrototype in pairs({prototype, unpack(self._prototypeRecordByPrototype[prototype].descendantPrototypes)}) do
+        if self._prototypeToClone[prototype] then
+            continue
+        end
+        
+        -- Automatically include all descendant prototypes when running.
+        for _, thisPrototype in ipairs({prototype, unpack(self._prototypeRecordByPrototype[prototype].descendantPrototypes)}) do
+            if not self._prototypeToClone[thisPrototype] then
                 local clone = thisPrototype:Clone()
                 self._prototypeToClone[thisPrototype] = clone
                 
                 local prototypeRecord = self._prototypeRecordByPrototype[thisPrototype]
-    
+
                 for tag in pairs(prototypeRecord.tagsMap) do
                     CollectionService:RemoveTag(clone, tag)
                 end
@@ -119,7 +124,7 @@ function Cloner:RunPrototypes(selector)
 
                 self._cloneRecordByClone[clone] = cloneRecord
                 table.insert(cloneRecords, cloneRecord)
-            end            
+            end
         end
     end
 
