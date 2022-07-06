@@ -47,9 +47,7 @@ function MapController:OnStart()
 		self.PreMapChanged:Fire(mapName, oldMapName)
 	end)
 
-	MapService.CurrentMap:Observe(function(currentMap)
-		self:_tween(currentMap.Name)
-	end)
+	self:_tween(MapService.CurrentMap:Get().Name)
 end
 
 function MapController:onMapChanged(map)

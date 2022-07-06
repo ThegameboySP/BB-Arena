@@ -1,5 +1,6 @@
 return {
 	Name = "__startGamemode";
+	Description = "Technical command.";
 	Aliases = {};
 	Group = "Admin";
 	Args = {

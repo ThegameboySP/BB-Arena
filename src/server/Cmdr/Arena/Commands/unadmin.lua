@@ -1,5 +1,5 @@
 return {
-	Name = "Unadmin";
+	Name = "unadmin";
 	Aliases = {};
 	Description = "Unadmins players.";
 	Group = "Admin";
