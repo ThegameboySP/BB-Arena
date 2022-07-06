@@ -27,6 +27,7 @@ local CmdrService = {
 	
 	Cmdr = Cmdr;
 	_lockedCommands = {};
+	_logs = {};
 }
 
 local BLACKLISTED_COMMANDS = {
@@ -38,6 +39,10 @@ local BLACKLISTED_COMMANDS = {
 
 function CmdrService:CanRun(player, group)
 	return canRun.canRun(Root.Store:getState().users, player.UserId, group)
+end
+
+function CmdrService:GetLogs()
+	return self._logs
 end
 
 function CmdrService:OnStart()
@@ -111,7 +116,11 @@ function CmdrService:_setupCmdr()
 	end)
 	
 	Cmdr:RegisterHook("AfterRun", function(context)
-		self.Client.CommandExecuted:FireAllClients({
+		if #self._logs > 100 then
+			table.remove(self._logs, 1)
+		end
+		
+		table.insert(self._logs, {
 			ExecutorName = context.Executor and context.Executor.Name or "Server";
 			RawText = context.RawText;
 			Response = context.Response;

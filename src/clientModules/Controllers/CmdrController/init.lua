@@ -1,23 +1,21 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local Root = require(ReplicatedStorage.Common.Root)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
-local CmdrReplicated = ReplicatedStorage:WaitForChild("CmdrReplicated")
-local canRun = require(CmdrReplicated:WaitForChild("Hooks"):WaitForChild("canRun"))
+local CmdrReplicated = ReplicatedStorage.CmdrReplicated
+local canRun = require(CmdrReplicated.Hooks.canRun)
 local CmdrNotifications = require(script.CmdrNotifications)
 
 local LOCAL_PLAYER = Players.LocalPlayer
 local ERROR_COLOR = Color3.fromRGB(255, 112, 112)
-local IS_STUDIO = game:GetService("RunService"):IsStudio()
 
 local CmdrController = {
 	Name = "CmdrController";
 	Cmdr = nil;
-	
-	_logs = {{}};
 }
 
 function CmdrController:CanRun(player, group)
@@ -26,19 +24,6 @@ end
 
 function CmdrController:OnInit()
     local CmdrService = Root:GetServerService("CmdrService")
-	
-	CmdrService.CommandExecuted:Connect(function(context)
-		local len = #self._logs
-		local latestPage = self._logs[len]
-		
-		local selectedPage = latestPage
-		if #latestPage > 50 then
-			selectedPage = {}
-			self._logs[len + 1] = selectedPage
-		end
-
-		table.insert(selectedPage, context)
-	end)
 
 	CmdrService.Warning:Connect(function(str)
 		CmdrNotifications:AddMessage(str, true, ERROR_COLOR)
@@ -59,7 +44,7 @@ function CmdrController:OnStart()
 	CmdrClient.Registry.Types.player = CmdrClient.Registry.Types.arenaPlayer
 	CmdrClient.Registry.Types.players = CmdrClient.Registry.Types.arenaPlayers
 	
-	if IS_STUDIO then
+	if RunService:IsStudio() then
 		CmdrClient.Dispatcher:EvaluateAndRun("bind t blink")
 	end
 
@@ -89,7 +74,7 @@ function CmdrController:OnStart()
 
 		local dispatcher = CmdrClient.Dispatcher
 		local cmd = message:sub(2, -1)
-		if cmd == "help" or cmd == "cmds" then
+		if cmd == "help" or cmd == "cmds" or cmd == "commands" then
 			CmdrClient:Show()
 			return dispatcher:EvaluateAndRun("help", LOCAL_PLAYER)
 		elseif cmd == "logs" or cmd == "l" then
@@ -105,20 +90,13 @@ function CmdrController:OnStart()
 			CmdrNotifications:AddMessage(err, true, ERROR_COLOR)
 			dispatcher:EvaluateAndRun(("reply %q %s"):format(("%q: -> %s"):format(cmd, err), "255,73,73"))
 		else
+			if msg ~= "Command executed." then
+				CmdrNotifications:AddMessage(msg, false)
+			end
+
 			dispatcher:EvaluateAndRun(("reply %q %s"):format(("%q: -> %s"):format(cmd, msg), "255,255,255"))
 		end
 	end)
-end
-
-function CmdrController:GetLogs(pageIndex)
-	pageIndex = pageIndex or -1
-	if pageIndex == 0 then
-		pageIndex = -1
-	end
-	
-	local len = #self._logs
-	local index = math.clamp(len + pageIndex + 1, 1, len)
-	return self._logs[index]
 end
 
 function CmdrController:OnPlayerLoaded(player)
