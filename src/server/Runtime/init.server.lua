@@ -110,6 +110,20 @@ local function spawnPlayers()
     end)
 end
 
+local function initializePlayers()
+    local function onPlayerAdded(player)
+        -- hack
+        task.delay(0.2, function()
+            player:SetAttribute("Initialized", true)
+        end)
+    end
+
+    Players.PlayerAdded:Connect(onPlayerAdded)
+    for _, player in ipairs(Players:GetPlayers()) do
+        onPlayerAdded(player)
+    end
+end
+
 local function warnIfSlow()
     local lastUpdate = os.clock()
     local lastWarn = 0
@@ -143,6 +157,7 @@ loadTools()
 registerRoot()
 runScripts()
 spawnPlayers()
+initializePlayers()
 warnIfSlow()
 
 workspace:SetAttribute("GameInitialized", true)

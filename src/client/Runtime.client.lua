@@ -18,8 +18,8 @@ local clientErrorRemote = ReplicatedStorage:WaitForChild("ClientErrorRemote")
 local Controllers = ReplicatedStorage.ClientModules.Controllers
 local Scripts = ReplicatedStorage.ClientModules.Scripts
 
-if not workspace:GetAttribute("GameInitialized") then
-    workspace:GetAttributeChangedSignal("GameInitialized"):Wait()
+if not Players.LocalPlayer:GetAttribute("Initialized") then
+    Players.LocalPlayer:GetAttributeChangedSignal("Initialized"):Wait()
 end
 
 local function registerRoot()
@@ -39,8 +39,11 @@ local function registerRoot()
         end
     end)
 
-    ScriptContext.Error:Connect(function(...)
-        clientErrorRemote:FireServer(...)
+    ScriptContext.Error:Connect(function(message, stackTrace)
+        -- Avoid stupid error spam caused by the toolset.
+        if not stackTrace or not stackTrace:find("Core") then
+            clientErrorRemote:FireServer(message, stackTrace)
+        end
     end)
 
     Root:RegisterServicesIn(Controllers)
