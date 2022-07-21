@@ -70,7 +70,7 @@ function GamemodeService:OnInit()
         end
     end)
 
-    self.MapService.PreMapChanged:Connect(function(map, _, oldTeamToNewTeam)
+    self.MapService.MapChanging:Connect(function(map, _, oldTeamToNewTeam)
         if self.CurrentGamemode then
             local definition = self.CurrentGamemode.definition
             if definition.stopOnMapChange then

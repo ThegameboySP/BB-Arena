@@ -61,6 +61,10 @@ local function registerRoot()
     local GamemodeController = Root:GetService("GamemodeController")
 
     local queuedMap
+    MapService.MapChanging:Connect(function(mapName, oldMapName)
+        MapController:onMapChanging(mapName, oldMapName)
+    end)
+
     MapService.CurrentMap:Observe(function(map)
         queuedMap = map
     end)

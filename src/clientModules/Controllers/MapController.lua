@@ -15,7 +15,7 @@ local MapController = {
 	Name = "MapController";
 
 	MapChanged = Signal.new();
-	PreMapChanged = Signal.new();
+	MapChanging = Signal.new();
 
 	CurrentMap = nil;
 	MapScript = nil;
@@ -41,21 +41,20 @@ end
 
 function MapController:OnStart()
 	local MapService = Root:GetServerService("MapService")
-
-	MapService.PreMapChanged:Connect(function(mapName, oldMapName)
-		self:_tween(mapName)
-		self.PreMapChanged:Fire(mapName, oldMapName)
-	end)
-
 	self:_tween(MapService.CurrentMap:Get().Name)
+end
+
+function MapController:onMapChanging(mapName, oldMapName)
+	self.ClonerManager:Clear()
+	self:_tween(mapName)
+	self.MapChanging:Fire(mapName, oldMapName)
 end
 
 function MapController:onMapChanged(map)
 	local oldMap = self.CurrentMap
 	self.CurrentMap = map
 	self.MapScript = nil
-
-	self.ClonerManager:Clear()
+	
 	self.ClonerManager:ClientInit(map)
 	self.ClonerManager:Flush()
 	self.ClonerManager.Cloner:RunPrototypes(function()

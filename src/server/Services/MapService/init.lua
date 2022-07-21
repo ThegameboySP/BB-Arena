@@ -27,7 +27,7 @@ local metaDefinition = t.strictInterface({
 local MapService = {
 	Name = "MapService";
 	Client = {
-		PreMapChanged = Root.remoteEvent();
+		MapChanging = Root.remoteEvent();
 		MapChanged = Root.remoteEvent();
 		CurrentMap = Root.remoteProperty(nil);
 	};
@@ -36,7 +36,7 @@ local MapService = {
 	LightingSaves = ServerStorage.Plugin_LightingSaves;
 	mapParent = Workspace.MapRoot;
 
-	PreMapChanged = Signal.new();
+	MapChanging = Signal.new();
 	MapChanged = Signal.new();
 	
 	CurrentMap = nil;
@@ -165,8 +165,8 @@ function MapService:ChangeMap(mapName)
 	end
 
 	self.CurrentMap = newMap
-	self.PreMapChanged:Fire(newMap, oldMap, oldTeamToNewTeam)
-	self.Client.PreMapChanged:FireAllClients(newMap.Name, oldMap and oldMap.Name or nil)
+	self.MapChanging:Fire(newMap, oldMap, oldTeamToNewTeam)
+	self.Client.MapChanging:FireAllClients(newMap.Name, oldMap and oldMap.Name or nil)
 
 	newMap.Parent = self.mapParent
 
