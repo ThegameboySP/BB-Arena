@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 local TestService = game:GetService("TestService")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
@@ -150,9 +151,16 @@ local function warnIfSlow()
     end)
 end
 
--- Clear Studio lighting.
-Lighting:ClearAllChildren()
+local function removeStudioInstances()
+    -- Clear Studio lighting.
+    Lighting:ClearAllChildren()
 
+    for _, instance in ipairs(CollectionService:GetTagged("Studio")) do
+        instance.Parent = nil
+    end
+end
+
+removeStudioInstances()
 loadTools()
 registerRoot()
 runScripts()
