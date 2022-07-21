@@ -214,6 +214,10 @@ function ControlPointsClient:_handleGUI(controlPoints)
 				and tostring(point.State.TeammatesCount)
 				or ""
 			
+			local capturedBy = point.State.CapturedBy
+			local color = capturedBy and capturedBy.TeamColor.Color or NEUTRAL
+			Point:FindFirstChild("CapturedIndicator").BackgroundColor3 = color
+
 			setGradient(
 				Point:FindFirstChild("UIGradient"),
 				point.State.CapturedBy,
