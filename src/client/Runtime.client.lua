@@ -41,7 +41,7 @@ local function registerRoot()
 
     ScriptContext.Error:Connect(function(message, stackTrace)
         -- Avoid stupid error spam caused by the toolset.
-        if not stackTrace or not stackTrace:find("Core") then
+        if not stackTrace or not stackTrace:find("Backpack") then
             clientErrorRemote:FireServer(message, stackTrace)
         end
     end)

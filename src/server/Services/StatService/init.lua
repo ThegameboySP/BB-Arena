@@ -123,6 +123,7 @@ function StatService:RegisterStat(data)
         error(string.format("%q is an already registered stat name", data.name))
     end
 
+    data.priority = data.priority or -1
     self._registeredStats[data.name] = assert(checkRegisteredStat(data)) and data
 end
 

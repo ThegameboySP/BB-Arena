@@ -83,16 +83,25 @@ function MapController:_tween(mapName)
 			end
 		end
 
-		local skybox = lightingEntry:FindFirstChildWhichIsA("Sky", true):Clone()
-		CollectionService:AddTag(skybox, "MapBound")
-		
-		self._skyboxTweener:TweenSkybox(skybox, FADE_INFO, function()
+		local skybox = lightingEntry:FindFirstChildWhichIsA("Sky", true)
+		local removeSkybox = function()
 			for _, child in pairs(Lighting:GetChildren()) do
 				if child:IsA("Sky") and CollectionService:HasTag(child, "MapBound") then
 					child.Parent = nil
 				end
 			end
-		end)
+		end
+
+		if skybox then
+			self._skyboxTweener._fakeSkybox._viewport.Visible = true
+			local clone = skybox:Clone()
+			CollectionService:AddTag(clone, "MapBound")
+			
+			self._skyboxTweener:TweenSkybox(clone, FADE_INFO, removeSkybox)
+		else
+			self._skyboxTweener._fakeSkybox._viewport.Visible = false
+			removeSkybox()
+		end
 
 		local tweenProps = {}
 		for _, child in pairs(lightingEntry.Lighting:GetChildren()) do

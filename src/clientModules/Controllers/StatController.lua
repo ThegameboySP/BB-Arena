@@ -39,7 +39,7 @@ function StatController:OnInit()
     end
 
     Players.PlayerAdded:Connect(onPlayerAdded)
-    for _, player in pairs(Players:GetPlayers()) do
+    for _, player in ipairs(Players:GetPlayers()) do
         onPlayerAdded(player)
     end
 
@@ -97,7 +97,6 @@ function StatController:_getOrMakeLeaderstats(userId)
     return leaderstats
 end
 
--- Priority TODO
 function StatController:_update(userId, name, value)
     local registeredStat = self._registeredStats[name]
 
@@ -139,13 +138,21 @@ function StatController:_setStatVisibility(name, visible)
 end
 
 function StatController:_updateInit(stats)
-    for name, users in pairs(stats) do
-        if not self._registeredStats[name].show then
-            continue
-        end
+    local statsToAdd = {}
 
-        for userId, value in pairs(users) do
-            self:_update(userId, name, value)
+    for _, stat in pairs(self._registeredStats) do
+        if stat.show then
+            table.insert(statsToAdd, stat)
+        end
+    end
+    
+    table.sort(statsToAdd, function(a, b)
+        return a.priority > b.priority
+    end)
+
+    for _, stat in ipairs(statsToAdd) do
+        for userId, value in pairs(stats[stat.name]) do
+            self:_update(userId, stat.name, value)
         end
     end
 end
