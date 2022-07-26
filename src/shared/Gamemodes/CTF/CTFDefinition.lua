@@ -26,6 +26,10 @@ return {
 	};
 
 	stats = {
-		
+		CTF_captures = {
+			default = 0;
+			friendlyName = "Captures";
+			show = true;
+		}
 	};
 }

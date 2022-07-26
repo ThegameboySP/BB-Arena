@@ -150,8 +150,21 @@ function MapService:ChangeMap(mapName)
 	self.ClonerManager:Clear()
 	self.ClonerManager:ServerInit(newMap)
 	self.ClonerManager.Cloner:RunPrototypes(function(record)
-		return not record.parent:GetAttribute("Prototype_DisableRun")
+		local currentRecord = record
+		while currentRecord do
+			if
+				currentRecord.prototype:GetAttribute("Prototype_DisableRun")
+				or currentRecord.parent:GetAttribute("Prototype_DisableRun")
+			then
+				return false
+			end
+
+			currentRecord = currentRecord.ancestorPrototype
+		end
+
+		return true
 	end)
+	
 	local componentsToReplicate = self.ClonerManager:Flush()
 
 	local mapScript = newMap:FindFirstChild("MapScript")

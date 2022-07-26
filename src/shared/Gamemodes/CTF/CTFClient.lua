@@ -4,8 +4,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CTFScoreGUI = ReplicatedStorage.UI.CTFScoreGUI
 local Sounds = ReplicatedStorage.Assets.Sounds
 
-local ControlPointsClient = {}
-ControlPointsClient.__index = ControlPointsClient
+local CTFClient = {}
+CTFClient.__index = CTFClient
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -18,16 +18,16 @@ local function playSound(sound)
 	clone.Parent = workspace
 end
 
-function ControlPointsClient.new(binder)
+function CTFClient.new(binder)
 	return setmetatable({
 		binder = binder;
 		_gui = nil;
 		connections = {};
 		instancesToDestroy = {};
-	}, ControlPointsClient)
+	}, CTFClient)
 end
 
-function ControlPointsClient:Destroy()
+function CTFClient:Destroy()
 	for _, instance in pairs(self.instancesToDestroy) do
 		instance:Destroy()
 	end
@@ -37,7 +37,7 @@ function ControlPointsClient:Destroy()
 	end
 end
 
-function ControlPointsClient:OnInit(teams)
+function CTFClient:OnInit(teams)
 	self.teams = teams
 
     local values = ReplicatedStorage:FindFirstChild("CTFValues")
@@ -60,7 +60,7 @@ function ControlPointsClient:OnInit(teams)
 	self:_handleGUI(teams)
 end
 
-function ControlPointsClient:_handleGUI(teams)
+function CTFClient:_handleGUI(teams)
 	local Gui = CTFScoreGUI:Clone()
 	local scores = Gui:FindFirstChild("Scores")
 	local temp = Gui:FindFirstChild("Temp")
@@ -79,7 +79,7 @@ function ControlPointsClient:_handleGUI(teams)
 	end
 	
 	local function updateScore()
-		Gui:FindFirstChild("Goal").Text = string.format("To %d", self.binder.State.maxScore or 0)
+		Gui:FindFirstChild("Goal").Text = string.format("To %s", tostring(self.binder.State.maxScore) or "0")
 		for team, gui in pairs(guisByTeam) do
 			gui.Text = tostring(self.binder.State[team.Name .. "Score"])
 		end
@@ -91,4 +91,4 @@ function ControlPointsClient:_handleGUI(teams)
 	Gui.Parent = LocalPlayer.PlayerGui
 end
 
-return ControlPointsClient
+return CTFClient

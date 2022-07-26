@@ -38,8 +38,9 @@ function Cloner.new(matchedTagsByPrototype, onClonesAdded, onCloneRemoved)
         local ancestor = getAncestorPrototype(matchedTagsByPrototype, prototype)
         
         if ancestor then
-            self._prototypeRecordByPrototype[prototype].ancestorPrototype = ancestor
-            table.insert(self._prototypeRecordByPrototype[ancestor].descendantPrototypes, prototype)
+            local ancestorRecord = self._prototypeRecordByPrototype[ancestor]
+            self._prototypeRecordByPrototype[prototype].ancestorPrototype = ancestorRecord
+            table.insert(ancestorRecord.descendantPrototypes, prototype)
         end
     end
 
@@ -131,7 +132,7 @@ function Cloner:RunPrototypes(selector)
     local clonesAdded = {}
     for _, cloneRecord in ipairs(cloneRecords) do
         if cloneRecord.prototypeRecord.ancestorPrototype then
-            cloneRecord.clone.Parent = self._prototypeToClone[cloneRecord.prototypeRecord.ancestorPrototype]
+            cloneRecord.clone.Parent = self._prototypeToClone[cloneRecord.prototypeRecord.ancestorPrototype.prototype]
         else
             cloneRecord.clone.Parent = cloneRecord.prototypeRecord.parent
         end

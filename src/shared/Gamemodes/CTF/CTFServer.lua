@@ -59,6 +59,7 @@ function CTFServer:OnInit(config, teams)
         flag.Captured:Connect(function(player)
             capturedRemote:FireAllClients(flag.State.Team, player)
             self:addPointToTeam(player.Team, 1)
+            self.service.StatService:IncrementStat(player.UserId, "CTF_captures", 1)
         end)
 
         flag.Stolen:Connect(function(player)
