@@ -2,9 +2,9 @@ local settings = {
 	-- GENERAL WEAPON SETTINGS --
 	SuperballFly = false,
 	SlingClimb = true,
+	RocketRiding = false,
 	RocketsExplodeSBs = true, -- WIP
 	TagLifetime = 10,
-	
 	
 	-- TEAM SETTINGS --
 	SpectatorTeamActive = true,   -- Spectators can't take or deal dmg.
