@@ -3,6 +3,8 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
+local Events = script.Events
+
 local Root = require(ReplicatedStorage.Common.Root)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
@@ -60,12 +62,9 @@ function CmdrController:OnStart()
 	-- We set this on the server so it doesn't matter.
 	CmdrClient.Registry:RegisterHook("BeforeRun", function() end)
 	
-	-- CmdrClient:HandleEvent("Wakeup", require(script.WakeupEvent))
-	-- CmdrClient:HandleEvent("Message", require(script.MessageEvent))
-	-- CmdrClient:HandleEvent("Countdown", require(script.CountdownEvent))
-	-- CmdrClient:HandleEvent("Hint", require(script.HintEvent))
-	-- CmdrClient:HandleEvent("Objective", require(script.ObjectiveEvent))
-	-- CmdrClient:HandleEvent("Unobjective", require(script.UnobjectiveEvent))
+	for _, eventModule in Events:GetChildren() do
+		CmdrClient:HandleEvent(eventModule.Name, require(eventModule))
+	end
 	
 	LOCAL_PLAYER.Chatted:Connect(function(message)
 		if message:sub(1, 1) ~= ":" then

@@ -1,14 +1,18 @@
 local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local Sounds = ReplicatedStorage.Assets.Sounds
 
 local CmdrNotifications = {}
 
-local LOCAL_PLAYER = game:GetService("Players").LocalPlayer
+local LOCAL_PLAYER = Players.LocalPlayer
 local EASE_IN = TweenInfo.new(0.35, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 local EASE_OUT = TweenInfo.new(0.75, Enum.EasingStyle.Exponential, Enum.EasingDirection.In)
 
 local Gui = script.CmdrNotificationsGui
 local Frame = script.CmdrNotificationsGui.Frame
--- local NotificationSound = script.Notification
+local NotificationSound = Sounds.Beep1
 local MessageTemp = Frame.Template
 
 function CmdrNotifications:AddMessage(text, playSound, color)
@@ -17,9 +21,9 @@ function CmdrNotifications:AddMessage(text, playSound, color)
 		table.remove(children, 2):Destroy()
 	end
 	
-	-- if playSound == true then
-	-- 	NotificationSound:Play()
-	-- end
+	if playSound == true then
+		NotificationSound:Play()
+	end
 	
 	local msg = MessageTemp:Clone()
 	msg.Name = "Entry"
