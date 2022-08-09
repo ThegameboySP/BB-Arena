@@ -18,7 +18,7 @@ return {
             end
 
             return {
-                Type = context.Cmdr.Util.MakeListableType(context.Cmdr.Util.MakeEnumType("regen groups", instances));
+                Type = context.Cmdr.Util.MakeListableType(context.Cmdr.Util.MakeEnumType("regen group", instances));
                 Name = "groups";
                 Description = "Parts of the map to regen";
                 Optional = true;
