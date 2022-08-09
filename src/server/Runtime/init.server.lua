@@ -47,14 +47,10 @@ local function registerRoot()
     end)
     
     Root.hint = function(message, options)
-        options = options or {}
-        options.sender = options.sender or "Nexus Arena"
         notificationRemote:FireAllClients(true, message, options)
     end
 
     Root.notification = function(message, options)
-        options = options or {}
-        options.sender = options.sender or "Nexus Arena"
         notificationRemote:FireAllClients(false, message, options)
     end
 

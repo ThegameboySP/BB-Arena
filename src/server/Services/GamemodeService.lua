@@ -27,6 +27,7 @@ local GamemodeService = {
 
 local gamemodeDefinition = t.strictInterface({
     stopOnMapChange = t.optional(t.boolean);
+    hasMapProps = t.optional(t.boolean);
     minTeams = t.integer;
     friendlyName = t.string;
     nameId = t.string;
@@ -58,6 +59,8 @@ function GamemodeService:OnInit()
         if not ok then
             error(("Gamemode %s definition error: %s"):format(module.Name, err))
         end
+
+        definition.configChecker = t.strictInterface(definition.config)
 
         for name, data in pairs(definition.stats or {}) do
             local clonedData = table.clone(data)
@@ -122,6 +125,7 @@ function GamemodeService:SetGamemode(name, config)
     binder.Parent = ReplicatedStorage
     self.binder = Components.Binder.new(binder)
 
+    self.config = config
     self.gamemodeProcess = gamemode.server.new(self, self.binder)
     self.gamemodeProcess:OnInit(config, CollectionService:GetTagged("FightingTeam"))
 
@@ -140,7 +144,7 @@ function GamemodeService:_mapSupportsGamemode(map, definition)
         return false, string.format("%s needs at least %d teams to work", definition.friendlyName, definition.minTeams)
     end
 
-    if not map:FindFirstChild(definition.nameId) then
+    if definition.hasMapProps and not map:FindFirstChild(definition.nameId) then
         return false, string.format("Map does not support %s", definition.friendlyName)
     end
 
@@ -202,20 +206,7 @@ function GamemodeService:StopGamemode(completedSuccessfully)
 end
 
 function GamemodeService:_checkConfig(config, gamemode)
-    local definition = gamemode.definition
-
-    for k, v in pairs(config) do
-        if not definition.config[k] then
-            return false, "Unexpected key " .. k
-        end
-
-        local ok, err = definition.config[k](v)
-        if not ok then
-            return false, err
-        end
-    end
-
-    return true
+    return gamemode.definition.configChecker(config)
 end
 
 function GamemodeService:FireGamemodeEvent(name, value)
@@ -237,6 +228,7 @@ function GamemodeService:SetConfig(delta)
             return false, err
         end
 
+        self.config = resolved
         self.gamemodeProcess:OnConfigChanged(resolved)
 
         return true

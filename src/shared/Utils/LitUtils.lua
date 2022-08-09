@@ -22,7 +22,7 @@ function LitUtils.arrayToSubject(nouns)
 		return nouns[1] .. " and " .. nouns[2]
 	end
 
-	return nouns[1]
+	return nouns[1] or ""
 end
 
 return LitUtils

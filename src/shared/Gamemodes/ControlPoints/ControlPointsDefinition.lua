@@ -6,6 +6,7 @@ local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 return {
     stopOnMapChange = true;
 	minTeams = 2;
+	hasMapProps = true;
 
 	friendlyName = "Control Points";
 	nameId = "ControlPoints";

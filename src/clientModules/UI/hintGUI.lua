@@ -108,6 +108,8 @@ end
 -- Options.color: Color3
 -- Options.stayOpen: boolean
 return(function(Message, Options)
+	Options = Options or {}
+	
 	local seconds = (countWords(Message) * .3) + 1
 	timer += seconds
     local Color = Options.color or Color3.new(1, 1, 1)

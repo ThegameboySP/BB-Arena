@@ -28,14 +28,24 @@ local function registerRoot()
         Root.globals[child.Name] = RemoteProperty.new(RemoteProperties, child.Name)
     end
 
-    Root.notification = notificationGUI
-    Root.hint = hintGUI
+    Root.notification = function(msg, options)
+        options = options or {}
+        options.sender = options.sender or "Nexus Arena"
+
+        notificationGUI(msg, options)
+    end
+    Root.hint = function(msg, options)
+        options = options or {}
+        options.sender = options.sender or "Nexus Arena"
+
+        hintGUI(msg, options)
+    end
     
     notificationRemote.OnClientEvent:Connect(function(isHint, message, options)
         if isHint then
-            hintGUI(message, options)
+            Root.hint(message, options)
         else
-            notificationGUI(message, options)
+            Root.notification(message, options)
         end
     end)
 
