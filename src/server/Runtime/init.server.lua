@@ -156,6 +156,26 @@ local function removeStudioInstances()
     end
 end
 
+local function setPlayerTags()
+    RunService.Stepped:Connect(function()
+		for _, player in Players:GetPlayers() do
+            local team = player.Team
+
+			if CollectionService:HasTag(team, "ParticipatingTeam") then
+				CollectionService:AddTag(player, "ParticipatingPlayer")
+			else
+				CollectionService:RemoveTag(player, "ParticipatingPlayer")
+			end
+
+			if CollectionService:HasTag(team, "FightingTeam") then
+				CollectionService:AddTag(player, "FightingPlayer")
+			else
+				CollectionService:RemoveTag(player, "FightingPlayer")
+			end
+		end
+	end)
+end
+
 removeStudioInstances()
 loadTools()
 registerRoot()
@@ -163,5 +183,6 @@ runScripts()
 spawnPlayers()
 initializePlayers()
 warnIfSlow()
+setPlayerTags()
 
 workspace:SetAttribute("GameInitialized", true)

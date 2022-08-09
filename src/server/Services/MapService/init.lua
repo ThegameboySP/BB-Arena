@@ -2,8 +2,6 @@ local ServerStorage = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local Teams = game:GetService("Teams")
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
 local Root = require(ReplicatedStorage.Common.Root)
@@ -67,16 +65,6 @@ function MapService:OnInit()
 	
 	self.LightingSaves.Name = "LightingSaves"
 	self.LightingSaves.Parent = ReplicatedStorage
-
-	RunService.Heartbeat:Connect(function()
-		for _, player in pairs(Players:GetPlayers()) do
-			if CollectionService:HasTag(player.Team, "FightingTeam") then
-				CollectionService:AddTag(player, "FightingPlayer")
-			else
-				CollectionService:RemoveTag(player, "FightingPlayer")
-			end
-		end
-	end)
 end
 
 function MapService:OnStart()
@@ -223,6 +211,7 @@ function MapService:_reconcileTeams(newNameToColor)
 		local newTeam = Instance.new("Team")
 		newTeam.AutoAssignable = false
 		CollectionService:AddTag(newTeam, "FightingTeam")
+		CollectionService:AddTag(newTeam, "ParticipatingTeam")
 		CollectionService:AddTag(newTeam, "Map")
 
 		newTeam.TeamColor = data.color
