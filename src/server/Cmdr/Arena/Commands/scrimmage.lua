@@ -8,16 +8,16 @@ return {
 	Group = "Admin";
 	Args = {
 		Scrimmage.definition.cmdrConfig.maxScore;
-        Scrimmage.definition.cmdrConfig.winByTwo;
+        Scrimmage.definition.cmdrConfig.wb2;
         Scrimmage.definition.cmdrConfig.tiesCount;
 	};
 
-    Run = function(context, maxScore, winByTwo, tiesCount)
+    Run = function(context, maxScore, wb2, tiesCount)
         return context.Cmdr.Dispatcher:EvaluateAndRun("__startGamemode Scrimmage", context.Executor, {
             Data = {
                 config = {
                     maxScore = maxScore;
-                    winByTwo = winByTwo;
+                    wb2 = wb2;
                     tiesCount = tiesCount;
                 }
             }

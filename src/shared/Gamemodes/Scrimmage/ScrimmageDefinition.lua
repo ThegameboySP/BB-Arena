@@ -12,7 +12,7 @@ return {
 	nameId = "Scrimmage";
 	config = {
 		maxScore = t.numberMin(1);
-		winByTwo = t.boolean;
+		wb2 = t.boolean;
 		tiesCount = t.boolean;
 	};
 
@@ -26,7 +26,7 @@ return {
 			Name = "max score";
 			Description = "The score a team needs to achieve to win the game.";
 		};
-		winByTwo = {
+		wb2 = {
 			Type = "boolean";
 			Name = "win by two";
 			Description = "Whether a team needs to have at least 2 more rounds won to win the game.";

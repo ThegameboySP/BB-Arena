@@ -74,7 +74,7 @@ function Scrimmage:OnConfigChanged(config)
     self.config = config
     
     self.replicatedRoot:SetAttribute("MaxScore", config.maxScore)
-    self.replicatedRoot:SetAttribute("WinByTwo", config.winByTwo)
+    self.replicatedRoot:SetAttribute("WinByTwo", config.wb2)
     self.replicatedRoot:SetAttribute("TiesCount", config.tiesCount)
 
     for _, team in self.fightingTeams do
@@ -154,6 +154,10 @@ function Scrimmage:Destroy()
     table.insert(teams, self.deadTeam)
 
     for _, team in teams do
+        if not team.Parent then
+            continue
+        end
+        
         for _, player in team:GetPlayers() do
             local data = self.fightingPlayers[player]
             if data then
@@ -248,17 +252,17 @@ function Scrimmage:_resolveWinner()
         return a.score > b.score
     end)
 
-    if not self.config.winByTwo and scores[1].score >= self.config.maxScore then
-        if scores[1].score == scores[2].score then
+    if scores[1].score >= self.config.maxScore then
+        if self.config.winByTwo then
+            if (scores[1].score - scores[2].score) >= 2 then
+                return GameState.TeamWon, scores[1].team
+            else
+                return GameState.WinByTwo
+            end
+        elseif scores[1].score == scores[2].score then
             return GameState.Tied
         else
             return GameState.TeamWon, scores[1].team
-        end
-    elseif self.config.winByTwo then
-        if (scores[1].score - scores[2].score) >= 2 then
-            return GameState.TeamWon, scores[1].team
-        else
-            return GameState.WinByTwo
         end
     end
 
