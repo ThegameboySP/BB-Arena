@@ -103,6 +103,10 @@ function StatController:_update(userId, name, value)
     if registeredStat.show then
         local resolvedName = registeredStat.friendlyName or name
         local leaderstats = self:_getOrMakeLeaderstats(userId)
+        if leaderstats == nil then
+            return
+        end
+
         local stat = leaderstats:FindFirstChild(resolvedName)
 
         if not stat or stat.ClassName ~= valueClassByType[typeof(value)] then
