@@ -84,13 +84,7 @@ local IDef = t.strictInterface({
 })
 
 function CmdrUtils.fightingTeamTo(cmdrType, params)
-	local wrappedCmdrType
-
 	return function(commandContext)
-		if wrappedCmdrType then
-			return wrappedCmdrType
-		end
-
 		local schema = {}
 		
 		local resolvedCmdrType = cmdrType
@@ -111,7 +105,7 @@ function CmdrUtils.fightingTeamTo(cmdrType, params)
 			})
 		end
 
-		wrappedCmdrType = {}
+		local wrappedCmdrType = {}
 		wrappedCmdrType.Name = params.Name
 		wrappedCmdrType.Description = params.Description
 
