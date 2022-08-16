@@ -81,9 +81,11 @@ function GamemodeService:OnInit()
                 return
             end
     
-            if not definition.nameId or self:_mapSupportsGamemode(map, definition) then
+            if self:_mapSupportsGamemode(map, definition) then
                 self:_runGamemodeProtoypes(definition)
                 self.gamemodeProcess:OnMapChanged(oldTeamToNewTeam)
+            else
+                self:StopGamemode()
             end
         end
     end)
