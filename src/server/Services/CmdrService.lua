@@ -35,6 +35,7 @@ local BLACKLISTED_COMMANDS = {
 	thru = true; -- thru also defines a "t" alias, replacing team's alias
 	respawn = true; -- already have a respawn
 	replace = true; -- replace defines a "map" alias for some reason
+	["goto-place"] = true;
 }
 
 function CmdrService:CanRun(player, group)
@@ -79,6 +80,14 @@ function CmdrService:_setupCmdr()
 
 	Cmdr.Registry:RegisterCommandsIn(CmdrArena.Commands)
 	Cmdr.Registry:RegisterCommandsIn(CmdrCore.Commands)
+
+	local place = ServerScriptService:FindFirstChild("Place")
+	if place then
+		local customCommands = place:FindFirstChild("CmdrCommands")
+		if customCommands then
+			Cmdr.Registry:RegisterCommandsIn(customCommands)
+		end
+	end
 	
 	Cmdr.Registry.Types.player = Cmdr.Registry.Types.arenaPlayer
 	Cmdr.Registry.Types.players = Cmdr.Registry.Types.arenaPlayers

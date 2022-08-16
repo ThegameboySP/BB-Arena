@@ -7,7 +7,6 @@ local Rodux = require(ReplicatedStorage.Packages.Rodux)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local actions = RoduxFeatures.actions
-local defaultPermissions = require(ServerScriptService.Server.defaultPermissions)
 
 local RoduxService = {
     Name = "RoduxService";
@@ -40,10 +39,18 @@ local function serialize(state)
 end
 
 local function initState()
+    local place = ServerScriptService:FindFirstChild("Place")
+
+    local defaultPermissions
+    if place then
+        defaultPermissions = place:FindFirstChild("DefaultPermissions")
+        defaultPermissions = defaultPermissions and require(defaultPermissions)
+    end
+
     return {
         users = {
-            referees = table.clone(defaultPermissions.Referees);
-            admins = table.clone(defaultPermissions.Admins);
+            referees = defaultPermissions and table.clone(defaultPermissions.Referees) or {};
+            admins = defaultPermissions and table.clone(defaultPermissions.Admins) or {};
         }
     }
 end
