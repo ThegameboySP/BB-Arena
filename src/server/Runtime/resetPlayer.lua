@@ -52,12 +52,23 @@ local function resetPlayer(player)
         end
     end
 
-    if chosenSpawn == nil then
+    if chosenSpawn == nil or not chosenSpawn.Enabled then
         character:MoveTo(Vector3.zero)
         return
     end
 
     character:MoveTo(chosenSpawn.Position)
+
+    if chosenSpawn.Duration > 0 then
+        local ff = Instance.new("ForceField")
+		
+		ff.Parent = character
+		task.delay(chosenSpawn.Duration, function()
+			ff.Parent = nil
+		end)
+    end
+
+    return chosenSpawn
 end
 
 return resetPlayer
