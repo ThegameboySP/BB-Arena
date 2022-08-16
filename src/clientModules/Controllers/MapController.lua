@@ -27,6 +27,9 @@ local MapController = {
 local FADE_INFO = TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 local TIME_FADE_INFO = TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
 
+local DEFAULT_TOP_COLOR = Color3.fromRGB(92, 114, 84)
+local DEFAULT_BASE_COLOR = Color3.fromRGB(108, 88, 75)
+
 function MapController:OnInit()
 	for _, component in Components do
 		self:RegisterComponent(component)
@@ -124,11 +127,11 @@ function MapController:_tween(mapName)
 		local meta = Root.globals.mapInfo:Get()[mapName]
 
 		for _, part in CollectionService:GetTagged("IslandTop") do
-			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandTopColor}))
+			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandTopColor or DEFAULT_TOP_COLOR}))
 		end
 
 		for _, part in CollectionService:GetTagged("IslandBase") do
-			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandBaseColor}))
+			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandBaseColor or DEFAULT_BASE_COLOR}))
 		end
 
 		for _, tween in tweens do

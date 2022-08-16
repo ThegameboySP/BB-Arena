@@ -18,8 +18,8 @@ local Components = require(ReplicatedStorage.Common.Components)
 local metaDefinition = t.strictInterface({
     Teams = t.map(t.string, t.BrickColor);
 
-    IslandTopColor = t.Color3;
-    IslandBaseColor = t.Color3;
+    IslandTopColor = t.optional(t.Color3);
+    IslandBaseColor = t.optional(t.Color3);
 })
 
 local MapService = {
@@ -58,7 +58,13 @@ function MapService:OnInit()
 	
     local mapInfo = {}
 	for _, map in pairs(self.Maps:GetChildren()) do
-        mapInfo[map.Name] = require(map:FindFirstChild("Meta"))
+		local meta = map:FindFirstChild("Meta")
+
+		if meta then
+        	mapInfo[map.Name] = require(meta)
+		else
+			warn(("%q does not have a Meta module"):format(map:GetFullName()))
+		end
 	end
 
 	Root.globals.mapInfo:Set(table.freeze(mapInfo))
@@ -175,7 +181,7 @@ function MapService:ChangeMap(mapName)
 		repFirst.Parent = newMap
 	end
 	
-	for _, player in pairs(CollectionService:GetTagged("FightingPlayer")) do
+	for _, player in pairs(CollectionService:GetTagged("ParticipatingPlayer")) do
         task.spawn(player.LoadCharacter, player)
 	end
 	
@@ -212,6 +218,7 @@ function MapService:_reconcileTeams(newNameToColor)
 		newTeam.AutoAssignable = false
 		CollectionService:AddTag(newTeam, "FightingTeam")
 		CollectionService:AddTag(newTeam, "ParticipatingTeam")
+		CollectionService:AddTag(newTeam, "ToolsEnabled")
 		CollectionService:AddTag(newTeam, "Map")
 
 		newTeam.TeamColor = data.color
