@@ -38,36 +38,120 @@ end
 function CTFServer:OnInit(config, teams)
     self:OnConfigChanged(config)
 
-    local replicatedRoot = Instance.new("Folder")
-    replicatedRoot.Name = "CTFValues"
-
-    local stolenRemote = Instance.new("RemoteEvent")
-    stolenRemote.Name = "Stolen"
-    stolenRemote.Parent = replicatedRoot
-
-    local capturedRemote = Instance.new("RemoteEvent")
-    capturedRemote.Name = "Captured"
-    capturedRemote.Parent = replicatedRoot
-
-    replicatedRoot.Parent = ReplicatedStorage
+    local stolenRemote = self.service:GetRemoteEvent("CTF_Stolen")
+    local capturedRemote = self.service:GetRemoteEvent("CTF_Captured")
+    local recoveredRemote = self.service:GetRemoteEvent("CTF_Recovered")
 
     for _, team in ipairs(teams) do
         self:addPointToTeam(team, 0)
     end
 
-    for _, flag in ipairs(self.service:GetManager():GetComponents(Components.S_CTF_Flag)) do
+    local flagDistance = {}
+    local carryingPlayers = {}
+    local flagPositions = {}
+
+    local componentManager = self.service:GetManager()
+    local flags = componentManager:GetComponents(Components.S_CTF_Flag)
+
+    for _, flag in flags do
         flag.Captured:Connect(function(player)
-            capturedRemote:FireAllClients(flag.State.Team, player)
+            capturedRemote:FireAllClients({
+                flag = flag.Instance;
+                player = player;
+                team = flag.State.Team;
+                distanceTraveled = flagDistance[player].distance or 0;
+            })
+
+            flagDistance[player] = nil
+
             self:addPointToTeam(player.Team, 1)
             self.service.StatService:IncrementStat(player.UserId, "CTF_captures", 1)
         end)
 
+        flag.PickedUp:Connect(function(player)
+            carryingPlayers[player] = true
+
+            local data = flagDistance[player]
+            flagDistance[player] = {
+                distance = (data and data.distance) or 0;
+                lastPosition = player.Character.PrimaryPart.Position
+            }
+        end)
+
+        flag.Dropped:Connect(function(player)
+            carryingPlayers[player] = nil
+        end)
+
+        flag.Recovered:Connect(function(player)
+            local enemyStands = {}
+            local thisFlagStand
+
+            for _, flagStand in componentManager:GetComponents(Components.S_CTF_FlagStand) do
+                if flagStand.State.Flag == flag.Instance then
+                    thisFlagStand = flagStand
+                end
+
+                if flagStand.State.Team ~= flag.State.Team then
+                    table.insert(enemyStands, flagStand.Instance)
+                end
+            end
+
+            local standPosition = thisFlagStand.Instance.Position
+            table.sort(enemyStands, function(a, b)
+                return (a.Position - standPosition).Magnitude > (b.Position - standPosition).Magnitude
+            end)
+
+            local closestEnemyStand = enemyStands[1]
+            local lastFlagPosition = flagPositions[flag]
+
+            print("flag position:", lastFlagPosition, "closest enemy stand:", closestEnemyStand.Position)
+
+            local captureDist = (closestEnemyStand.Position - lastFlagPosition).Magnitude
+            local standsDist = (standPosition - closestEnemyStand.Position).Magnitude
+            local defensiveClutch = (1 - math.min((captureDist / standsDist), 1)) * 100
+
+            recoveredRemote:FireAllClients({
+                flag = flag.Instance;
+                player = player;
+                defensiveClutch = defensiveClutch;
+            })
+        end)
+
+        flag.Docked:Connect(function(player)
+            carryingPlayers[player] = nil
+        end)
+
         flag.Stolen:Connect(function(player)
-            stolenRemote:FireAllClients(flag.State.Team, player)
+            stolenRemote:FireAllClients({
+                flag = flag.Instance;
+                player = player;
+                team = flag.State.Team;
+            })
         end)
     end
 
     local updateConnection = self.UpdateEvent:Connect(function()
+        for _, flag in flags do
+            flagPositions[flag] = flag.Instance.Position
+        end
+
+        for player, data in flagDistance do
+            if not player.Parent then
+                flagDistance[player] = nil
+                continue
+            end
+
+            local character = player.Character
+
+            if character and character.PrimaryPart then
+                local currentPosition = character.PrimaryPart.Position
+                local dist = (data.lastPosition - currentPosition).Magnitude
+
+                data.distance += dist
+                data.lastPosition = currentPosition
+            end
+        end
+
         for team, score in pairs(self.scores) do
             if score >= self.config.maxScore then
                 self:finish(team)
@@ -77,7 +161,6 @@ function CTFServer:OnInit(config, teams)
     end)
 
     self.destruct = function()
-        replicatedRoot:Destroy()
         updateConnection:Disconnect()
     end
 end

@@ -23,6 +23,22 @@ if TestService.ExecuteWithStudioRun and RunService:IsStudio() then
     return
 end
 
+local RemoteEvents = Instance.new("Folder")
+RemoteEvents.Name = "RemoteEvents"
+RemoteEvents.Parent = ReplicatedStorage
+
+local function getRemoteEvent(_, name)
+    local remoteEvent = RemoteEvents:FindFirstChild(name)
+
+    if not remoteEvent then
+        remoteEvent = Instance.new("RemoteEvent")
+        remoteEvent.Name = name
+        remoteEvent.Parent = RemoteEvents
+    end
+
+    return remoteEvent
+end
+
 local function registerRoot()
     local RemoteProperties = Instance.new("Folder")
     RemoteProperties.Name = "RemoteProperties"
@@ -55,6 +71,7 @@ local function registerRoot()
     end
 
     Root.resetPlayer = resetPlayer
+    Root.getRemoteEvent = getRemoteEvent
 
     Root:RegisterServicesIn(Services)
     
@@ -70,7 +87,7 @@ end
 
 local function runScripts()
     for _, script in ipairs(Scripts:GetChildren()) do
-        require(script)(Root)
+        task.spawn(require(script), Root)
     end
 end
 

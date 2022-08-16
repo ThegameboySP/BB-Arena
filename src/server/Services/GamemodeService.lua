@@ -241,6 +241,10 @@ function GamemodeService:GetManager()
     return self.MapService.ClonerManager.Manager
 end
 
+function GamemodeService:GetRemoteEvent(name)
+    return Root:getRemoteEvent(name)
+end
+
 function GamemodeService:SayEvent(msg, options)
     Root.hint(msg, options)
 end

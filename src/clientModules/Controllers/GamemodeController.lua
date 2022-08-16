@@ -44,6 +44,7 @@ function GamemodeController:_startGamemodeClient(binder, gamemodeName)
     self.CurrentGamemode = gamemode
 
     self.client = gamemode.client.new(binder)
+    self.client.service = self
     self.client:OnInit(CollectionService:GetTagged("FightingTeam"))
 end
 
@@ -63,6 +64,10 @@ function GamemodeController:onMapChanged()
     if self.gamemodeName then
         self:_startGamemodeClient(self.binder, self.gamemodeName)
     end
+end
+
+function GamemodeController:GetRemoteEvent(name)
+    return Root:getRemoteEvent(name)
 end
 
 return GamemodeController

@@ -191,6 +191,7 @@ function S_CTF_Flag:_docked(bin)
 	self.Instance.PointLight.Enabled = false
 	self:_dockFlag()
 	
+	local oldPlayer = self.State.EquippingPlayer
 	self:SetState({
 		State = "Docked",
 		EquippingPlayer = false
@@ -213,7 +214,7 @@ function S_CTF_Flag:_docked(bin)
 		self.Stolen:Fire(player)
 	end))
 
-	self.Docked:Fire()
+	self.Docked:Fire(oldPlayer)
 end
 
 function S_CTF_Flag:_carrying(bin, player)

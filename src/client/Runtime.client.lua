@@ -22,6 +22,11 @@ if not Players.LocalPlayer:GetAttribute("Initialized") then
     Players.LocalPlayer:GetAttributeChangedSignal("Initialized"):Wait()
 end
 
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+local function getRemoteEvent(_, name)
+    return RemoteEvents:WaitForChild(name)
+end
+
 local function registerRoot()
     Root.globals = {}
     for _, child in pairs(RemoteProperties:GetChildren()) do
@@ -40,6 +45,8 @@ local function registerRoot()
 
         hintGUI(msg, options)
     end
+
+    Root.getRemoteEvent = getRemoteEvent
     
     notificationRemote.OnClientEvent:Connect(function(isHint, message, options)
         if isHint then
@@ -51,7 +58,7 @@ local function registerRoot()
 
     ScriptContext.Error:Connect(function(message, stackTrace)
         -- Avoid stupid error spam caused by the toolset.
-        if not stackTrace or not stackTrace:find("Backpack") then
+        if not stackTrace or (not stackTrace:find("Backpack") and not stackTrace:find("ToolObjects")) then
             clientErrorRemote:FireServer(message, stackTrace)
         end
     end)
@@ -116,7 +123,7 @@ end
 
 local function runScripts()
     for _, script in ipairs(Scripts:GetChildren()) do
-        require(script)(Root)
+        task.spawn(require(script), Root)
     end
 end
 

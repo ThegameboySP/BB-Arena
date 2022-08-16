@@ -40,22 +40,21 @@ end
 function CTFClient:OnInit(teams)
 	self.teams = teams
 
-    local values = ReplicatedStorage:FindFirstChild("CTFValues")
-	values:FindFirstChild("Captured").OnClientEvent:Connect(function(flagTeam)
-		if LocalPlayer.Team == flagTeam then
+	self.service:GetRemoteEvent("CTF_Captured").OnClientEvent:Connect(function(data)
+		if LocalPlayer.Team == data.team then
 			playSound(Sounds.LaunchingRocket)
 		else
 			playSound(Sounds.Tada)
 		end
 	end)
 
-    values:FindFirstChild("Stolen").OnClientEvent:Connect(function(flagTeam)
-        if LocalPlayer.Team == flagTeam then
+	self.service:GetRemoteEvent("CTF_Stolen").OnClientEvent:Connect(function(data)
+		if LocalPlayer.Team == data.team then
             playSound(Sounds.Splat)
 		else
 			playSound(Sounds.Button)
 		end
-    end)
+	end)
 
 	self:_handleGUI(teams)
 end
