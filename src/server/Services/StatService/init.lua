@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
+local Teams = game:GetService("Teams")
 
 local Root = require(ReplicatedStorage.Common.Root)
 local t = require(ReplicatedStorage.Packages.t)
@@ -48,11 +49,13 @@ function StatService:OnInit()
     self:RegisterStat({name = "KOs", default = 0, priority = 1, show = true})
     self:RegisterStat({name = "WOs", default = 0, priority = 0, show = true})
 
-    EventBus.participantDied:Connect(function(victim, killer)
-        self:IncrementStat(victim.UserId, "WOs", 1)
+    EventBus.playerDied:Connect(function(victim, killer)
+        if victim.Team ~= Teams.Spectators then
+            self:IncrementStat(victim.UserId, "WOs", 1)
 
-        if killer and killer ~= victim then
-            self:IncrementStat(killer.UserId, "KOs", 1)
+            if killer and killer ~= victim then
+                self:IncrementStat(killer.UserId, "KOs", 1)
+            end
         end
     end)
 end
