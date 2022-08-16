@@ -33,15 +33,19 @@ return function(EventBus)
             
             local con = humanoid.StateChanged:Connect(function(_, new)
                 if new == Enum.HumanoidStateType.Dead then
+                    local player = Players:GetPlayerFromCharacter(character) or Players:FindFirstChild(character.Name)
+                    if not player then
+                        return
+                    end
+                    
                     local creatorValue = humanoid:WaitForChild("creator", 0.1)
                     local creator = creatorValue and creatorValue.Value
 
-                    local player = Players:GetPlayerFromCharacter(character)
                     if trackingPlayers[player] then
                         trackingPlayers[player]:Fire(creator)
                     end
 
-                    playerDied:Fire(player, creator)
+                    playerDied:Fire(player, creator, creatorValue)
                 end
             end)
 

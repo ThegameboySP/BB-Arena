@@ -38,7 +38,7 @@ end
 
 local function preventTeamInterference(Root)
     RunService.Heartbeat:Connect(function()
-        for _, character in getGroundedCharacters(CollectionService:GetTagged("FightingPlayer"), onSpectatorRegion) do
+        for _, character in getGroundedCharacters(CollectionService:GetTagged("ParticipatingPlayer"), onSpectatorRegion) do
             Root.resetPlayer(Players:GetPlayerFromCharacter(character))
         end
     
