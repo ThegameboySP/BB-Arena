@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 
 local Root = require(ReplicatedStorage.Common.Root)
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
@@ -8,6 +9,8 @@ local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local RoduxController = {
 	Name = "RoduxController";
 }
+
+local LocalPlayer = Players.LocalPlayer
 
 local function stringIndicesToNumber(map)
     local numberMap = {}
@@ -28,6 +31,25 @@ local function deserialize(state)
     return state
 end
 
+local function clientMiddleware(nextDispatch)
+    return function(action)
+        local meta = action.meta
+        if meta and meta.realm == "server" then
+            return
+        end
+
+        if meta and meta.serverRemote then
+            Root:GetServerService("RoduxService")[meta.serverRemote[1]]:FireServer(unpack(meta.serverRemote, 2))
+
+            if meta.interestedUserIds and not table.find(meta.interestedUserIds, LocalPlayer.UserId) then
+                return
+            end
+        end
+
+        nextDispatch(action)
+    end
+end
+
 function RoduxController:OnInit()
     local RoduxService = Root:GetServerService("RoduxService")
 
@@ -35,7 +57,7 @@ function RoduxController:OnInit()
         Root.Store = Rodux.Store.new(
             RoduxFeatures.reducer,
             deserialize(state),
-            { Rodux.thunkMiddleware }
+            { Rodux.thunkMiddleware, clientMiddleware }
         )
     end)
 

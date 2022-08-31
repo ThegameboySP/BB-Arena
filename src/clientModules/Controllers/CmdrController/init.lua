@@ -33,14 +33,14 @@ function CmdrController:OnInit()
 
 	local CmdrClient = require(ReplicatedStorage.CmdrClient)
 	self.Cmdr = CmdrClient
-	
-    local common = CmdrClient.Registry:GetStore("Common")
-	common.Root = Root
-	common.Store = Root.Store
 end
 
 function CmdrController:OnStart()
 	local CmdrClient = self.Cmdr
+
+	local common = CmdrClient.Registry:GetStore("Common")
+	common.Root = Root
+	common.Store = Root.Store
 
 	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, Root.globals.mapInfo:Get())
 	CmdrClient.Registry.Types.player = CmdrClient.Registry.Types.arenaPlayer
@@ -49,7 +49,7 @@ function CmdrController:OnStart()
 	if RunService:IsStudio() then
 		CmdrClient.Dispatcher:EvaluateAndRun("bind t blink")
 	end
-
+	
 	CmdrClient:SetPlaceName("bb-arena")
 	CmdrClient:SetActivationKeys({ Enum.KeyCode.F2, Enum.KeyCode.Semicolon })
 	UserInputService.InputBegan:Connect(function(input, gp)

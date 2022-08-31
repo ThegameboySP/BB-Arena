@@ -127,6 +127,50 @@ local function userLeft(userId)
     }
 end
 
+local function saveSettings(userId, settings)
+    return {
+        type = "users_saveSettings";
+        payload = {
+            userId = userId;
+            settings = settings;
+        };
+        meta = {
+            serverRemote = {"SaveSettings", settings};
+            interestedUserIds = {userId};
+        }
+    }
+end
+
+local function setLocalSetting(userId, id, value)
+    return {
+        type = "users_setLocalSetting";
+        payload = {
+            userId = userId;
+            id = id;
+            value = value;
+        };
+        meta = {
+            realm = "client";
+        }
+    }
+end
+
+local function flushSaveSettings(userId)
+    return function(store)
+        local state = store:getState()
+
+        store:dispatch(saveSettings(userId, state.users.locallyEditedSettings))
+
+        store:dispatch({
+            type = "users_flushSaveSettings";
+            payload = {};
+            meta = {
+                realm = "client";
+            }
+        })
+    end
+end
+
 return {
     setAdmin = setAdmin;
     setReferee = setReferee;
@@ -135,4 +179,8 @@ return {
     setUserWhitelisted = setUserWhitelisted;
     userJoined = userJoined;
     userLeft = userLeft;
+    
+    saveSettings = saveSettings;
+    setLocalSetting = setLocalSetting;
+    flushSaveSettings = flushSaveSettings;
 }

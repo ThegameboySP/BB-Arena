@@ -89,9 +89,6 @@ function CmdrService:_setupCmdr()
 		end
 	end
 	
-	Cmdr.Registry.Types.player = Cmdr.Registry.Types.arenaPlayer
-	Cmdr.Registry.Types.players = Cmdr.Registry.Types.arenaPlayers
-	
 	Cmdr.Registry:RegisterHook("BeforeRun", function(context)
 		if context.Executor and not self:CanRun(context.Executor, context.Group) then
 			local msg = "You don't have permission to run this command."
@@ -110,7 +107,7 @@ function CmdrService:_setupCmdr()
 	end)
 
 	Cmdr:RegisterHook("BeforeRun", function(context)
-		local locked = self._lockedCommands[context.Name]
+		local locked = self._lockedCommands[context.Name:lower()]
 		if not locked or context.Executor == nil then
 			return
 		end

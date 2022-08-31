@@ -1,3 +1,5 @@
+local SoundService = game:GetService("SoundService")
+
 return function (_, soundIdOrSound, volume, looped)
 	if workspace:FindFirstChild("CmdrMusic") then
 		workspace.CmdrMusic:Destroy()
@@ -10,6 +12,7 @@ return function (_, soundIdOrSound, volume, looped)
 		music.Looped = looped
 
 		music.Volume = math.clamp(0.5 + (volume or 0), 0, 2)
+		music.SoundGroup = SoundService.Music
 		music.Parent = workspace
 		music:Play()
 
@@ -20,6 +23,7 @@ return function (_, soundIdOrSound, volume, looped)
 		music.Looped = looped
 
 		music.Volume = math.clamp(music.Volume + (volume or 0), 0, 2)
+		music.SoundGroup = SoundService.Music
 		music.Parent = workspace
 		music:Play()
 

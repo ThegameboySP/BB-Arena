@@ -13,6 +13,8 @@ local RoduxService = {
     Client = {
         ActionDispatched = Root.remoteEvent();
         InitState = Root.remoteEvent();
+
+        SaveSettings = Root.remoteEvent();
     };
 }
 
@@ -55,11 +57,41 @@ local function initState()
     }
 end
 
+local function mapPlayers(userIds)
+    local players = {}
+    for _, userId in userIds do
+        table.insert(players, Players:GetPlayerByUserId(userId))
+    end
+
+    return players
+end
+
+local function serverMiddleware(nextDispatch)
+    return function(action)
+        local meta = action.meta
+        if meta and meta.realm == "client" then
+            return
+        end
+
+        if not meta or (meta.realm ~= "server" and not meta.dispatchedBy) then
+            local players = if meta and meta.interestedUserIds then mapPlayers(meta.interestedUserIds) else Players:GetPlayers()
+            
+            for _, player in players do
+                if player:GetAttribute("RoduxStateInitialized") then
+                    RoduxService.Client.ActionDispatched:FireClient(player, action)
+                end
+            end
+        end
+
+        nextDispatch(action)
+    end
+end
+
 function RoduxService:OnInit()
     Root.Store = Rodux.Store.new(
         RoduxFeatures.reducer,
         nil,
-        { Rodux.thunkMiddleware, self:_makeNetworkMiddleware() }
+        { Rodux.thunkMiddleware, serverMiddleware }
     )
 
     Root.Store:dispatch(actions.merge(initState()))
@@ -73,18 +105,19 @@ function RoduxService:OnInit()
     for _, player in pairs(Players:GetPlayers()) do
         onPlayerAdded(player)
     end
-end
 
-function RoduxService:_makeNetworkMiddleware()
-    return function (nextDispatch)
-        return function (action)
-            self.Client.ActionDispatched:FireFilter(function(player)
-                return player:GetAttribute("RoduxStateInitialized") == true 
-            end, action)
-    
-            nextDispatch(action)
+    self.Client.SaveSettings:Connect(function(client, settings)
+        if type(settings) ~= "table" then
+            return
         end
-    end
+
+        local action = actions.saveSettings(client.UserId, settings)
+        action.meta = action.meta or {}
+        action.meta.dispatchedBy = client
+        action.meta.serverRemote = nil
+
+        Root.Store:dispatch(action)
+    end)
 end
 
 return RoduxService

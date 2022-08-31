@@ -1,8 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 local Llama = require(ReplicatedStorage.Packages.Llama)
-
 local Dictionary = Llama.Dictionary
+
+local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+
+local defaultSettings = {}
+for key, value in GameEnum.Settings do
+    defaultSettings[key] = value.default
+end
 
 return Rodux.createReducer({
     serverLockedBy = nil;
@@ -11,17 +18,44 @@ return Rodux.createReducer({
     admins = {};
     referees = {};
     activeUsers = {};
+
+    userSettings = {};
+    locallyEditedSettings = {};
 }, {
+    -- Events
     users_joined = function(state, action)
         return Dictionary.mergeDeep(state, {
-            activeUsers = {[action.payload.userId] = true}
+            activeUsers = {[action.payload.userId] = true};
+            userSettings = {[action.payload.userId] = defaultSettings};
         })
     end;
     users_left = function(state, action)
         return Dictionary.mergeDeep(state, {
-            activeUsers = {[action.payload.userId] = Llama.None}
+            activeUsers = {[action.payload.userId] = Llama.None};
         })
     end;
+
+    -- Settings
+    users_saveSettings = function(state, action)
+        local payload = action.payload
+
+        return Dictionary.mergeDeep(state, {
+            userSettings = {[payload.userId] = payload.settings};
+            locallyEditedSettings = payload.settings;
+        })
+    end;
+    users_setLocalSetting = function(state, action)
+        return Dictionary.mergeDeep(state, {
+            locallyEditedSettings = {[action.payload.id] = action.payload.value};
+        })
+    end;
+    users_flushSaveSettings = function(state)
+        return Dictionary.merge(state, {
+            locallyEditedSettings = {};
+        })
+    end;
+
+    -- Permissions/gatekeeping
     users_setAdmin = function(state, action)
         return Dictionary.mergeDeep(state, {
             admins = {[action.payload.userId] = action.payload.admin};
@@ -29,7 +63,7 @@ return Rodux.createReducer({
     end;
     users_setReferee = function(state, action)
         return Dictionary.mergeDeep(state, {
-            referee = {[action.payload.userId] = action.isReferee or Llama.None};
+            referees = {[action.payload.userId] = action.isReferee or Llama.None};
         })
     end;
     users_setServerLocked = function(state, action)

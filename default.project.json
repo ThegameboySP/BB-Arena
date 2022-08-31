@@ -74,6 +74,21 @@
         }
       },
 
+      "SoundService": {
+        "Music": {
+          "$className": "SoundGroup",
+          "$properties": {
+            "Volume": 0.5
+          }
+        },
+        "Map": {
+          "$className": "SoundGroup",
+          "$properties": {
+            "Volume": 0.5
+          }
+        }
+      },
+
       "TestService": {
         "$ignoreUnknownInstances": true,
   
