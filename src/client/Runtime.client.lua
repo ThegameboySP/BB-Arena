@@ -6,6 +6,7 @@ local Players = game:GetService("Players")
 local Root = require(ReplicatedStorage.Common.Root)
 local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
+local roduxClient = require(ReplicatedStorage.ClientModules.roduxClient)
 
 local notificationGUI = require(ReplicatedStorage.ClientModules.UI.notificationGUI)
 local hintGUI = require(ReplicatedStorage.ClientModules.UI.hintGUI)
@@ -28,41 +29,6 @@ local function getRemoteEvent(_, name)
 end
 
 local function registerRoot()
-    Root.globals = {}
-    for _, child in pairs(RemoteProperties:GetChildren()) do
-        Root.globals[child.Name] = RemoteProperty.new(RemoteProperties, child.Name)
-    end
-
-    Root.notification = function(msg, options)
-        options = options or {}
-        options.sender = options.sender or "Nexus Arena"
-
-        notificationGUI(msg, options)
-    end
-    Root.hint = function(msg, options)
-        options = options or {}
-        options.sender = options.sender or "Nexus Arena"
-
-        hintGUI(msg, options)
-    end
-
-    Root.getRemoteEvent = getRemoteEvent
-    
-    notificationRemote.OnClientEvent:Connect(function(isHint, message, options)
-        if isHint then
-            Root.hint(message, options)
-        else
-            Root.notification(message, options)
-        end
-    end)
-
-    ScriptContext.Error:Connect(function(message, stackTrace)
-        -- Avoid stupid error spam caused by the toolset.
-        if not stackTrace or (not stackTrace:find("Backpack") and not stackTrace:find("ToolObjects")) then
-            clientErrorRemote:FireServer(message, stackTrace)
-        end
-    end)
-
     Root:RegisterServicesIn(Controllers)
 
     Root:Start()
@@ -127,6 +93,49 @@ local function runScripts()
     end
 end
 
+local function registerRodux()
+    roduxClient(Root)
+end
+
+local function init()
+    Root.globals = {}
+    for _, child in pairs(RemoteProperties:GetChildren()) do
+        Root.globals[child.Name] = RemoteProperty.new(RemoteProperties, child.Name)
+    end
+
+    Root.notification = function(msg, options)
+        options = options or {}
+        options.sender = options.sender or "Nexus Arena"
+
+        notificationGUI(msg, options)
+    end
+    Root.hint = function(msg, options)
+        options = options or {}
+        options.sender = options.sender or "Nexus Arena"
+
+        hintGUI(msg, options)
+    end
+
+    Root.getRemoteEvent = getRemoteEvent
+    
+    notificationRemote.OnClientEvent:Connect(function(isHint, message, options)
+        if isHint then
+            Root.hint(message, options)
+        else
+            Root.notification(message, options)
+        end
+    end)
+
+    ScriptContext.Error:Connect(function(message, stackTrace)
+        -- Avoid stupid error spam caused by the toolset.
+        if not stackTrace or (not stackTrace:find("Backpack") and not stackTrace:find("ToolObjects")) then
+            clientErrorRemote:FireServer(message, stackTrace)
+        end
+    end)
+end
+
+init()
+registerRodux()
 registerRoot()
 runScripts()
 

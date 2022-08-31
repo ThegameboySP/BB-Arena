@@ -13,7 +13,7 @@ Rodux = "roblox/rodux@3.0.0"
 Llama = "freddylist/llama@1.1.1"
 
 [server-dependencies]
-Cmdr = "evaera/cmdr@1.8.4"
+Cmdr = "evaera/cmdr@1.9.0"
 
 [dev-dependencies]
 TestEZ = "roblox/testez@0.4.1"

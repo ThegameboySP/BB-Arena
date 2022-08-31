@@ -137,7 +137,16 @@ function Root:Start(tbl)
             end
         end
     
-        for _, service in pairs(self.services) do
+        local servicesOrder = {}
+        for _, service in self.services do
+            table.insert(servicesOrder, service)
+        end
+
+        table.sort(servicesOrder, function(a, b)
+            return (a.Priority or 0) > (b.Priority or 0)
+        end)
+        
+        for _, service in servicesOrder do
             if service.OnInit then
                 xpcall(service.OnInit, function(err)
                     task.spawn(error, debug.traceback(err, 2))
@@ -145,7 +154,7 @@ function Root:Start(tbl)
             end
         end
     
-        for _, service in pairs(self.services) do
+        for _, service in servicesOrder do
             if service.OnStart then
                 task.spawn(service.OnStart, service, tbl)
             end

@@ -46,7 +46,7 @@ function CmdrService:GetLogs()
 	return self._logs
 end
 
-function CmdrService:OnStart()
+function CmdrService:OnInit()
 	local ownerId = game.PrivateServerOwnerId
 	if ownerId then
         if selectors.getAdmin(Root.Store:getState(), ownerId) < GameEnum.AdminTiers.Admin then

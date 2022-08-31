@@ -2,21 +2,10 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local Root = require(ReplicatedStorage.Common.Root)
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local actions = RoduxFeatures.actions
-
-local RoduxService = {
-    Name = "RoduxService";
-    Client = {
-        ActionDispatched = Root.remoteEvent();
-        InitState = Root.remoteEvent();
-
-        SaveSettings = Root.remoteEvent();
-    };
-}
 
 local function numberIndicesToString(map)
     local strMap = {}
@@ -66,38 +55,44 @@ local function mapPlayers(userIds)
     return players
 end
 
-local function serverMiddleware(nextDispatch)
-    return function(action)
-        local meta = action.meta
-        if meta and meta.realm == "client" then
-            return
-        end
-
-        if not meta or (meta.realm ~= "server" and not meta.dispatchedBy) then
-            local players = if meta and meta.interestedUserIds then mapPlayers(meta.interestedUserIds) else Players:GetPlayers()
-            
-            for _, player in players do
-                if player:GetAttribute("RoduxStateInitialized") then
-                    RoduxService.Client.ActionDispatched:FireClient(player, action)
+local function makeServerMiddleware(actionDispatchedRemote)
+    return function(nextDispatch)
+        return function(action)
+            local meta = action.meta
+            if meta and meta.realm == "client" then
+                return
+            end
+    
+            if not meta or (meta.realm ~= "server" and not meta.dispatchedBy) then
+                local players = if meta and meta.interestedUserIds then mapPlayers(meta.interestedUserIds) else Players:GetPlayers()
+                
+                for _, player in players do
+                    if player:GetAttribute("RoduxStateInitialized") then
+                        actionDispatchedRemote:FireClient(player, action)
+                    end
                 end
             end
+    
+            nextDispatch(action)
         end
-
-        nextDispatch(action)
     end
 end
 
-function RoduxService:OnInit()
-    Root.Store = Rodux.Store.new(
+local function roduxServer(root)
+    local initStateRemote = root:getRemoteEvent("Rodux_InitState")
+    local requestRemote = root:getRemoteEvent("Rodux_Request")
+    local actionDispatchedRemote = root:getRemoteEvent("Rodux_ActionDispatched")
+
+    root.Store = Rodux.Store.new(
         RoduxFeatures.reducer,
         nil,
-        { Rodux.thunkMiddleware, serverMiddleware }
+        { Rodux.thunkMiddleware, makeServerMiddleware(actionDispatchedRemote) }
     )
 
-    Root.Store:dispatch(actions.merge(initState()))
+    root.Store:dispatch(actions.merge(initState()))
 
     local function onPlayerAdded(player)
-        self.Client.InitState:FireClient(player, serialize(Root.Store:getState()))
+        initStateRemote:FireClient(player, serialize(root.Store:getState()))
         player:SetAttribute("RoduxStateInitialized", true)
     end
 
@@ -106,18 +101,20 @@ function RoduxService:OnInit()
         onPlayerAdded(player)
     end
 
-    self.Client.SaveSettings:Connect(function(client, settings)
-        if type(settings) ~= "table" then
-            return
+    requestRemote.OnServerEvent:Connect(function(client, remoteType, settings)
+        if remoteType == "SaveSettings" then
+            if type(settings) ~= "table" then
+                return
+            end
+
+            local action = actions.saveSettings(client.UserId, settings)
+            action.meta = action.meta or {}
+            action.meta.dispatchedBy = client
+            action.meta.serverRemote = nil
+
+            root.Store:dispatch(action)
         end
-
-        local action = actions.saveSettings(client.UserId, settings)
-        action.meta = action.meta or {}
-        action.meta.dispatchedBy = client
-        action.meta.serverRemote = nil
-
-        Root.Store:dispatch(action)
     end)
 end
 
-return RoduxService
+return roduxServer

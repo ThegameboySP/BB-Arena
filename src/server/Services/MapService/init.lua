@@ -29,6 +29,7 @@ local MapService = {
 		MapChanged = Root.remoteEvent();
 		CurrentMap = Root.remoteProperty(nil);
 	};
+	Priority = 1;
 	
 	Maps = ServerStorage.Maps;
 	LightingSaves = ServerStorage.Plugin_LightingSaves;

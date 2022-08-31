@@ -13,6 +13,7 @@ local defaultGlobalValues = require(script.Parent.defaultGlobalValues)
 
 local loadTools = require(script.loadTools)
 local resetPlayer = require(script.resetPlayer)
+local roduxServer = require(script.roduxServer)
 
 local Configuration = ReplicatedStorage.Configuration
 local Services = script.Parent.Services
@@ -40,39 +41,6 @@ local function getRemoteEvent(_, name)
 end
 
 local function registerRoot()
-    local RemoteProperties = Instance.new("Folder")
-    RemoteProperties.Name = "RemoteProperties"
-    RemoteProperties.Parent = ReplicatedStorage
-    
-    Root.globals = {}
-    for key, value in pairs(defaultGlobalValues) do
-        Root.globals[key] = RemoteProperty.new(RemoteProperties, key)
-        Root.globals[key]:Set(value)
-    end
-    
-    local notificationRemote = Instance.new("RemoteEvent")
-    notificationRemote.Name = "NotificationRemote"
-    notificationRemote.Parent = ReplicatedStorage
-
-    local clientErrorRemote = Instance.new("RemoteEvent")
-    clientErrorRemote.Name = "ClientErrorRemote"
-    clientErrorRemote.Parent = ReplicatedStorage
-
-    clientErrorRemote.OnServerEvent:Connect(function(client, message, stackTrace)
-        warn("[Game Critical]", getFullPlayerName(client) .. " errored:", message .. "\n" .. stackTrace)
-    end)
-    
-    Root.hint = function(message, options)
-        notificationRemote:FireAllClients(true, message, options)
-    end
-
-    Root.notification = function(message, options)
-        notificationRemote:FireAllClients(false, message, options)
-    end
-
-    Root.resetPlayer = resetPlayer
-    Root.getRemoteEvent = getRemoteEvent
-
     Root:RegisterServicesIn(Services)
     
     Root:Start()
@@ -193,8 +161,50 @@ local function setPlayerTags()
 	end)
 end
 
+local function registerRodux()
+    roduxServer(Root)
+end
+
+local function init()
+    local RemoteProperties = Instance.new("Folder")
+    RemoteProperties.Name = "RemoteProperties"
+    RemoteProperties.Parent = ReplicatedStorage
+    
+    Root.globals = {}
+    for key, value in pairs(defaultGlobalValues) do
+        Root.globals[key] = RemoteProperty.new(RemoteProperties, key)
+        Root.globals[key]:Set(value)
+    end
+    
+    local notificationRemote = Instance.new("RemoteEvent")
+    notificationRemote.Name = "NotificationRemote"
+    notificationRemote.Parent = ReplicatedStorage
+
+    local clientErrorRemote = Instance.new("RemoteEvent")
+    clientErrorRemote.Name = "ClientErrorRemote"
+    clientErrorRemote.Parent = ReplicatedStorage
+
+    clientErrorRemote.OnServerEvent:Connect(function(client, message, stackTrace)
+        warn("[Game Critical]", getFullPlayerName(client) .. " errored:", message .. "\n" .. stackTrace)
+    end)
+    
+    Root.hint = function(message, options)
+        notificationRemote:FireAllClients(true, message, options)
+    end
+
+    Root.notification = function(message, options)
+        notificationRemote:FireAllClients(false, message, options)
+    end
+
+    Root.resetPlayer = resetPlayer
+    Root.getRemoteEvent = getRemoteEvent
+end
+
 removeStudioInstances()
 loadTools()
+
+init()
+registerRodux()
 registerRoot()
 runScripts()
 spawnPlayers()
