@@ -5,7 +5,7 @@ return {
 	Group = "Admin";
 	Args = {
 		{
-			Type = "players",
+			Type = "players # playerIds",
 			Name = "players",
 			Description = "Players to ban"
 		}

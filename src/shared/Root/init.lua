@@ -1,10 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local UserService = game:GetService("UserService")
+local Players = game:GetService("Players")
 
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local RemoteEvent = require(ReplicatedStorage.Common.RemoteEvent)
 local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
+local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerName)
 
 local Status = {
     Uninitialized = 0;
@@ -24,7 +27,62 @@ function Root.new(replicatedContainer)
         _startedSignal = Signal.new();
         _root = nil;
         _replicatedContainer = replicatedContainer or ReplicatedStorage;
+
+        _infosByUserId = {};
+        _userIdsByName = {};
     }, Root)
+end
+
+function Root:GetFullNameByUserId(userId)
+    return self:GetUserInfoByUserId(userId)
+        :andThen(function(info)
+            return getFullPlayerName(info)
+        end, function()
+            return "#" .. tostring(userId)
+        end)
+end
+
+function Root:GetUserInfoByUserId(userId)
+    local cached = self._infosByUserId[userId]
+    
+    if Promise.is(cached) then
+        return cached
+    elseif cached then
+        return Promise.resolve(cached)
+    end
+
+    self._infosByUserId[userId] = Promise.new(function(resolve)
+        local info = UserService:GetUserInfosByUserIdsAsync({userId})[1]
+
+        self._infosByUserId[userId] = table.freeze(info)
+        self._userIdsByName[info.Username] = userId
+
+        resolve(info)
+    end):catch(function(err)
+        warn(err)
+        self._infosByUserId[userId] = nil
+    end)
+
+    return self._infosByUserId[userId]
+end
+
+function Root:GetUserIdByName(name)
+    local cached = self._userIdsByName[name]
+
+    if Promise.is(cached) then
+        return cached
+    elseif cached then
+        return Promise.resolve(cached)
+    end
+
+    self._userIdsByName[name] = Promise.new(function(resolve)
+        local userId = Players:GetUserIdFromNameAsync(name)
+        self._userIdsByName[name] = userId
+
+        resolve(userId)
+    end)
+
+    return self._userIdsByName[name]
 end
 
 function Root:RegisterServices(services)

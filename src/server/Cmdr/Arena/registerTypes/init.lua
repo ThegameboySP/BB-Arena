@@ -5,4 +5,7 @@ return function(registry, mapInfo)
 
     registry.Types.player = registry.Types.arenaPlayer
 	registry.Types.players = registry.Types.arenaPlayers
+
+    registry.Types.playerId = registry.Types.arenaPlayerId
+    registry.Types.playerIds = registry.Types.arenaPlayerIds
 end
