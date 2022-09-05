@@ -526,7 +526,7 @@ function Scrimmage:GameRunning()
             end
         end
 
-        if (#self.fightingTeams - count(nonEmptyTeams)) >= 1 then
+        if count(nonEmptyTeams) <= 1 then
             -- Sample health right now. Otherwise, it's prone to players resetting
             -- to clear their health.
             local startingHealth = {}
