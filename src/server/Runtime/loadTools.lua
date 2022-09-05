@@ -9,7 +9,7 @@ local settings = {
 	-- TEAM SETTINGS --
 	SpectatorTeamActive = true,   -- Spectators can't take or deal dmg.
 	IgnoreCertainTeams = true,
-	TeamsFiltered = {"Gladiators"}, -- "neutral" teams
+	TeamsFiltered = {"Gladiators", "Practice"}, -- "neutral" teams
 
 
 	-- DOOMSPIRE SETTINGS --

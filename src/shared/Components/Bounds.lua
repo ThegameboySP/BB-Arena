@@ -39,7 +39,7 @@ function Bounds:OnStart()
     self.connection = RunService.Heartbeat:Connect(function()
         local characters = {}
 
-        for _, player in pairs(CollectionService:GetTagged("FightingPlayer")) do
+        for _, player in pairs(CollectionService:GetTagged("ParticipatingPlayer")) do
             local character = player.Character
             if character and character.PrimaryPart then
                 table.insert(characters, character)
