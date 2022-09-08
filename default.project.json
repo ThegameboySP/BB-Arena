@@ -97,6 +97,14 @@
           "$className": "SoundGroup",
           "$properties": {
             "Volume": 0.5
+          },
+          "Equalizer": {
+            "$className": "EqualizerSoundEffect",
+            "$properties": {
+              "HighGain": 0,
+              "MidGain": -2,
+              "LowGain": -4
+            }
           }
         }
       },
