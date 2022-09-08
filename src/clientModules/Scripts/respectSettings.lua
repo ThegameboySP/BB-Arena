@@ -33,6 +33,10 @@ local function respectSettings(root)
             SoundService.Map.Volume = 2 * getLocalSetting(new, "mapVolume")
         end
 
+        if old == nil or getLocalSetting(new, "gamemodeVolume") ~= getLocalSetting(old, "gamemodeVolume") then
+            SoundService.Gamemode.Volume = 2 * getLocalSetting(new, "gamemodeVolume")
+        end
+
         if old == nil or getLocalSetting(new, "weaponVolume") ~= getLocalSetting(old, "weaponVolume") then
             weaponGroup.Volume = getLocalSetting(new, "weaponVolume")
         end

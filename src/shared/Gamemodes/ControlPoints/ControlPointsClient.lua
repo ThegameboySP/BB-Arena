@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 
 local Root = require(ReplicatedStorage.Common.Root)
 local Components = require(ReplicatedStorage.Common.Components)
@@ -17,6 +18,8 @@ local function playSound(sound)
 	clone.Ended:Connect(function()
 		clone.Parent = nil
 	end)
+
+	clone.SoundGroup = SoundService.Gamemode
 	clone:Play()
 	clone.Parent = workspace
 end
@@ -30,8 +33,9 @@ local function playSoundAt(sound, pos)
 	part.CanQuery = false
 	part.Name = "SoundHolder"
 	part.Size = Vector3.zero
-
+	
 	local clone = sound:Clone()
+	clone.SoundGroup = SoundService.Gamemode
 	clone.Parent = part
 	clone.Ended:Connect(function()
 		part.Parent = nil

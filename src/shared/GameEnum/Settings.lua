@@ -26,15 +26,15 @@ return table.freeze({
         name = "Map volume";
         description = [[The volume of the ambient sounds in maps. Includes "music" found in maps as well]];
     },
-    -- gamemodeVolume = {
-    --     order = 4;
-    --     group = "place";
+    gamemodeVolume = {
+        order = 4;
+        group = "place";
 
-    --     default = 0.25;
-    --     type = "percentage";
-    --     name = "Gamemode volume";
-    --     description = "The volume of gamemode sound effects";
-    -- },
+        default = 0.25;
+        type = "percentage";
+        name = "Gamemode volume";
+        description = "The volume of gamemode sound effects";
+    },
     -- fieldOfView = {
     --     order = 4;
     --     group = "place";

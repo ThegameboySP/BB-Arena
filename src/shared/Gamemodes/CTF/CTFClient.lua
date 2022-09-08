@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 
 local CTFScoreGUI = ReplicatedStorage.UI.CTFScoreGUI
 local Sounds = ReplicatedStorage.Assets.Sounds
@@ -14,6 +15,8 @@ local function playSound(sound)
 	clone.Ended:Connect(function()
 		clone.Parent = nil
 	end)
+
+	clone.SoundGroup = SoundService.Gamemode
 	clone:Play()
 	clone.Parent = workspace
 end
