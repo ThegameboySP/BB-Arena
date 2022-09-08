@@ -2,19 +2,23 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
-local actions = require(ReplicatedStorage.Common.RoduxFeatures).actions
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
 local LocalPlayer = Players.LocalPlayer
 
 local array = {}
 for _, value in GameEnum.Settings do
-	table.insert(array, value.cmdr)
+	table.insert(array, {
+		Name = value.name;
+		Type = value.type;
+		Description = value.description;
+	})
 end
 table.freeze(array)
 
 local function getId(setting)
 	for key, _setting in GameEnum.Settings do
-		if setting == _setting.cmdr then
+		if setting.Name == _setting.name then
 			return key
 		end
 	end
@@ -40,8 +44,8 @@ return {
 				local arg = table.clone(setting)
 
 				if LocalPlayer then
-					local settings = context:GetStore("Common").Store:getState().users.userSettings[LocalPlayer.UserId]
-					arg.Description ..= "\n\nCurrent value: " .. tostring(settings[getId(setting)])
+					local value = RoduxFeatures.selectors.getSavedSetting(context:GetStore("Common").Store:getState(), nil, getId(setting))
+					arg.Description ..= "\n\nCurrent value: " .. tostring(value)
 				end
 
 				return arg
@@ -52,14 +56,7 @@ return {
 	Run = function(context, setting, value)
 		local store = context:GetStore("Common").Store
 
-		local id
-		for key, _setting in GameEnum.Settings do
-			if setting == _setting.cmdr then
-				id = key
-				break
-			end
-		end
-
-		store:dispatch(actions.saveSettings(context.Executor.UserId, {[id] = value}))
+		local id = getId(setting)
+		store:dispatch(RoduxFeatures.actions.saveSettings(context.Executor.UserId, {[id] = value}))
 	end;
 }

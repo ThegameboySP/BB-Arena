@@ -11,6 +11,9 @@ Signal = "sleitnick/signal@1.1.0"
 Promise = "evaera/promise@4.0.0"
 Rodux = "roblox/rodux@3.0.0"
 Llama = "freddylist/llama@1.1.1"
+Roact = "roblox/roact@1.4.2"
+RoactRodux = "roblox/roact-rodux@0.3.0"
+RoactHooks = "kampfkarren/roact-hooks@0.3.0"
 
 [server-dependencies]
 Cmdr = "evaera/cmdr@1.9.0"

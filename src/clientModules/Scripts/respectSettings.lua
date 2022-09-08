@@ -1,42 +1,47 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
-local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
 
-local function get(state, ...)
-    local current = state
-
-    for i = 1, select("#", ...) do
-        local key = select(i, ...)
-        current = current[key]
-
-        if current == nil then
-            return nil
-        end
-    end
-
-    return current
-end
-
-local function changed(new, old, ...)
-    if new == nil or old == nil then
-        return new ~= old
-    end
-
-    return get(new, ...) ~= get(old, ...)
-end
-
-local userId = Players.LocalPlayer.UserId
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local getLocalSetting = RoduxFeatures.selectors.getLocalSetting
 
 local function respectSettings(root)
+    local weaponGroup = SoundService:FindFirstChild("Tools")
+    local projectiles = Workspace:FindFirstChild("Projectiles")
+
+    local colorCorrection = Instance.new("ColorCorrectionEffect")
+    colorCorrection.Name = "IlluminanceCorrection"
+    colorCorrection.Parent = Lighting
+
+    Workspace.DescendantAdded:Connect(function(descendant)
+        if descendant:IsA("Sound") then
+            if descendant:FindFirstAncestorWhichIsA("Tool") or descendant:IsDescendantOf(projectiles) then
+                descendant.SoundGroup = weaponGroup
+            end
+        end
+    end)
+
     local function onChanged(new, old)
         assert(new, "New Rodux state was somehow nil")
         
-        if not changed(new, old, "users", "userSettings", userId) then
-            return
+        if old == nil or getLocalSetting(new, "musicVolume") ~= getLocalSetting(old, "musicVolume") then
+            SoundService.Music.Volume = 2 * getLocalSetting(new, "musicVolume")
         end
 
-        local settings = get(root.Store:getState(), "users", "userSettings", userId)
-        SoundService.Music.Volume = 2 * settings.musicVolume
-        SoundService.Map.Volume = 2 * settings.mapVolume
+        if old == nil or getLocalSetting(new, "mapVolume") ~= getLocalSetting(old, "mapVolume") then
+            SoundService.Map.Volume = 2 * getLocalSetting(new, "mapVolume")
+        end
+
+        if old == nil or getLocalSetting(new, "weaponVolume") ~= getLocalSetting(old, "weaponVolume") then
+            weaponGroup.Volume = getLocalSetting(new, "weaponVolume")
+        end
+
+        if old == nil or getLocalSetting(new, "lighting") ~= getLocalSetting(old, "lighting") then
+            local percent = getLocalSetting(new, "lighting")
+            colorCorrection.Brightness = 1 * (percent - 0.5)
+            colorCorrection.Contrast = 0.5 * (percent - 0.5)
+        end
     end
 
     root.Store.changed:connect(onChanged)

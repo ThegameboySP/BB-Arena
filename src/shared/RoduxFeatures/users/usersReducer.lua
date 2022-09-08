@@ -41,7 +41,6 @@ return Rodux.createReducer({
 
         return Dictionary.mergeDeep(state, {
             userSettings = {[payload.userId] = payload.settings};
-            locallyEditedSettings = payload.settings;
         })
     end;
     users_setLocalSetting = function(state, action)
@@ -52,6 +51,26 @@ return Rodux.createReducer({
     users_flushSaveSettings = function(state)
         return Dictionary.merge(state, {
             locallyEditedSettings = {};
+        })
+    end;
+    users_cancelLocalSettings = function(state)
+        return Dictionary.merge(state, {
+            locallyEditedSettings = {};
+        })
+    end;
+    users_cancelLocalSetting = function(state, action)
+        return Dictionary.mergeDeep(state, {
+            locallyEditedSettings = {[action.payload.id] = Llama.None}
+        })
+    end;
+    users_restoreDefaultSettings = function(state)
+        local defaultsById = {}
+        for id, setting in GameEnum.Settings do
+            defaultsById[id] = setting.default
+        end
+
+        return Dictionary.mergeDeep(state, {
+            locallyEditedSettings = defaultsById;
         })
     end;
 

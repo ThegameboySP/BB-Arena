@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 
@@ -141,11 +142,10 @@ local function saveSettings(userId, settings)
     }
 end
 
-local function setLocalSetting(userId, id, value)
+local function setLocalSetting(id, value)
     return {
         type = "users_setLocalSetting";
         payload = {
-            userId = userId;
             id = id;
             value = value;
         };
@@ -155,11 +155,11 @@ local function setLocalSetting(userId, id, value)
     }
 end
 
-local function flushSaveSettings(userId)
+local function flushSaveSettings()
     return function(store)
         local state = store:getState()
 
-        store:dispatch(saveSettings(userId, state.users.locallyEditedSettings))
+        store:dispatch(saveSettings(Players.LocalPlayer and Players.LocalPlayer.UserId or 0, state.users.locallyEditedSettings))
 
         store:dispatch({
             type = "users_flushSaveSettings";
@@ -169,6 +169,38 @@ local function flushSaveSettings(userId)
             }
         })
     end
+end
+
+local function cancelLocalSettings()
+    return {
+        type = "users_cancelLocalSettings";
+        payload = {};
+        meta = {
+            realm = "client";
+        }
+    }
+end
+
+local function cancelLocalSetting(id)
+    return {
+        type = "users_cancelLocalSetting";
+        payload = {
+            id = id;
+        };
+        meta = {
+            realm = "client";
+        }
+    }
+end;
+
+local function restoreDefaultSettings()
+    return {
+        type = "users_restoreDefaultSettings";
+        payload = {};
+        meta = {
+            realm = "client";
+        }
+    }
 end
 
 return {
@@ -183,4 +215,7 @@ return {
     saveSettings = saveSettings;
     setLocalSetting = setLocalSetting;
     flushSaveSettings = flushSaveSettings;
+    cancelLocalSettings = cancelLocalSettings;
+    cancelLocalSetting = cancelLocalSetting;
+    restoreDefaultSettings = restoreDefaultSettings;
 }

@@ -3,6 +3,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Effects = require(ReplicatedStorage.Common.Utils.Effects)
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local getLocalSetting = RoduxFeatures.selectors.getLocalSetting
 
 local function filterProjectile(proj)
     local name = proj.Name:lower()
@@ -12,17 +14,16 @@ local function filterProjectile(proj)
         or name:find("superball")
         or name:find("pellet")
         or name:find("paintball")
+        or name:find("bomb")
     )
 end
 
 local function neonTools(root)
-    local localUserId = Players.LocalPlayer.UserId
-    
     local changed = Signal.new()
 
     local function applyNeon(part)
         local function update()
-            if root.Store:getState().users.userSettings[localUserId].neonWeapons then
+            if getLocalSetting(root.Store:getState(), "neonWeapons") then
                 part.Material = Enum.Material.Neon
             else
                 part.Material = Enum.Material.Plastic
@@ -44,8 +45,7 @@ local function neonTools(root)
     local function onChanged(new, old)
         if
             not old
-            or not old.users.userSettings[localUserId]
-            or new.users.userSettings[localUserId].neonWeapons ~= old.users.userSettings[localUserId].neonWeapons
+            or getLocalSetting(new, "neonWeapons") ~= getLocalSetting(old, "neonWeapons")
         then
             changed:Fire()
         end

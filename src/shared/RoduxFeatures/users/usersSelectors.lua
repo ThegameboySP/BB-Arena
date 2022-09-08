@@ -1,3 +1,9 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+
 local function getAdmin(state, userId)
     return state.users.admins[userId] or 0
 end
@@ -34,6 +40,26 @@ local function isUserBanned(state, userId)
     return canUserBeKickedBy(state, userId, bannerId)
 end
 
+local function getSavedSetting(state, userId, settingId)
+    local default = GameEnum.Settings[settingId].default
+
+    local userSettings = state.users.userSettings[userId or LocalPlayer and LocalPlayer.UserId or 0]
+    if userSettings then
+        return if userSettings[settingId] ~= nil then userSettings[settingId] else default
+    end
+
+    return default
+end
+
+local function getLocalSetting(state, settingId)
+    local overriddedSetting = state.users.locallyEditedSettings[settingId]
+    if overriddedSetting ~= nil then
+        return overriddedSetting
+    end
+
+    return getSavedSetting(state, LocalPlayer and LocalPlayer.UserId or 0, settingId)
+end
+
 return {
     getAdmin = getAdmin;
     isReferee = isReferee;
@@ -41,4 +67,6 @@ return {
     getUserBannedBy = getUserBannedBy;
     canUserBeKickedBy = canUserBeKickedBy;
     canUserBeLockKicked = canUserBeLockKicked;
+    getLocalSetting = getLocalSetting;
+    getSavedSetting = getSavedSetting;
 }
