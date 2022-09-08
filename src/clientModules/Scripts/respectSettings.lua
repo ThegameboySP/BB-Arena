@@ -46,6 +46,10 @@ local function respectSettings(root)
             colorCorrection.Brightness = 1 * (percent - 0.5)
             colorCorrection.Contrast = 0.5 * (percent - 0.5)
         end
+
+        if old == nil or getLocalSetting(new, "fieldOfView") ~= getLocalSetting(old, "fieldOfView") then
+            Workspace.CurrentCamera.FieldOfView = getLocalSetting(new, "fieldOfView")
+        end
     end
 
     root.Store.changed:connect(onChanged)

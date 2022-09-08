@@ -35,16 +35,20 @@ return table.freeze({
         name = "Gamemode volume";
         description = "The volume of gamemode sound effects";
     },
-    -- fieldOfView = {
-    --     order = 4;
-    --     group = "place";
+    fieldOfView = {
+        order = 4;
+        group = "place";
 
-    --     default = 70;
-    --     type = "range";
-    --     payload = {min = 10, max = 180};
-    --     name = "Field of View";
-    --     description = "The field of view of your camera";
-    -- },
+        default = 70;
+        type = "range";
+        payload = {
+            min = 20,
+            max = 120,
+            sign = "°"
+        };
+        name = "Field of View";
+        description = "The field of view of your camera";
+    },
     weaponVolume = {
         order = 1;
         group = "tool";

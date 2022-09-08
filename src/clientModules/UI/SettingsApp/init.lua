@@ -80,6 +80,7 @@ end
 local typeMap = {
     percentage = "slider";
     boolean = "switch";
+    range = "range";
 }
 
 local groupMap = {
@@ -103,6 +104,7 @@ SettingsApp = RoactRodux.connect(
             table.insert(settingRecords[group], {
                 name = setting.name;
                 type = typeMap[setting.type] or error("Unknown type: " .. tostring(setting.type));
+                payload = setting.payload;
                 value = value;
                 description = setting.description;
                 id = id;

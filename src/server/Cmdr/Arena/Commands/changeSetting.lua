@@ -3,14 +3,23 @@ local Players = game:GetService("Players")
 
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 
 local LocalPlayer = Players.LocalPlayer
+
+local function mapType(setting)
+	if setting.type == "range" then
+		return CmdrUtils.constrainedInteger(setting.payload.min, setting.payload.max)
+	end
+
+	return setting.type
+end
 
 local array = {}
 for _, value in GameEnum.Settings do
 	table.insert(array, {
 		Name = value.name;
-		Type = value.type;
+		Type = mapType(value);
 		Description = value.description;
 	})
 end

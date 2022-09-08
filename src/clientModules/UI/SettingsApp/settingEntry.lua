@@ -7,6 +7,7 @@ local e = Roact.createElement
 
 local switch = require(script.Parent.Parent.Presentational.switch)
 local percentSlider = require(script.Parent.Parent.Presentational.percentSlider)
+local rangeSlider = require(script.Parent.Parent.Presentational.rangeSlider)
 local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
 local MARGIN = 6
@@ -38,6 +39,19 @@ local function settingEntry(props, hooks)
             position = UDim2.new(1, -10, 0.5, 0);
             onChanged = function(percent)
                 props.onSettingChanged(setting.id, percent)
+            end;
+        })
+    elseif setting.type == "range" then
+        control = e(rangeSlider, {
+            value = setting.value;
+            min = setting.payload.min;
+            max = setting.payload.max;
+            sign = setting.payload.sign;
+
+            anchor = Vector2.new(1, 0.5);
+            position = UDim2.new(1, -10, 0.5, 0);
+            onChanged = function(value)
+                props.onSettingChanged(setting.id, value)
             end;
         })
     end
