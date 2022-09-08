@@ -26,15 +26,15 @@ local function respectSettings(root)
         assert(new, "New Rodux state was somehow nil")
         
         if old == nil or getLocalSetting(new, "musicVolume") ~= getLocalSetting(old, "musicVolume") then
-            SoundService.Music.Volume = 2 * getLocalSetting(new, "musicVolume")
+            SoundService.Music.Volume = getLocalSetting(new, "musicVolume")
         end
 
         if old == nil or getLocalSetting(new, "mapVolume") ~= getLocalSetting(old, "mapVolume") then
-            SoundService.Map.Volume = 2 * getLocalSetting(new, "mapVolume")
+            SoundService.Map.Volume = getLocalSetting(new, "mapVolume")
         end
 
         if old == nil or getLocalSetting(new, "gamemodeVolume") ~= getLocalSetting(old, "gamemodeVolume") then
-            SoundService.Gamemode.Volume = 2 * getLocalSetting(new, "gamemodeVolume")
+            SoundService.Gamemode.Volume = getLocalSetting(new, "gamemodeVolume")
         end
 
         if old == nil or getLocalSetting(new, "weaponVolume") ~= getLocalSetting(old, "weaponVolume") then

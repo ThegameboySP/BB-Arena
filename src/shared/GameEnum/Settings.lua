@@ -12,7 +12,7 @@ return table.freeze({
         order = 2;
         group = "place";
 
-        default = 0.25;
+        default = 0.5;
         type = "percentage";
         name = "Music volume";
         description = "The volume of the in-game music";
@@ -21,7 +21,7 @@ return table.freeze({
         order = 3;
         group = "place";
 
-        default = 0.25;
+        default = 0.5;
         type = "percentage";
         name = "Map volume";
         description = [[The volume of the ambient sounds in maps. Includes "music" found in maps as well]];
@@ -30,7 +30,7 @@ return table.freeze({
         order = 4;
         group = "place";
 
-        default = 0.25;
+        default = 0.5;
         type = "percentage";
         name = "Gamemode volume";
         description = "The volume of gamemode sound effects";
