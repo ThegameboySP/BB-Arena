@@ -91,6 +91,15 @@ function GamemodeService:OnInit()
     end)
 end
 
+function GamemodeService:GetGamemodes()
+    local definitions = {}
+    for _, gamemode in self.gamemodes do
+        table.insert(definitions, gamemode.definition)
+    end
+
+    return definitions
+end
+
 function GamemodeService:SetGamemode(name, config)
     if self.CurrentGamemode and self.CurrentGamemode.definition.nameId == name then
         return false, string.format("%q is already set", name)

@@ -1,7 +1,25 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Rodux = require(ReplicatedStorage.Packages.Rodux)
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local Dictionary = Llama.Dictionary
+
+local function combineReducers(map)
+	return function(state, action)
+		-- If state is nil, substitute it with a blank table.
+		if state == nil then
+			state = {}
+		end
+
+        -- If there is any manually merged data, preserve it.
+		local newState = table.clone(state)
+
+		for key, reducer in pairs(map) do
+			-- Each reducer gets its own state, not the entire state table
+			newState[key] = reducer(state[key], action)
+		end
+
+		return newState
+	end
+end
 
 local features = {}
 local reducers = {}
@@ -55,7 +73,7 @@ for _, module in pairs(script:GetChildren()) do
     end
 end
 
-local reducer = Rodux.combineReducers(reducers)
+local reducer = combineReducers(reducers)
 
 return {
     index = features;

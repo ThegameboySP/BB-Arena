@@ -20,6 +20,8 @@ local metaDefinition = t.strictInterface({
 
     IslandTopColor = t.optional(t.Color3);
     IslandBaseColor = t.optional(t.Color3);
+	
+	Creator = t.optional(t.string);
 })
 
 local MapService = {
@@ -192,6 +194,15 @@ function MapService:ChangeMap(mapName)
 
 	self.MapChanged:Fire(newMap)
 	self.Client.CurrentMap:Set(newMap)
+end
+
+function MapService:GetMaps()
+	local children = self.Maps:GetChildren()
+	if self.CurrentMap then
+		table.insert(children, self.CurrentMap)
+	end
+
+	return children
 end
 
 function MapService:_reconcileTeams(newNameToColor)
