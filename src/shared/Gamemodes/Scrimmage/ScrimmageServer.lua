@@ -656,7 +656,12 @@ function Scrimmage:putPlayerAway(player, originalCharacter)
 		local cframe, size = self.cage:GetBoundingBox()
         overlapParams.FilterDescendantsInstances = {character}
 
-		cBin:Add(Scrimmage.UpdateEvent:Connect(function()
+        cBin:Add(Scrimmage.UpdateEvent:Connect(function()
+            if not character.Parent then
+                cBin:DoCleaning()
+                return
+            end
+
             local parts = Workspace:GetPartBoundsInBox(cframe, size, overlapParams)
 
 			if parts[1] == nil then
