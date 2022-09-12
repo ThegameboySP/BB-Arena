@@ -7,7 +7,7 @@ local function getDistance(char1, char2)
     local pPart1 = char1.PrimaryPart
     local pPart2 = char2.PrimaryPart
 
-    return if (pPart1 and pPart2) then (pPart1.Position - pPart2.Position).Magnitude else nil
+    return if (pPart1 and pPart2) then (pPart1.Position - pPart2.Position).Magnitude else 0
 end
 
 local function killfeedServer(root)
