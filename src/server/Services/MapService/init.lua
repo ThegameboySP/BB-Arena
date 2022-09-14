@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local Teams = game:GetService("Teams")
 local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
 
 local Root = require(ReplicatedStorage.Common.Root)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -45,6 +46,8 @@ local MapService = {
 	MapScript = nil;
 	
 	ClonerManager = ClonerManager.new("MapComponents");
+
+	_lastRegenTimes = {};
 }
 
 function MapService:OnInit()
@@ -74,6 +77,30 @@ function MapService:OnInit()
 	
 	self.LightingSaves.Name = "LightingSaves"
 	self.LightingSaves.Parent = ReplicatedStorage
+
+	RunService.Heartbeat:Connect(function()
+		if not self.CurrentMap then
+			return
+		end
+
+		local prototypes = {}
+		local clones = {}
+
+		local currentTime = os.clock()
+		for _, component in self.ClonerManager.Manager:GetComponents(Components.RegenGroup) do
+			local prototype = self.ClonerManager.Cloner:GetPrototypeByClone(component.Instance)
+			local lastTime = self._lastRegenTimes[prototype] or 0
+
+			if (currentTime - lastTime) >= component.Config.Time then
+				table.insert(clones, component.Instance)
+				table.insert(prototypes, prototype)
+			end
+		end
+
+		if clones[1] then
+			self:_regen(clones, prototypes)
+		end
+	end)
 end
 
 function MapService:OnStart()
@@ -85,6 +112,22 @@ end
 function MapService:RegisterComponent(class)
 	if class.realm ~= "client" then
 		self.ClonerManager:Register(class)
+	end
+end
+
+function MapService:_regen(clones, prototypes)
+	for _, clone in clones do
+		self.ClonerManager.Cloner:DespawnClone(clone)
+	end
+
+	self.ClonerManager.Cloner:RunPrototypes(prototypes)
+	
+	local components = self.ClonerManager:Flush()
+	self.ClonerManager:ReplicateToClients(components)
+
+	local currentTime = os.clock()
+	for _, prototype in prototypes do
+		self._lastRegenTimes[prototype] = currentTime
 	end
 end
 
@@ -103,14 +146,7 @@ function MapService:Regen(filter)
 		end
 	end
 
-	for _, clone in clones do
-		self.ClonerManager.Cloner:DespawnClone(clone)
-	end
-
-	self.ClonerManager.Cloner:RunPrototypes(prototypes)
-	
-	local components = self.ClonerManager:Flush()
-	self.ClonerManager:ReplicateToClients(components)
+	self:_regen(clones, prototypes)
 end
 
 function MapService:ChangeMap(mapName)
@@ -144,6 +180,7 @@ function MapService:ChangeMap(mapName)
 	-- Should reconcile teams before components run.
 	local oldTeamToNewTeam = self:_reconcileTeams(meta.Teams)
 
+	table.clear(self._lastRegenTimes)
 	self.ClonerManager:Clear()
 	self.ClonerManager:ServerInit(newMap)
 	self.ClonerManager.Cloner:RunPrototypes(function(record)
