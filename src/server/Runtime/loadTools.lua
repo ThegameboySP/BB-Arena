@@ -11,6 +11,11 @@ local settings = {
 	IgnoreCertainTeams = true,
 	TeamsFiltered = {"Gladiators", "Practice"}, -- "neutral" teams
 
+	Themes = {
+		--ThemePacks = {};
+		TrailsOmitted = {"Normal", "Team Color"}; -- Add theme names for them to not have trails
+		TrailFilterType = true;
+	},
 
 	-- DOOMSPIRE SETTINGS --
 	Doomspire = {
@@ -51,8 +56,8 @@ local settings = {
 		LungeExtensionTime = .85;
 	},
 	PaintballGun = {
-		Damage = 18;
-		Speed = 300;
+		Damage = 15;
+		Speed = 200;
 		MultiplierPartNames = {
 			Head = false,
 			Torso = false,
@@ -78,6 +83,7 @@ local settings = {
 	LocalSettingsDefaults = { -- mostly aesthetic
 		Hit = "Ping"; -- None for no sound
 		Themes = false;
+		ThemesHighGraphics = false;
 	},
 
 }
