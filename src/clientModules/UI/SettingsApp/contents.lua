@@ -118,6 +118,10 @@ local function contents(props, hooks)
 
             local y = sizeY / 2
             for _, child in pairs(self.listRef:getValue().Parent:GetChildren()) do
+                if not child:IsA("GuiObject") then
+                    continue
+                end
+                
                 y += child.AbsoluteSize.Y
 
                 if
