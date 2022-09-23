@@ -36,7 +36,7 @@ return table.freeze({
         description = "The volume of gamemode sound effects";
     },
     fieldOfView = {
-        order = 4;
+        order = 5;
         group = "place";
 
         default = 70;
@@ -46,7 +46,7 @@ return table.freeze({
             max = 120,
             sign = "°"
         };
-        name = "Field of View";
+        name = "Field of view";
         description = "The field of view of your camera";
     },
     weaponVolume = {
@@ -57,7 +57,7 @@ return table.freeze({
         type = "percentage";
         name = "Tools volume";
         description = "The volume of the toolset. With this, you don't have to choose between your hearing and playing Brickbattle!";
-    };
+    },
     neonWeapons = {
         order = 2;
         group = "tool";
@@ -65,6 +65,6 @@ return table.freeze({
         type = "boolean";
         default = true;
         name = "Neon tools";
-        description = "Whether neon tools should be displayed or not";
-    }
+        description = "Whether neon weapons should be displayed or not";
+    },
 })
