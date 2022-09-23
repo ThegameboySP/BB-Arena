@@ -1,10 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
+local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
+local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
 local e = Roact.createElement
 
-local function sidePanel(props)
+local function sidePanel(props, hooks)
+    local theme = hooks.useContext(ThemeContext)
+
     local children = {}
     for i, settingCategory in ipairs(props.settingCategories) do
         children[string.char(i)] = e("ImageButton", {
@@ -15,6 +19,25 @@ local function sidePanel(props)
             [Roact.Event.MouseButton1Down] = function()
                 props.onPressed(settingCategory)
             end
+        }, {
+            Outline = e("Frame", {
+                BackgroundTransparency = 1;
+                AnchorPoint = Vector2.new(0.5, 0.5);
+                Size = UDim2.new(1, 10, 1, 10);
+                Position = UDim2.new(0.5, 0, 0.5, 0);
+
+                Visible = props.activeCategory:map(function(activeCategory)
+                    return activeCategory.name == settingCategory.name
+                end);
+            }, {
+                UIStroke = e("UIStroke", {
+                    Color = theme.highContrast;
+                    Thickness = 2
+                }),
+                UICorner = e("UICorner", {
+                    CornerRadius = UDim.new(0, 8)
+                })
+            })
         })
     end
 
@@ -54,4 +77,4 @@ local function sidePanel(props)
     })
 end
 
-return sidePanel
+return RoactHooks.new(Roact)(sidePanel)

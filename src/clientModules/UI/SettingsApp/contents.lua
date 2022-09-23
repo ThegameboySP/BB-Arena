@@ -114,14 +114,13 @@ local function contents(props, hooks)
 
         [Roact.Change.CanvasPosition] = function()
             local currentY = self.listRef:getValue().Parent.Parent.CanvasPosition.Y
-            local sizeY = self.listRef:getValue().Parent.Parent.AbsoluteSize.Y
 
-            local y = sizeY / 2
+            local y = -1
             for _, child in pairs(self.listRef:getValue().Parent:GetChildren()) do
                 if not child:IsA("GuiObject") then
                     continue
                 end
-                
+
                 y += child.AbsoluteSize.Y
 
                 if

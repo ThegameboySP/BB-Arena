@@ -114,6 +114,7 @@ local function mainWidget(props, hooks)
 					size = UDim2.new(0, 100, 1, 0);
 					iconSize = UDim2.fromOffset(80, 80);
 					dividerColor = theme.border;
+					activeCategory = categoryBinding;
 					
 					settingCategories = props.settingCategories;
 					onPressed = function(category)
