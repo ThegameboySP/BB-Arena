@@ -49,6 +49,15 @@ return table.freeze({
         name = "Field of view";
         description = "The field of view of your camera";
     },
+    trowelVisualization = {
+        order = 1;
+        group = "tool";
+
+        default = true;
+        type = "boolean";
+        name = "Trowel visualization";
+        description = "Whether the position and orientation of your trowel is shown before firing";
+    },
     weaponVolume = {
         order = 1;
         group = "tool";
