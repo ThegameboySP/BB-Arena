@@ -14,13 +14,22 @@ local function respectSettings(root)
     colorCorrection.Name = "IlluminanceCorrection"
     colorCorrection.Parent = Lighting
 
-    Workspace.DescendantAdded:Connect(function(descendant)
+    local function onDescendantAdded(descendant)
         if descendant:IsA("Sound") then
-            if descendant:FindFirstAncestorWhichIsA("Tool") or descendant:IsDescendantOf(projectiles) then
+            if
+                descendant:FindFirstAncestorWhichIsA("Tool")
+                or descendant:IsDescendantOf(projectiles)
+                or descendant:FindFirstAncestor("ToolObjects")
+            then
                 descendant.SoundGroup = weaponGroup
             end
         end
-    end)
+    end
+
+    game.DescendantAdded:Connect(onDescendantAdded)
+    for _, descendant in game:GetDescendants() do
+        onDescendantAdded(descendant)
+    end
 
     local function onChanged(new, old)
         assert(new, "New Rodux state was somehow nil")
