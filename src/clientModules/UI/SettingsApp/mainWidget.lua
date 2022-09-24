@@ -40,11 +40,9 @@ local function mainWidget(props, hooks)
 			image = "rbxassetid://9206592117";
 			imageSize = Vector2.new(50, 50);
 			name = "Settings";
-			useExitButton = true;
+			useExitButton = false;
 
 			outerRef = value.outerRef;
-			
-			onClosed = props.onClosed;
 		}, {
 			PanelContainer = e("Frame", {
 				BackgroundTransparency = 1;
@@ -95,20 +93,22 @@ local function mainWidget(props, hooks)
 				});
 			});
 
-			Save = e(button, {
-				position = UDim2.new(0.86, 0, 1, -10);
+			Confirm = e(button, {
+				position = UDim2.new(0.5, 0, 1, -10);
 				anchor = Vector2.new(0.5, 1);
-				text = "Save settings";
+				text = "Confirm";
 				textSize = 28;
+				minSize = Vector2.new(230, 0);
 				color = theme.button;
 				textColor = theme.highContrast;
 				onPressed = function()
 					props.onSettingsSaved()
+					props.onClosed()
 				end;
 			});
 
 			Defaults = e(button, {
-				position = UDim2.new(0.86, -220, 1, -10);
+				position = UDim2.new(0.5, 240, 1, -10);
 				anchor = Vector2.new(0.5, 1);
 				text = "Restore defaults";
 				textSize = 28;
@@ -116,6 +116,18 @@ local function mainWidget(props, hooks)
 				textColor = theme.highContrast;
 				onPressed = function()
 					props.onRestoreDefaults()
+				end;
+			});
+
+			Undo = e(button, {
+				position = UDim2.new(0.5, 408, 1, -10);
+				anchor = Vector2.new(0.5, 1);
+				text = "Undo";
+				textSize = 28;
+				color = theme.lessImportantButton;
+				textColor = theme.highContrast;
+				onPressed = function()
+					props.onSettingsCanceled()
 				end;
 			});
 		});

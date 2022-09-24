@@ -13,68 +13,10 @@ local mainWidget = require(script.mainWidget)
 
 local SettingsApp = Roact.Component:extend("Settings")
 
--- function SettingsApp:init()
---     self.localEdits = {}
--- end
-
--- function SettingsApp:getChangedSettings(newSettingRecords)
---     local changed = {}
-
---     -- Only iterate over new, since new setting entries should never happen.
---     for name, settings in newSettingRecords do
---         local oldSettings = self.props.settingRecords[name]
-
---         for id, setting in settings do
---             if setting.value ~= oldSettings[id].value then
---                 changed[id] = setting.value
---             end
---         end
---     end
-
---     return changed
--- end
-
--- function SettingsApp:shouldUpdate(newProps)
---     if newProps == self.props then
---         return false
---     end
-
---     for id, value in self:getChangedSettings(newProps.settingRecords) do
---         if self.localEdits[id] ~= value then
---             return true
---         end
---     end
-
---     return false
--- end
-
--- function SettingsApp:render()
---     return e(ThemeController, {}, {
---         SettingsApp = e(mainWidget, Llama.Dictionary.merge(self.props, {
---             onSettingChanged = function(settingId, value)
---                 self.localEdits[settingId] = value
---                 self.props.onSettingChanged(settingId, value)
---             end;
---             onSettingsSaved = function()
---                 table.clear(self.localEdits)
---                 self.props.onSettingChanged()
---             end;
---             onSettingsCanceled = function()
---                 table.clear(self.localEdits)
---                 self.props.onSettingChanged()
---             end
---         }));
---     })
--- end
-
 function SettingsApp:render()
     return e(ThemeController, {}, {
         SettingsApp = e(mainWidget, self.props);
     })
-end
-
-function SettingsApp:willUnmount()
-    self.props.onSettingsCanceled()
 end
 
 local typeMap = {

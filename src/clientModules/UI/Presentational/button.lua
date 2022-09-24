@@ -7,8 +7,17 @@ local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
 local e = Roact.createElement
 
 local function button(props)
-    local textBounds = TextService:GetTextSize(props.text, props.textSize, Enum.Font.Gotham, Vector2.new(682, 1000))
-    textBounds += Vector2.new(20, 20)
+    local textBounds = TextService:GetTextSize(props.text, props.textSize, Enum.Font.Gotham, props.minSize or Vector2.new(math.huge, math.huge))
+	
+	local padding = props.padding or 20
+    textBounds += Vector2.new(padding, padding)
+
+	if props.minSize then
+		textBounds = Vector2.new(
+			math.max(props.minSize.X, textBounds.X),
+			math.max(props.minSize.Y, textBounds.Y)
+		)
+	end
 
 	return e("ImageButton", {
 		Size = UDim2.fromOffset(textBounds.X, textBounds.Y);
