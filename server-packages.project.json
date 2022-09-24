@@ -7,6 +7,9 @@
 		"$path": "ServerPackages",
 		"MockDataStoreService": {
 			"$path": "modules/MockDataStoreService.rbxmx"
+		},
+		"Toolset": {
+			"$path": "modules/Toolset.rbxmx"
 		}
 	}
 }

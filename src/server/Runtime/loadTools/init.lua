@@ -1,3 +1,7 @@
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local Toolset = ServerScriptService.Packages.Toolset
+
 local ThemePack = script.ThemePack
 local CustomThemePack = script.CustomThemePack
 
@@ -94,7 +98,7 @@ local settings = {
 
 local function loadTools()
     task.spawn(function()
-        require(6101328137)(settings)
+        require(Toolset)(settings)
     end)
 end
 
