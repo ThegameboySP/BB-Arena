@@ -5,6 +5,7 @@ local Players = game:GetService("Players")
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local actions = RoduxFeatures.actions
 
 local function numberIndicesToString(map)
@@ -63,7 +64,7 @@ local function makeServerMiddleware(actionDispatchedRemote)
                 return
             end
     
-            if not meta or (meta.realm ~= "server" and not meta.dispatchedBy) then
+            if not meta or meta.realm ~= "server" then
                 local players = if meta and meta.interestedUserIds then mapPlayers(meta.interestedUserIds) else Players:GetPlayers()
                 
                 for _, player in players do
@@ -107,12 +108,36 @@ local function roduxServer(root)
                 return
             end
 
+            local replicateSettings = {}
+            for settingName, setting in settings do
+                -- Client must have exploited to send this message.
+                if not GameEnum.Settings[settingName] then
+                    return
+                end
+
+                if GameEnum.Settings[settingName].replicateToAll then
+                    replicateSettings[settingName] = setting
+                end
+            end
+
             local action = actions.saveSettings(client.UserId, settings)
-            action.meta = action.meta or {}
-            action.meta.dispatchedBy = client
+            action.meta.interestedUserIds = {}
             action.meta.serverRemote = nil
 
             root.Store:dispatch(action)
+
+            if next(replicateSettings) then
+                local replicatedAction = actions.saveSettings(client.UserId, replicateSettings)
+                replicatedAction.meta.interestedUserIds = {}
+
+                for _, player in Players:GetPlayers() do
+                    if player ~= client then
+                        table.insert(replicatedAction.meta.interestedUserIds, player.UserId)
+                    end
+                end
+
+                root.Store:dispatch(replicatedAction)
+            end
         end
     end)
 end

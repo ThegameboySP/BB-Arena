@@ -81,6 +81,7 @@ local typeMap = {
     percentage = "slider";
     boolean = "switch";
     range = "range";
+    enum = "enum";
 }
 
 local groupMap = {

@@ -37,7 +37,7 @@ local function makeClientMiddleware(requestRemote)
                 return
             end
     
-            if meta and meta.serverRemote then
+            if meta and meta.serverRemote and not meta.dispatchedByServer then
                 requestRemote:FireServer(unpack(meta.serverRemote))
     
                 if meta.interestedUserIds and not table.find(meta.interestedUserIds, LocalPlayer.UserId) then
@@ -64,6 +64,9 @@ local function roduxClient(root)
     end)
 
     actionDispatchedRemote.OnClientEvent:Connect(function(action)
+        action.meta = action.meta or {}
+        action.meta.dispatchedByServer = true
+
         root.Store:dispatch(action)
     end)
 end

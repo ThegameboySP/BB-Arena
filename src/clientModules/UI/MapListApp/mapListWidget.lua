@@ -6,9 +6,8 @@ local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
 local e = Roact.createElement
 
-local AutoUIScale = require(script.Parent.Parent.AutoUIScale)
 local button = require(script.Parent.Parent.Presentational.button)
-local draggable = require(script.Parent.Parent.draggable)
+local window = require(script.Parent.Parent.Presentational.window)
 
 local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
@@ -76,8 +75,7 @@ local function mapListWidget(props, hooks)
 	local selected, setSelected = hooks.useState(nil)
 
 	if not next(values) then
-		values.topRef = Roact.createRef()
-		values.rootRef = Roact.createRef()
+		values.outerRef = Roact.createRef()
 	end
 	
 	local outputTextBinding, setOutputText = hooks.useBinding("")
@@ -188,7 +186,7 @@ local function mapListWidget(props, hooks)
 
 	hooks.useEffect(function()
 		-- Sometimes cells are improperly sized in UITableLayout. This is essentially a hack to get :ApplyLayout.
-		local root = values.rootRef:getValue()
+		local root = values.outerRef:getValue():FindFirstChild("Window")
 		local scrollingFrame = root:FindFirstChild("ContentsContainer")
 
 		for _, child in scrollingFrame:GetChildren() do
@@ -207,87 +205,22 @@ local function mapListWidget(props, hooks)
 	end)
 
 	return e("Frame", {
+		[Roact.Ref] = values.outerRef;
+
 		BackgroundTransparency = 1;
 		Size = UDim2.fromScale(1, 1);
 	}, {
-		Frame = e("ImageLabel", {
-			[Roact.Ref] = values.rootRef;
-			
-			BackgroundTransparency = 1;
-			
-			ImageColor3 = theme.background;
-			Image = "rbxassetid://9264310289";
-			ScaleType = Enum.ScaleType.Slice;
-			SliceCenter = Rect.new(Vector2.new(128, 128), Vector2.new(128, 128));
-			SliceScale = 0.1;
-			
-			AnchorPoint = Vector2.new(0.5, 0.5),
-			Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(0, 1100, 0, 700)
+		Window = e(window, {
+			size = UDim2.new(0, 1100, 0, 700);
+			aspectRatio = 2;
+			image = "rbxassetid://10866961648";
+			imageSize = Vector2.new(63, 50);
+			name = "Map list";
+			useExitButton = true;
+
+			outerRef = values.outerRef;
+			onClosed = props.onClosed;
 		}, {
-			UIScale = e(AutoUIScale, {
-				minScaleRatio = 0.5;
-			});
-			UIAspectRatioConstraint = e("UIAspectRatioConstraint", {
-				AspectRatio = 2;
-			});
-			Top = e(draggable, {
-				topRef = values.topRef;
-				rootRef = values.rootRef;
-
-				position = UDim2.new(0, 0, 0, -60);
-				size = UDim2.new(1, 0, 0, 60)
-			}, {
-				Title = e("ImageLabel", {
-					[Roact.Ref] = values.topRef;
-
-					ImageColor3 = theme.foreground;
-					Image = "rbxassetid://9264443152";
-					ScaleType = Enum.ScaleType.Slice;
-					SliceCenter = Rect.new(Vector2.new(128, 128), Vector2.new(128, 128));
-					SliceScale = 0.1;
-					
-					BorderSizePixel = 0;
-					Position = UDim2.new(0, 0, 0, 0);
-					Size = UDim2.fromScale(1, 1);
-					BackgroundTransparency = 1;
-				}, {
-					Icon = e("ImageLabel", {
-						Image = "rbxassetid://10866961648";
-						BackgroundTransparency = 1;
-
-						Size = UDim2.fromOffset(63, 50);
-						AnchorPoint = Vector2.new(0, 0.5);
-						Position = UDim2.new(0, 10, 0.5, 0);
-					});
-
-					TextLabel = e("TextLabel", {
-						Text = "Map list";
-						Font = Enum.Font.GothamBold;
-						TextColor3 = theme.title;
-						TextSize = 38;
-						TextXAlignment = Enum.TextXAlignment.Left;
-
-						BackgroundTransparency = 1;
-						Size = UDim2.fromScale(1, 1);
-						Position = UDim2.new(0, 85, 0, 0);
-					});
-
-					Close = e("ImageButton", {
-						BackgroundTransparency = 1;
-
-						AnchorPoint = Vector2.new(1, 0.5);
-						Position = UDim2.new(1, -5, 0.5, 0);
-						Size = UDim2.new(0, 50, 0, 50);
-						Image = "http://www.roblox.com/asset/?id=5107150301";
-
-						[Roact.Event.MouseButton1Down] = function()
-							props.onClosed()
-						end;
-					});
-				})
-			});
-
 			ContentsContainer = e("ScrollingFrame", {
 				BackgroundTransparency = 0;
 				BackgroundColor3 = theme.foreground;
@@ -313,6 +246,7 @@ local function mapListWidget(props, hooks)
 				anchor = Vector2.new(0.5, 0);
 				color = theme.lessImportantButton;
 				textColor = theme.title;
+				textSize = 28;
 
 				onPressed = function()
 					if selected then

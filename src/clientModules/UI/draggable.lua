@@ -29,8 +29,8 @@ local function capDelta(maxSize, pos, size, anchorPoint, delta)
     pos += delta
 
     -- Anchor point can be anything. We force it to the center here.
-    local sizeRatios = Vector2.new(0.5, 0.5) - anchorPoint
-    pos += size * sizeRatios
+    local anchorDelta = Vector2.new(0.5, 0.5) - anchorPoint
+    pos += size * anchorDelta
 
     if (pos - size/2).X < 0 then
         pos = Vector2.new(pos.X + (size.X/2 - pos.X), pos.Y)
@@ -47,7 +47,7 @@ local function capDelta(maxSize, pos, size, anchorPoint, delta)
     end
 
     -- Change anchor point back to its original value.
-    pos -= size * sizeRatios
+    pos -= size * anchorDelta
 
     local change = roundv2(pos - originalPos)
     return UDim2.fromOffset(change.X, change.Y)
@@ -57,6 +57,10 @@ local function v2(v3)
     return Vector2.new(v3.X, v3.Y)
 end
 
+-- Draggable must not be under UIScale or any other constraint that means 1 UDim != 1 real pixel. It should be near the top.
+-- topRef is the active GuiObject that takes input.
+-- rootRef is the top level GuiObject that moves the rest with itself.
+-- outerRef is the containing GuiObject which represents the allowable space to drag.
 local function draggable(props, hooks)
     hooks.useEffect(function()
         local connections = {}
@@ -88,7 +92,7 @@ local function draggable(props, hooks)
                 local delta = input.Position - lastMousePosition
 
                 root.Position = lastRootPosition + capDelta(
-                    root:FindFirstAncestorWhichIsA("GuiObject").AbsoluteSize,
+                    props.outerRef:getValue().AbsoluteSize,
                     lastTopPosition,
                     top.AbsoluteSize,
                     top.AnchorPoint,
@@ -102,7 +106,7 @@ local function draggable(props, hooks)
                 connection:Disconnect()
             end
         end
-    end, props)
+    end)
 
     return Roact.createElement("Frame", {
         BackgroundTransparency = 1;

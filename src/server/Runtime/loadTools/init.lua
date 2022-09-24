@@ -1,3 +1,6 @@
+local ThemePack = script.ThemePack
+local CustomThemePack = script.CustomThemePack
+
 local settings = {
 	-- GENERAL WEAPON SETTINGS --
 	SuperballFly = false,
@@ -10,9 +13,10 @@ local settings = {
 	SpectatorTeamActive = true,   -- Spectators can't take or deal dmg.
 	IgnoreCertainTeams = true,
 	TeamsFiltered = {"Gladiators", "Practice"}, -- "neutral" teams
+	ThemeOverrides = true, -- themes will override team colors if above is true
 
 	Themes = {
-		--ThemePacks = {};
+		ThemePacks = {ThemePack, CustomThemePack};
 		TrailsOmitted = {"Normal", "Team Color"}; -- Add theme names for them to not have trails
 		TrailFilterType = true;
 	},
@@ -82,8 +86,8 @@ local settings = {
 	-- LOCAL MISC SETTINGS --
 	LocalSettingsDefaults = { -- mostly aesthetic
 		Hit = "Ping"; -- None for no sound
-		Themes = false;
-		ThemesHighGraphics = false;
+		Themes = true;
+		ThemesHighGraphics = true;
 	},
 
 }

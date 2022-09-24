@@ -10,6 +10,13 @@ local LocalPlayer = Players.LocalPlayer
 local function mapType(setting)
 	if setting.type == "range" then
 		return CmdrUtils.constrainedInteger(setting.payload.min, setting.payload.max)
+	elseif setting.type == "enum" then
+		local array = {}
+		for name in setting.payload do
+			table.insert(array, name)
+		end
+
+		return CmdrUtils.enum(setting.name, array)
 	end
 
 	return setting.type

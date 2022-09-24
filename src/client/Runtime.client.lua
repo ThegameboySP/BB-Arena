@@ -23,6 +23,11 @@ if not Players.LocalPlayer:GetAttribute("Initialized") then
     Players.LocalPlayer:GetAttributeChangedSignal("Initialized"):Wait()
 end
 
+-- Legacy toolset crap
+while not _G.BB or not _G.BB.Local do
+    task.wait()
+end
+
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local function getRemoteEvent(_, name)
     return RemoteEvents:WaitForChild(name)

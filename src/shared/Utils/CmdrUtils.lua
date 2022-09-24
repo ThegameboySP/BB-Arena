@@ -401,4 +401,32 @@ function makeFuzzyFinder(setOrContainer)
 	end
 end
 
+--- Takes an array of instances and returns an array of those instances' names.
+local function getNames(instances)
+	local names = {}
+
+	for i = 1, #instances do
+		names[i] = instances[i].Name or tostring(instances[i])
+	end
+
+	return names
+end
+
+--- Makes an Enum type.
+function CmdrUtils.enum(name, values)
+	local findValue = makeFuzzyFinder(values)
+	return {
+		Validate = function(text)
+			return findValue(text, true) ~= nil, ("Value %q is not a valid %s."):format(text, name)
+		end,
+		Autocomplete = function(text)
+			local list = findValue(text)
+			return type(list[1]) ~= "string" and getNames(list) or list
+		end,
+		Parse = function(text)
+			return findValue(text, true)
+		end
+	}
+end
+
 return CmdrUtils

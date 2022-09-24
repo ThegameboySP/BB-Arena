@@ -31,6 +31,12 @@
         "ClientModules": {
           "$path": "src/clientModules"
         },
+        "Place": {
+          "$className": "Folder",
+          "WeaponThemes": {
+            "$className": "Folder"
+          }
+        },
         "Configuration": {
           "$className": "Configuration"
         }
@@ -42,6 +48,9 @@
         },
         "Server": {
           "$path": "src/server"
+        },
+        "Place": {
+          "$className": "Folder"
         }
       },
 

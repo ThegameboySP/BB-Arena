@@ -32,7 +32,7 @@ local function sidePanel(props, hooks)
             }, {
                 UIStroke = e("UIStroke", {
                     Color = theme.highContrast;
-                    Thickness = 2
+                    Thickness = 2;
                 }),
                 UICorner = e("UICorner", {
                     CornerRadius = UDim.new(0, 8)

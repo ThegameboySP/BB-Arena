@@ -59,6 +59,7 @@ local function contents(props, hooks)
             changedSettings = props.changedSettings;
             onSettingChanged = props.onSettingChanged;
             onSettingCanceled = props.onSettingCanceled;
+            onPrompt = props.onPrompt;
         })    
     end
 

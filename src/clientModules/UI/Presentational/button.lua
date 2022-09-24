@@ -6,26 +6,8 @@ local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
 
 local e = Roact.createElement
 
-local ThemeContext = require(script.Parent.Parent.ThemeContext)
-
-local function button(props, hooks)
-    local theme = hooks.useContext(ThemeContext)
-
-    local color
-    if type(props.color) == "string" then
-        color = theme[props.color]
-    else
-        color = props.color
-    end
-
-    local textColor
-    if type(props.textColor) == "string" then
-        textColor = theme[props.textColor]
-    else
-        textColor = props.textColor
-    end
-
-    local textBounds = TextService:GetTextSize(props.text, 28, Enum.Font.Gotham, Vector2.new(682, 1000))
+local function button(props)
+    local textBounds = TextService:GetTextSize(props.text, props.textSize, Enum.Font.Gotham, Vector2.new(682, 1000))
     textBounds += Vector2.new(20, 20)
 
 	return e("ImageButton", {
@@ -39,7 +21,7 @@ local function button(props, hooks)
 		SliceScale = 0.5;
 
 		BackgroundTransparency = 1;
-		ImageColor3 = color;
+		ImageColor3 = props.color;
 
 		[Roact.Event.MouseButton1Click] = function()
 			props.onPressed()
@@ -50,9 +32,9 @@ local function button(props, hooks)
             Size = UDim2.fromScale(1, 1);
             BackgroundTransparency = 1;
 
-            TextColor3 = textColor;
+            TextColor3 = props.textColor;
             Text = props.text;
-            TextSize = 28;
+            TextSize = props.textSize;
         })
 	})
 end

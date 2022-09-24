@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextService = game:GetService("TextService")
+local Players = game:GetService("Players")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
@@ -8,11 +9,80 @@ local e = Roact.createElement
 local switch = require(script.Parent.Parent.Presentational.switch)
 local percentSlider = require(script.Parent.Parent.Presentational.percentSlider)
 local rangeSlider = require(script.Parent.Parent.Presentational.rangeSlider)
+local list = require(script.Parent.Parent.Presentational.list)
+local button = require(script.Parent.Parent.Presentational.button)
+local window = require(script.Parent.Parent.Presentational.window)
+
 local ThemeContext = require(script.Parent.Parent.ThemeContext)
+
+local Container = Players.LocalPlayer and Players.LocalPlayer:FindFirstChild("PlayerGui") or game:GetService("CoreGui")
 
 local MARGIN = 6
 local TITLE_TEXT_SIZE = 28
 local DESCRIPTION_TEXT_SIZE = 24
+
+local function modal(props, hooks)
+    local self = hooks.useValue()
+    self.outerRef = self.outerRef or Roact.createRef()
+
+    return e(Roact.Portal, {
+        target = Container
+    }, {
+        Modal = e("ScreenGui", {
+            [Roact.Ref] = self.outerRef;
+
+            ResetOnSpawn = false;
+        }, {
+            Window = e(window, {
+                size = UDim2.fromOffset(800, 400);
+                aspectRatio = 1;
+                name = props.name;
+                outerRef = self.outerRef;
+
+                useExitButton = false;
+
+                onClosed = function()
+                    props.onFinished(false)
+                end;
+            }, {
+                List = e("Frame", {
+                    BackgroundTransparency = 0;
+                    BackgroundColor3 = props.theme.background;
+                    BorderSizePixel = 0;
+                    Size = UDim2.new(1, 0, 1, 0);
+                }, {
+                    List = e(list, {
+                        padding = 15;
+                    }, props.list);
+    
+                    Bottom = e("Frame", {
+                        BackgroundTransparency = 0;
+                        BackgroundColor3 = props.theme.foreground;
+                        BorderSizePixel = 0;
+                        AnchorPoint = Vector2.new(0.5, 0);
+                        Size = UDim2.new(1, 0, 0, 50);
+                        Position = UDim2.new(0.5, 0, 1, 0);
+                    }, {
+                        Confirm = e(button, {
+                            anchor = Vector2.new(0.5, 1);
+                            position = UDim2.new(0.5, 0, 1, 0);
+                            text = "Confirm";
+                            textSize = 24;
+                            textColor = props.theme.highContrast;
+                            color = props.theme.background;
+
+                            onPressed = function()
+                                props.onFinished(true)
+                            end;
+                        })
+                    });
+                })
+            })
+        })
+    })
+end
+
+modal = RoactHooks.new(Roact)(modal)
 
 local function settingEntry(props, hooks)
     local setting = props.setting
@@ -21,7 +91,44 @@ local function settingEntry(props, hooks)
     descriptionBounds = Vector2.new(682, descriptionBounds.Y)
 
     local theme = hooks.useContext(ThemeContext)
+    local isPrompting, setIsPrompting = hooks.useState(false)
     
+    local prompt = nil
+
+    if isPrompting then
+        local listItems = {}
+
+        for name in setting.payload do
+            listItems[name] = e("TextButton", {
+                BackgroundTransparency = if setting.value == name then 0 else 1;
+                BorderSizePixel = 0;
+                BackgroundColor3 = theme.accent;
+
+                Text = name;
+                TextSize = 24;
+                Font = Enum.Font.GothamSemibold;
+
+                Size = UDim2.new(1, 0, 0, 24);
+                TextColor3 = theme.highContrast;
+                TextXAlignment = Enum.TextXAlignment.Center;
+
+                [Roact.Event.MouseButton1Down] = function()
+                    props.onSettingChanged(setting.id, name)
+                end;
+            })
+        end
+
+        prompt = e(modal, {
+            theme = theme;
+            list = listItems;
+            name = setting.name;
+            onFinished = function()
+                props.onPrompt(false)
+                setIsPrompting(false)
+            end;
+        })
+    end
+
     local control
     if setting.type == "switch" then
         control = e(switch, {
@@ -52,6 +159,20 @@ local function settingEntry(props, hooks)
             position = UDim2.new(1, -10, 0.5, 0);
             onChanged = function(value)
                 props.onSettingChanged(setting.id, value)
+            end;
+        })
+    elseif setting.type == "enum" then
+        control = e(button, {
+            position = UDim2.new(1, -10, 0.5, 0);
+            anchor = Vector2.new(1, 0.5);
+            text = string.format("Press for list...\n%q", tostring(setting.value));
+            color = theme.background;
+            textColor = theme.text;
+            textSize = 20;
+
+            onPressed = function()
+                props.onPrompt(true)
+                setIsPrompting(true)
             end;
         })
     end
@@ -103,6 +224,8 @@ local function settingEntry(props, hooks)
             BackgroundTransparency = 1;
         });
         Control = control;
+
+        Prompt = prompt;
     })
 end
 

@@ -29,6 +29,7 @@ local function settingCategory(props, hooks)
             setting = setting;
             onSettingChanged = props.onSettingChanged;
             onSettingCanceled = props.onSettingCanceled;
+            onPrompt = props.onPrompt;
         })
 
         if not props.settings[index + 1] then
