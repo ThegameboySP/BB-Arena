@@ -63,7 +63,7 @@ local function trowelVisualizer(root)
     local equippingCharacter = nil
 
     UserInputService.InputBegan:Connect(function(input, gp)
-        if not gp and input.KeyCode == Enum.KeyCode.Q then
+        if not gp and equippingCharacter and input.KeyCode == Enum.KeyCode.Q then
             root.Store:dispatch(RoduxFeatures.actions.saveSettings(LocalPlayer.UserId, {
                 trowelVisualization = not RoduxFeatures.selectors.getSavedSetting(
                     root.Store:getState(), LocalPlayer.UserId, "trowelVisualization"
