@@ -43,8 +43,8 @@ function MapController:RegisterComponent(class)
 end
 
 function MapController:OnStart()
-	local MapService = Root:GetServerService("MapService")
-	self:_tween(MapService.CurrentMap:Get().Name)
+	self.MapService = Root:GetServerService("MapService")
+	self:_tween(self.MapService.CurrentMap:Get().Name)
 end
 
 function MapController:onMapChanging(mapName, oldMapName)
@@ -70,6 +70,8 @@ function MapController:onMapChanged(map)
 	end
 
 	self.MapChanged:Fire(map, oldMap)
+
+	self.MapService.PlayerStreamedMap:FireServer()
 end
 
 function MapController:_tween(mapName)

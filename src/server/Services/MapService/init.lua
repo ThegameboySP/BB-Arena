@@ -4,6 +4,7 @@ local CollectionService = game:GetService("CollectionService")
 local Teams = game:GetService("Teams")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 
 local Root = require(ReplicatedStorage.Common.Root)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -30,6 +31,7 @@ local MapService = {
 	Client = {
 		MapChanging = Root.remoteEvent();
 		MapChanged = Root.remoteEvent();
+		PlayerStreamedMap = Root.remoteEvent();
 		CurrentMap = Root.remoteProperty(nil);
 	};
 	Priority = 1;
@@ -100,6 +102,10 @@ function MapService:OnInit()
 		if clones[1] then
 			self:_regen(clones, prototypes)
 		end
+	end)
+
+	self.Client.PlayerStreamedMap:Connect(function(player)
+		CollectionService:RemoveTag(player, "PlayerStreamingMap")
 	end)
 end
 
@@ -223,6 +229,10 @@ function MapService:ChangeMap(mapName)
 	
 	for _, player in pairs(CollectionService:GetTagged("ParticipatingPlayer")) do
         task.spawn(player.LoadCharacter, player)
+	end
+
+	for _, player in Players:GetPlayers() do
+		CollectionService:AddTag(player, "PlayerStreamingMap")
 	end
 	
 	self.ClonerManager:ReplicateToClients(componentsToReplicate)

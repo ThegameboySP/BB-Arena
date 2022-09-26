@@ -584,9 +584,15 @@ end
 
 function Effects.getFromTag(tag)
 	return function(collectionService, add, remove, context)
-		local addedCon = collectionService:GetInstanceAddedSignal(tag):Connect(function(instance)
+		local function onInstanceAdded(instance)
 			add(instance, context)
-		end)
+		end
+
+		for _, instance in collectionService:GetTagged(tag) do
+			onInstanceAdded(instance)
+		end
+		
+		local addedCon = collectionService:GetInstanceAddedSignal(tag):Connect(onInstanceAdded)
 		local removedCon = collectionService:GetInstanceRemovedSignal(tag):Connect(remove)
 
 		return function()
