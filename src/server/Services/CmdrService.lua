@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextService = game:GetService("TextService")
 
 local Root = require(ReplicatedStorage.Common.Root)
 local Promise = require(ReplicatedStorage.Packages.Promise)
@@ -11,6 +12,7 @@ local CmdrArena = ServerScriptService.Server.Cmdr.Arena
 local registerArenaTypes = require(CmdrArena.registerTypes)
 local canRun = require(CmdrArena.Hooks.canRun)
 
+local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerName)
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local LitUtils = require(ReplicatedStorage.Common.Utils.LitUtils)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
@@ -126,15 +128,30 @@ function CmdrService:_setupCmdr()
 			table.remove(self._logs, 1)
 		end
 		
-		table.insert(self._logs, {
-			ExecutorName = context.Executor and context.Executor.Name or "Server";
-			RawText = context.RawText;
-			Response = context.Response;
-		})
-		
-		for _, warning in ipairs(context.State.Warnings) do
-			self.Client.Warning:FireClient(context.Executor, warning)
-		end
+		task.spawn(function()
+			local executorName = "Server"
+			local argumentsText = table.concat(context.RawArguments, " ")
+
+			if context.Executor then
+				pcall(function()
+					executorName = getFullPlayerName(context.Executor)
+					
+					local filterResult = TextService:FilterStringAsync(argumentsText, context.Executor.UserId, Enum.TextFilterContext.PublicChat)
+					argumentsText = filterResult:GetNonChatStringForBroadcastAsync()
+				end)
+			end
+	
+			table.insert(self._logs, {
+				ExecutorName = executorName;
+				ArgumentsText = argumentsText;
+				Name = context.Name;
+				Response = context.Response;
+			})
+			
+			for _, warning in ipairs(context.State.Warnings) do
+				self.Client.Warning:FireClient(context.Executor, warning)
+			end
+		end)
 	end)
 	
 	-- Replicate to all clients.

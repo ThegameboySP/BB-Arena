@@ -5,7 +5,7 @@ return {
 	Group = "Any";
 	Args = {
 		{
-			Type = "player $ string";
+			Type = "player";
 			Name = "player filter";
 			Description = "The player to filter. Prefix with $ to use a player name (not display name).";
 			Optional = true;
