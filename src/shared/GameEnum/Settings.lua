@@ -67,7 +67,7 @@ return table.freeze({
         default = true;
         type = "boolean";
         name = "Trowel visualization";
-        description = "Whether the position and orientation of your trowel is shown before firing";
+        description = "Whether the position and orientation of your trowel is shown before firing. Press Q while equipping trowel to toggle";
     },
     weaponTheme = {
         order = 3;
