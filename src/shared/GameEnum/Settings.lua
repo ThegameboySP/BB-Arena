@@ -80,8 +80,17 @@ return table.freeze({
         name = "Trowel visualization";
         description = "Whether the position and orientation of your trowel is shown before firing. Press Q while equipping trowel to toggle";
     },
-    weaponTheme = {
+    trowelBuildDisplay = {
         order = 3;
+        group = "tool";
+
+        default = true;
+        type = "boolean";
+        name = "Trowel build display";
+        description = "Whether a line is drawn between a trowel and the player who fired it";
+    },
+    weaponTheme = {
+        order = 4;
         group = "tool";
 
         default = "Normal";
@@ -93,7 +102,7 @@ return table.freeze({
         replicateToAll = true;
     },
     weaponThemeHighGraphics = {
-        order = 4;
+        order = 5;
         group = "tool";
 
         default = true;
@@ -102,7 +111,7 @@ return table.freeze({
         description = "Whether themes have extra decorations. This can be distracting. Only applies to your screen";
     },
     neonWeapons = {
-        order = 5;
+        order = 6;
         group = "tool";
 
         type = "boolean";

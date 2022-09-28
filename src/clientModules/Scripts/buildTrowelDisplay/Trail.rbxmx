@@ -1,0 +1,29 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Trail" referent="RBX573262160DAB4569B9C2C4A1D3DC3EFA">
+		<Properties>
+			<Ref name="Attachment0">null</Ref>
+			<Ref name="Attachment1">null</Ref>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<float name="Brightness">1</float>
+			<ColorSequence name="Color">0 1 1 1 0 1 1 1 1 0 </ColorSequence>
+			<bool name="Enabled">true</bool>
+			<bool name="FaceCamera">true</bool>
+			<float name="Lifetime">0.200000003</float>
+			<float name="LightEmission">1</float>
+			<float name="LightInfluence">0</float>
+			<float name="MaxLength">0</float>
+			<float name="MinLength">0</float>
+			<string name="Name">Trail</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+			<Content name="Texture"><null></null></Content>
+			<float name="TextureLength">1</float>
+			<token name="TextureMode">0</token>
+			<NumberSequence name="Transparency">0 1 0 0.3 0.6 0 0.7 0.6 0 1 1 0 </NumberSequence>
+			<NumberSequence name="WidthScale">0 1 0 0.358039 1 0 1 0.8 0 </NumberSequence>
+		</Properties>
+	</Item>
+</roblox>
