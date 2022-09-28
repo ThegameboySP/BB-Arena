@@ -1,4 +1,5 @@
 local WeaponThemes = require(script.Parent.WeaponThemes)
+local ForcefieldThemes = require(script.Parent.ForcefieldThemes)
 
 return table.freeze({
     lighting = {
@@ -50,6 +51,16 @@ return table.freeze({
         };
         name = "Field of view";
         description = "The field of view of your camera";
+    },
+    forcefieldTheme = {
+        order = 6;
+        group = "place";
+
+        default = "Default";
+        type = "enum";
+        payload = ForcefieldThemes;
+        name = "Forcefield theme";
+        description = "The theme of forcefields. Only applies to your screen";
     },
     weaponVolume = {
         order = 1;
