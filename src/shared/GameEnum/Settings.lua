@@ -1,9 +1,9 @@
 local WeaponThemes = require(script.Parent.WeaponThemes)
 local ForcefieldThemes = require(script.Parent.ForcefieldThemes)
 
-return table.freeze({
-    lighting = {
-        order = 1;
+local array = {
+    {
+        key = "lighting";
         group = "place";
 
         default = 0.5;
@@ -11,8 +11,8 @@ return table.freeze({
         name = "Brightness";
         description = "The brightness of the game world";
     },
-    musicVolume = {
-        order = 2;
+    {
+        key = "musicVolume";
         group = "place";
 
         default = 0.5;
@@ -20,8 +20,8 @@ return table.freeze({
         name = "Music volume";
         description = "The volume of the in-game music";
     },
-    mapVolume = {
-        order = 3;
+    {
+        key = "mapVolume";
         group = "place";
 
         default = 0.5;
@@ -29,8 +29,8 @@ return table.freeze({
         name = "Map volume";
         description = [[The volume of the ambient sounds in maps. Includes "music" found in maps as well]];
     },
-    gamemodeVolume = {
-        order = 4;
+    {
+        key = "gamemodeVolume";
         group = "place";
 
         default = 0.5;
@@ -38,8 +38,8 @@ return table.freeze({
         name = "Gamemode volume";
         description = "The volume of gamemode sound effects";
     },
-    fieldOfView = {
-        order = 5;
+    {
+        key = "fieldOfView";
         group = "place";
 
         default = 70;
@@ -52,8 +52,8 @@ return table.freeze({
         name = "Field of view";
         description = "The field of view of your camera";
     },
-    forcefieldTheme = {
-        order = 6;
+    {
+        key = "forcefieldTheme";
         group = "place";
 
         default = "Default";
@@ -62,8 +62,8 @@ return table.freeze({
         name = "Forcefield theme";
         description = "The theme of forcefields. Only applies to your screen";
     },
-    weaponVolume = {
-        order = 1;
+    {
+        key = "weaponVolume";
         group = "tool";
 
         default = 0.5;
@@ -71,8 +71,8 @@ return table.freeze({
         name = "Tools volume";
         description = "The volume of the toolset. With this, you don't have to sacrifice your hearing to play!";
     },
-    trowelVisualization = {
-        order = 2;
+    {
+        key = "trowelVisualization";
         group = "tool";
 
         default = true;
@@ -80,8 +80,8 @@ return table.freeze({
         name = "Trowel visualization";
         description = "Whether the position and orientation of your trowel is shown before firing. Press Q while equipping trowel to toggle";
     },
-    trowelBuildDisplay = {
-        order = 3;
+    {
+        key = "trowelBuildDisplay";
         group = "tool";
 
         default = true;
@@ -89,8 +89,8 @@ return table.freeze({
         name = "Trowel build display";
         description = "Whether a line is drawn between a trowel and the player who fired it";
     },
-    practiceWeaponDisplay = {
-        order = 4;
+    {
+        key = "practiceWeaponDisplay";
         group = "tool";
 
         default = true;
@@ -98,8 +98,8 @@ return table.freeze({
         name = "Practice superball visualization";
         description = "Whether the superball's trajectory is shown before firing while under the Practice team";
     },
-    weaponTheme = {
-        order = 5;
+    {
+        key = "weaponTheme";
         group = "tool";
 
         default = "Normal";
@@ -110,8 +110,8 @@ return table.freeze({
 
         replicateToAll = true;
     },
-    weaponThemeHighGraphics = {
-        order = 6;
+    {
+        key = "weaponThemeHighGraphics";
         group = "tool";
 
         default = true;
@@ -119,8 +119,8 @@ return table.freeze({
         name = "Fancy tools themes";
         description = "Whether themes have extra decorations. This can be distracting. Only applies to your screen";
     },
-    neonWeapons = {
-        order = 7;
+    {
+        key = "neonWeapons";
         group = "tool";
 
         type = "boolean";
@@ -128,4 +128,12 @@ return table.freeze({
         name = "Neon tools";
         description = "Whether all tools and projectiles should be neon. Only applies to your screen";
     },
-})
+}
+
+local dictionary = {}
+for index, setting in array do
+    dictionary[setting.key] = setting
+    setting.order = index
+end
+
+return table.freeze(dictionary)
