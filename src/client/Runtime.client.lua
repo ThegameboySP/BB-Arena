@@ -133,7 +133,8 @@ local function init()
 
     ScriptContext.Error:Connect(function(message, stackTrace)
         -- Avoid stupid error spam caused by the toolset.
-        if not stackTrace or (not stackTrace:find("Backpack") and not stackTrace:find("ToolObjects")) then
+        local loweredStacktrace = stackTrace:lower()
+        if not stackTrace or (not loweredStacktrace:find("backpack") and not loweredStacktrace:find("tool")) then
             clientErrorRemote:FireServer(message, stackTrace)
         end
     end)
