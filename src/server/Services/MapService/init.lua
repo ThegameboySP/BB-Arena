@@ -91,7 +91,12 @@ function MapService:OnInit()
 		local currentTime = os.clock()
 		for _, component in self.ClonerManager.Manager:GetComponents(Components.RegenGroup) do
 			local prototype = self.ClonerManager.Cloner:GetPrototypeByClone(component.Instance)
-			local lastTime = self._lastRegenTimes[prototype] or 0
+			
+			local lastTime = self._lastRegenTimes[prototype]
+			if lastTime == nil then
+				self._lastRegenTimes[prototype] = currentTime
+				continue
+			end
 
 			if (currentTime - lastTime) >= component.Config.Time then
 				table.insert(clones, component.Instance)
