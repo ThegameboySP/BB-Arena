@@ -89,8 +89,17 @@ return table.freeze({
         name = "Trowel build display";
         description = "Whether a line is drawn between a trowel and the player who fired it";
     },
-    weaponTheme = {
+    practiceWeaponDisplay = {
         order = 4;
+        group = "tool";
+
+        default = true;
+        type = "boolean";
+        name = "Practice superball visualization";
+        description = "Whether the superball's trajectory is shown before firing while under the Practice team";
+    },
+    weaponTheme = {
+        order = 5;
         group = "tool";
 
         default = "Normal";
@@ -102,7 +111,7 @@ return table.freeze({
         replicateToAll = true;
     },
     weaponThemeHighGraphics = {
-        order = 5;
+        order = 6;
         group = "tool";
 
         default = true;
@@ -111,7 +120,7 @@ return table.freeze({
         description = "Whether themes have extra decorations. This can be distracting. Only applies to your screen";
     },
     neonWeapons = {
-        order = 6;
+        order = 7;
         group = "tool";
 
         type = "boolean";

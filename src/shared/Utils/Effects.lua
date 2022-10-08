@@ -602,8 +602,8 @@ function Effects.getFromTag(tag)
 	end
 end
 
-function Effects.call(item, effect)
-    return effect(item, function() end, function() end)
+function Effects.call(item, effect, context)
+    return effect(item, function() end, function() end, context)
 end
 
 return Effects
