@@ -37,7 +37,25 @@ local function getGroundedCharacters(players, params)
 end
 
 local function preventTeamInterference(Root)
+    local Practice = Teams:FindFirstChild("Practice")
+    local onPracticeRegion = RaycastParams.new()
+    onPracticeRegion.FilterDescendantsInstances = {Workspace:FindFirstChild("Practice Island")}
+    onPracticeRegion.FilterType = Enum.RaycastFilterType.Whitelist
+
     RunService.Heartbeat:Connect(function()
+        if Practice then
+            local nonPracticePlayers = {}
+            for _, player in Players:GetPlayers() do
+                if player.Team ~= Practice then
+                    table.insert(nonPracticePlayers, player)
+                end
+            end
+
+            for _, character in getGroundedCharacters(nonPracticePlayers, onPracticeRegion) do
+                Root.resetPlayer(Players:GetPlayerFromCharacter(character))
+            end
+        end
+
         for _, character in getGroundedCharacters(CollectionService:GetTagged("ParticipatingPlayer"), onSpectatorRegion) do
             Root.resetPlayer(Players:GetPlayerFromCharacter(character))
         end
