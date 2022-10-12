@@ -9,7 +9,8 @@ local function mapStatNames(stats)
 end
 
 return function(context, players, name, value)
-    local StatService = context:GetStore("Common").Root:GetService("StatService")
+    local root = context:GetStore("Common").Root
+    local StatService = root:GetService("StatService")
 
     local statNames = mapStatNames(StatService:GetRegisteredStats())
     local fuzzyFinder = context.Cmdr.Util.MakeFuzzyFinder(statNames)
@@ -18,8 +19,8 @@ return function(context, players, name, value)
     if results[1] then
         for _, player in pairs(players) do
             local userId = player.UserId
-            local oldValue = StatService.Stats:GetUserStat(results[1], userId)
-            StatService.Stats:Set(userId, results[1], value)
+            local oldValue = root.Store:getState().stats.visualStats[player.UserId][results[1]]
+            StatService:SetStatVisual(userId, results[1], value)
 
             context:Reply(string.format("%s %q %s -> %s", tostring(player), results[1], tostring(oldValue), tostring(value)))
         end

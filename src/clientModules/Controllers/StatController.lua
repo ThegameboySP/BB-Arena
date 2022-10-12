@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local Root = require(ReplicatedStorage.Common.Root)
-local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local valueClassByType = {
     string = "StringValue";
@@ -17,21 +16,10 @@ local valueClassByType = {
 
 local StatController = {
 	Name = "StatController";
-    _stats = {};
     _leaderstats = {};
     _loggedIn = {};
-
-    Changed = Signal.new();
+    _stats = {};
 }
-
-local function mapToNumber(map)
-    local tbl = {}
-    for key, value in pairs(map) do
-        tbl[tonumber(key)] = value
-    end
-
-    return tbl
-end
 
 function StatController:OnInit()
     local function onPlayerAdded(player)
@@ -39,7 +27,7 @@ function StatController:OnInit()
     end
 
     Players.PlayerAdded:Connect(onPlayerAdded)
-    for _, player in ipairs(Players:GetPlayers()) do
+    for _, player in Players:GetPlayers() do
         onPlayerAdded(player)
     end
 
@@ -48,36 +36,35 @@ function StatController:OnInit()
         self._leaderstats[player.UserId] = nil
     end)
 
-    local StatService = Root:GetServerService("StatService")
-    
-    StatService.InitStats:Connect(function(stats, registeredStats)
-        self._registeredStats = registeredStats
+    self:_updateInit(Root.Store:getState().stats)
 
-        for key, value in pairs(stats) do
-            stats[key] = mapToNumber(value)
+    Root.Store.changed:connect(function(new, old)
+        if new.stats.visualStats ~= old.stats.visualStats then
+            for userId, stats in new.stats.visualStats do
+                local oldStats = old.stats.visualStats[userId]
+    
+                for name, value in stats do
+                    if not oldStats or oldStats[name] ~= value then
+                        self:_update(userId, name, value)
+                    end
+                end
+            end
         end
 
-        self._stats = stats
+        if new.stats.visibleRegisteredStats ~= old.stats.visibleRegisteredStats then
+            for id in new.stats.visibleRegisteredStats do
+                if not old.stats.visibleRegisteredStats[id] then
+                    self:_setStatVisibility(id, true)
+                end
+            end
 
-        self:_updateInit(stats)
+            for id in old.stats.visibleRegisteredStats do
+                if not new.stats.visibleRegisteredStats[id] then
+                    self:_setStatVisibility(id, false)
+                end
+            end
+        end
     end)
-
-    StatService.StatSet:Connect(function(userId, name, value)
-        local oldValue = self._stats[name][userId]
-        self._stats[name][userId] = value
-
-        self:_update(userId, name, value)
-        self.Changed:Fire(name, userId, value, oldValue)
-    end)
-
-    StatService.SetStatVisibility:Connect(function(name, visible)
-        self._registeredStats[name].show = visible
-        self:_setStatVisibility(name, visible)
-    end)
-end
-
-function StatController:GetStats()
-    return self._stats
 end
 
 function StatController:_getOrMakeLeaderstats(userId)
@@ -98,9 +85,11 @@ function StatController:_getOrMakeLeaderstats(userId)
 end
 
 function StatController:_update(userId, name, value)
-    local registeredStat = self._registeredStats[name]
+    local stats = Root.Store:getState().stats
 
-    if registeredStat.show then
+    if stats.visibleRegisteredStats[name] then
+        local registeredStat = stats.registeredStats[name]
+
         local resolvedName = registeredStat.friendlyName or name
         local leaderstats = self:_getOrMakeLeaderstats(userId)
         if leaderstats == nil then
@@ -127,12 +116,16 @@ end
 
 function StatController:_setStatVisibility(name, visible)
     if visible then
-        for userId, value in pairs(self._stats[name]) do
-            self:_update(userId, name, value)
+        for userId, values in Root.Store:getState().stats.visualStats do
+            for statName, value in values do
+                if statName == name then
+                    self:_update(userId, name, value)
+                end
+            end
         end
     else
-        for _, leaderstat in pairs(self._leaderstats) do
-            for _, stat in pairs(leaderstat:GetChildren()) do
+        for _, leaderstat in self._leaderstats do
+            for _, stat in leaderstat:GetChildren() do
                 if stat:GetAttribute("InternalName") == name then
                     stat.Parent = nil
                 end
@@ -144,8 +137,8 @@ end
 function StatController:_updateInit(stats)
     local statsToAdd = {}
 
-    for _, stat in pairs(self._registeredStats) do
-        if stat.show then
+    for _, stat in stats.registeredStats do
+        if stats.visibleRegisteredStats[stat.name] then
             table.insert(statsToAdd, stat)
         end
     end
@@ -154,9 +147,13 @@ function StatController:_updateInit(stats)
         return a.priority > b.priority
     end)
 
-    for _, stat in ipairs(statsToAdd) do
-        for userId, value in pairs(stats[stat.name]) do
-            self:_update(userId, stat.name, value)
+    for _, stat in statsToAdd do
+        for userId, values in stats.visualStats do
+            for name, value in values do
+                if name == stat.name then
+                    self:_update(userId, name, value)
+                end
+            end
         end
     end
 end

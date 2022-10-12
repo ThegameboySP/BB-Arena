@@ -9,6 +9,7 @@ local Players = game:GetService("Players")
 local Root = require(ReplicatedStorage.Common.Root)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 local t = require(ReplicatedStorage.Packages.t)
 local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
@@ -244,6 +245,7 @@ function MapService:ChangeMap(mapName)
 
 	self.ChangingMaps = false
 
+	Root.Store:dispatch(RoduxFeatures.actions.mapChanged(mapName))
 	self.MapChanged:Fire(newMap)
 	self.Client.CurrentMap:Set(newMap)
 end

@@ -13,8 +13,8 @@ local function combineReducers(map)
 		local newState = table.clone(state)
 
 		for key, reducer in pairs(map) do
-			-- Each reducer gets its own state, not the entire state table
-			newState[key] = reducer(state[key], action)
+			-- Reducers can read the entire state table, but only if absolutely required.
+			newState[key] = reducer(state[key], action, state)
 		end
 
 		return newState
@@ -26,16 +26,15 @@ local reducers = {}
 local actions = {}
 local selectors = {}
 local middlewares = {}
-
-actions.merge = function(with)
-    return {
-        type = "merge";
-        payload = with;
-    }
-end
+local serializers = {}
+local serializersArray = {}
 
 for _, module in pairs(script:GetChildren()) do
     local feature = require(module)
+    if type(feature) ~= "table" then
+        continue
+    end
+
     features[module.Name] = feature
     
     if feature.reducer then
@@ -71,21 +70,67 @@ for _, module in pairs(script:GetChildren()) do
             middlewares[middlewareName] = middleware
         end
     end
+
+    if feature.serializers then
+        for _, entry in ipairs(feature.serializers) do
+            if serializers[entry.actionName] then
+                error(string.format("Duplicate action serializer %q", entry.actionName))
+            end
+
+            serializers[entry.actionName] = entry
+            table.insert(serializersArray, entry)
+        end
+    end
 end
 
 local reducer = combineReducers(reducers)
+
+table.sort(serializersArray, function(a, b)
+    return a.actionName > b.actionName
+end)
+
+for index, entry in serializersArray do
+    entry.id = string.char(index)
+    serializers[entry.id] = entry
+end
+
+function actions.merge(with)
+    return {
+        type = "rodux_merge";
+        payload = with;
+    }
+end
+
+function actions.serialize()
+    return {
+        type = "rodux_serialize";
+    }
+end
+
+function actions.deserialize(serialized)
+    return {
+        type = "rodux_deserialize";
+        payload = {
+            serialized = serialized;
+        };
+    }
+end
 
 return {
     index = features;
 
     reducer = function(state, action)
-        if action.type == "merge" then
+        if action.type == "rodux_merge" then
             return Dictionary.mergeDeep(state, action.payload)
+        elseif action.type == "rodux_deserialize" then
+            return Dictionary.merge(action.payload.serialized, reducer(state, action))
         end
 
         return reducer(state, action)
     end;
+    
     actions = table.freeze(actions);
     selectors = table.freeze(selectors);
-    middlewares = middlewares;
+    middlewares = table.freeze(middlewares);
+    serializers = table.freeze(serializers);
 }

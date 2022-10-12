@@ -1,21 +1,18 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
-local Players = game:GetService("Players")
 
 local Root = require(ReplicatedStorage.Common.Root)
 local Llama = require(ReplicatedStorage.Packages.Llama)
-local Dictionary = Llama.Dictionary
 local t = require(ReplicatedStorage.Packages.t)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Components = require(ReplicatedStorage.Common.Components)
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
+local Dictionary = Llama.Dictionary
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
 local GamemodeService = {
     Name = "GamemodeService";
-    Client = {
-        CurrentGamemode = Root.remoteProperty(nil);
-    };
 
     GamemodeStarted = Signal.new();
     GamemodeOver = Signal.new();
@@ -61,16 +58,6 @@ function GamemodeService:OnInit()
         end
 
         definition.configChecker = t.strictInterface(definition.config)
-
-        for name, data in pairs(definition.stats or {}) do
-            local clonedData = table.clone(data)
-            clonedData.domain = definition.nameId
-            clonedData.showOnGamemode = data.show
-            clonedData.name = name
-            clonedData.show = false
-            
-            self.StatService:RegisterStat(clonedData)
-        end
     end)
 
     self.MapService.MapChanging:Connect(function(map, _, oldTeamToNewTeam)
@@ -101,7 +88,8 @@ function GamemodeService:GetGamemodes()
 end
 
 function GamemodeService:SetGamemode(name, config)
-    if self.CurrentGamemode and self.CurrentGamemode.definition.nameId == name then
+    local gamemodeId = Root.Store:getState().game.gamemodeId
+    if gamemodeId == name then
         return false, string.format("%q is already set", name)
     end
 
@@ -125,10 +113,6 @@ function GamemodeService:SetGamemode(name, config)
     self:StopGamemode()
     self.CurrentGamemode = gamemode
 
-    for _, registeredStat in pairs(self.StatService:GetRegisteredStatsByDomain(name)) do
-        self.StatService:SetStatVisibility(registeredStat.name, registeredStat.showOnGamemode)
-    end
-
     self:_runGamemodeProtoypes(definition)
 
     local binder = Instance.new("Folder")
@@ -140,7 +124,7 @@ function GamemodeService:SetGamemode(name, config)
     self.gamemodeProcess = gamemode.server.new(self, self.binder)
     self.gamemodeProcess:OnInit(config, CollectionService:GetTagged("FightingTeam"))
 
-    self.Client.CurrentGamemode:Set(definition.nameId)
+    Root.Store:dispatch(RoduxFeatures.actions.gamemodeStarted(definition.nameId))
     self.GamemodeStarted:Fire(definition)
 
     return true, string.format("Gamemode set to %q", name)
@@ -198,17 +182,8 @@ function GamemodeService:StopGamemode(completedSuccessfully)
         self.binder:Destroy()
         self.binder = nil
 
-        self.Client.CurrentGamemode:Set(nil)
-
+        Root.Store:dispatch(RoduxFeatures.actions.gamemodeEnded(nameId))
         self.GamemodeOver:Fire({cancelled = not completedSuccessfully})
-
-        for _, registeredStat in pairs(self.StatService:GetRegisteredStatsByDomain(nameId)) do
-            for _, player in pairs(Players:GetPlayers()) do
-                self.StatService.Stats:Set(player.UserId, registeredStat.name, registeredStat.default)
-            end
-
-            self.StatService:SetStatVisibility(registeredStat.name, false)
-        end
 
         return true
     end

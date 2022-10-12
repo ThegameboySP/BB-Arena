@@ -24,11 +24,7 @@ end
 
 return function(target)
     local store = Rodux.Store.new(RoduxFeatures.reducer, nil, { Rodux.thunkMiddleware })
-    store:dispatch(RoduxFeatures.actions.merge({
-        map = {
-            mapInfo = mapInfo;
-        };
-    }))
+    store:dispatch(RoduxFeatures.actions.setMapInfo(mapInfo))
 
 	local tree
 	local roactTree = e(MapListApp, {

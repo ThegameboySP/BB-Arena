@@ -24,6 +24,8 @@ if TestService.ExecuteWithStudioRun and RunService:IsStudio() then
     return
 end
 
+_G.debug = require(ReplicatedStorage.Common.Utils.breakpoint)
+
 local RemoteEvents = Instance.new("Folder")
 RemoteEvents.Name = "RemoteEvents"
 RemoteEvents.Parent = ReplicatedStorage

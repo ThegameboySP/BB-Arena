@@ -1,10 +1,46 @@
 local Rodux = require(game:GetService("ReplicatedStorage").Packages.Rodux)
 local Dictionary = require(game:GetService("ReplicatedStorage").Packages.Llama).Dictionary
-local reducer = require(script.Parent.Parent).reducer
-local actions = require(script.Parent.usersActions)
-local selectors = require(script.Parent.usersSelectors)
+
+local RoduxFeatures = require(script.Parent.Parent)
+local reducer = RoduxFeatures.reducer
+local actions = RoduxFeatures.actions
+local selectors = RoduxFeatures.selectors
 
 return function()
+    describe("serialization", function()
+        local function serializeCase()
+            return reducer({
+                users = {
+                    banned = {[2] = true};
+                    whitelisted = {[2] = true};
+                    admins = {[2] = true};
+                    referees = {[2] = true};
+                    activeUsers = {[2] = true};
+                };
+            }, RoduxFeatures.actions.serialize())
+        end
+
+        it("should serialize properly", function()
+            local serialized = serializeCase().users
+
+            expect(serialized.banned["2"]).to.equal(true)
+            expect(serialized.whitelisted["2"]).to.equal(true)
+            expect(serialized.admins["2"]).to.equal(true)
+            expect(serialized.referees["2"]).to.equal(true)
+            expect(serialized.activeUsers["2"]).to.equal(true)
+        end)
+
+        it("should deserialize properly", function()
+            local deserialized = reducer(nil, RoduxFeatures.actions.deserialize(serializeCase())).users
+
+            expect(deserialized.banned[2]).to.equal(true)
+            expect(deserialized.whitelisted[2]).to.equal(true)
+            expect(deserialized.admins[2]).to.equal(true)
+            expect(deserialized.referees[2]).to.equal(true)
+            expect(deserialized.activeUsers[2]).to.equal(true)
+        end)
+    end)
+
     describe("admining", function()
         local store
         beforeEach(function()

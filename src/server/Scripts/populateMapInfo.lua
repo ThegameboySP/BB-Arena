@@ -52,11 +52,7 @@ local function populateMapInfo(root)
         end
     end
 
-    root.Store:dispatch(RoduxFeatures.actions.merge({
-        map = {
-            mapInfo = mapInfo;
-        };
-    }))
+    root.Store:dispatch(RoduxFeatures.actions.setMapInfo(mapInfo))
 end
 
 return populateMapInfo

@@ -19,6 +19,8 @@ local clientErrorRemote = ReplicatedStorage:WaitForChild("ClientErrorRemote")
 local Controllers = ReplicatedStorage.ClientModules.Controllers
 local Scripts = ReplicatedStorage.ClientModules.Scripts
 
+_G.debug = require(ReplicatedStorage.Common.Utils.breakpoint)
+
 if not Players.LocalPlayer:GetAttribute("Initialized") then
     Players.LocalPlayer:GetAttributeChangedSignal("Initialized"):Wait()
 end
@@ -43,7 +45,6 @@ local function registerRoot()
         :await()
 
     local MapService = Root:GetServerService("MapService")
-    local GamemodeService = Root:GetServerService("GamemodeService")
 
     local MapController = Root:GetService("MapController")
     local GamemodeController = Root:GetService("GamemodeController")
@@ -58,13 +59,18 @@ local function registerRoot()
     end)
 
     local queuedGamemodeName
-    GamemodeService.CurrentGamemode:Observe(function(gamemodeName)
-        if gamemodeName == nil then
-            queuedGamemodeName = "nil"
-        else
-            queuedGamemodeName = gamemodeName
+    local function onChanged(new, old)
+        if old == nil or new.game.gamemodeId ~= old.game.gamemodeId then
+            if new.game.gamemodeId == nil then
+                queuedGamemodeName = "nil"
+            else
+                queuedGamemodeName = new.game.gamemodeId
+            end
         end
-    end)
+    end
+
+    Root.Store.changed:connect(onChanged)
+    onChanged(Root.Store:getState(), nil)
 
     local function updateControllers()
         if queuedMap then

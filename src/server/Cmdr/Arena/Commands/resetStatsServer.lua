@@ -1,24 +1,13 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+
 return function(context, players)
-    local StatService = context:GetStore("Common").Root:GetService("StatService")
+    local root = context:GetStore("Common").Root
 
-    local registeredStats = StatService:GetRegisteredStats()
-    local stats = StatService.Stats
-
-    for statName in pairs(registeredStats) do
-        for _, player in pairs(players) do
-            local userId = player.UserId
-            local default = registeredStats[statName].default
-            StatService.Stats:Set(userId, statName, default)
-
-            context:Reply(
-                string.format("%s %q %s -> %s",
-                tostring(player),
-                statName,
-                tostring(stats:GetUserStat(userId, statName)),
-                tostring(default))
-            )
-        end
+    local userIds = {}
+    for _, player in players do
+        table.insert(userIds, player.UserId)
     end
 
-    return ""
+    root.Store:dispatch(RoduxFeatures.actions.resetUsersStats(userIds))
 end

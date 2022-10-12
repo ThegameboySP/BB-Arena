@@ -6,27 +6,13 @@ local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
 local LocalPlayer = Players.LocalPlayer
 
-local function stringIndicesToNumber(map)
-    local numberMap = {}
-    for str, value in pairs(map) do
-        numberMap[tonumber(str)] = value
+local function deserializeAction(serialized, actionType)
+    local serializers = RoduxFeatures.serializers[actionType]
+    if serializers then
+        return serializers.deserialize(serialized)
     end
 
-    return numberMap
-end
-
-local function deserialize(state)
-    for key, value in pairs(state.users) do
-        if type(value) == "table" then
-            -- Assume this key is a UserId.
-            local tableKey = next(value)
-            if type(tableKey) == "string" and tonumber(tableKey) then
-                state.users[key] = stringIndicesToNumber(value)
-            end
-        end
-    end
-
-    return state
+    error(("No deserializer for action %q"):format(string.byte(actionType)))
 end
 
 local function makeClientMiddleware(requestRemote)
@@ -56,18 +42,25 @@ local function roduxClient(root)
     local actionDispatchedRemote = root:getRemoteEvent("Rodux_ActionDispatched")
 
     initStateRemote.OnClientEvent:Connect(function(state)
+        local deserialized = RoduxFeatures.reducer({}, RoduxFeatures.actions.deserialize(state))
+
         root.Store = Rodux.Store.new(
             RoduxFeatures.reducer,
-            deserialize(state),
+            deserialized,
             { Rodux.thunkMiddleware, makeClientMiddleware(requestRemote) }
         )
     end)
 
-    actionDispatchedRemote.OnClientEvent:Connect(function(action)
-        action.meta = action.meta or {}
-        action.meta.dispatchedByServer = true
+    actionDispatchedRemote.OnClientEvent:Connect(function(action, serializedType)
+        local resolvedAction = action
+        if type(action) == "string" then
+            resolvedAction = deserializeAction(action, serializedType)
+        end
 
-        root.Store:dispatch(action)
+        resolvedAction.meta = resolvedAction.meta or {}
+        resolvedAction.meta.dispatchedByServer = true
+
+        root.Store:dispatch(resolvedAction)
     end)
 end
 

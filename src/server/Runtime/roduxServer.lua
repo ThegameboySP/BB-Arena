@@ -8,28 +8,6 @@ local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local actions = RoduxFeatures.actions
 
-local function numberIndicesToString(map)
-    local strMap = {}
-    for number, value in pairs(map) do
-        strMap[tostring(number)] = value
-    end
-
-    return strMap
-end
-
-local function serialize(state)
-    local clone = table.clone(state)
-    clone.users = table.clone(state.users)
-    
-    for key, value in pairs(state.users) do
-        if type(value) == "table" then
-            clone.users[key] = numberIndicesToString(value)
-        end
-    end
-
-    return clone
-end
-
 local function initState()
     local place = ServerScriptService:FindFirstChild("Place")
 
@@ -56,6 +34,15 @@ local function mapPlayers(userIds)
     return players
 end
 
+local function serializeAction(action)
+    local serializers = RoduxFeatures.serializers[action.type]
+    if serializers then
+        return serializers.serialize(action), serializers.id
+    end
+
+    return action
+end
+
 local function makeServerMiddleware(actionDispatchedRemote)
     return function(nextDispatch)
         return function(action)
@@ -67,9 +54,15 @@ local function makeServerMiddleware(actionDispatchedRemote)
             if not meta or meta.realm ~= "server" then
                 local players = if meta and meta.interestedUserIds then mapPlayers(meta.interestedUserIds) else Players:GetPlayers()
                 
+                local serialized, serializedType = serializeAction(action)
+
                 for _, player in players do
                     if player:GetAttribute("RoduxStateInitialized") then
-                        actionDispatchedRemote:FireClient(player, action)
+                        if type(serialized) == "table" then
+                            actionDispatchedRemote:FireClient(player, serialized)
+                        elseif type(serialized) == "string" then
+                            actionDispatchedRemote:FireClient(player, serialized, serializedType)
+                        end
                     end
                 end
             end
@@ -93,7 +86,8 @@ local function roduxServer(root)
     root.Store:dispatch(actions.merge(initState()))
 
     local function onPlayerAdded(player)
-        initStateRemote:FireClient(player, serialize(root.Store:getState()))
+        local serialized = RoduxFeatures.reducer(root.Store:getState(), RoduxFeatures.actions.serialize())
+        initStateRemote:FireClient(player, serialized)
         player:SetAttribute("RoduxStateInitialized", true)
     end
 
