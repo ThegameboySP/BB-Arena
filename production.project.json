@@ -1,0 +1,10 @@
+{
+	"name": "Production BB",
+	"globIgnorePaths": [
+		"**/*.spec.lua",
+        "**/*.story.lua"
+    ],
+	"tree": {
+		"$path": "default.project.json"
+	}
+}
