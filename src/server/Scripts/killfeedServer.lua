@@ -16,12 +16,8 @@ local function killfeedServer(root)
 
     EventBus.participantDied:Connect(function(participant, attacker, creatorValue)
         local character = participant.Character
-        local participantHumanoid = character:FindFirstChild("Humanoid")
-        if not participantHumanoid then
-            return
-        end
-        
         local flag = character:FindFirstChild("Flag")
+        
         local flagTeam = nil
         if flag then
             flagTeam = componentManager:GetComponent(flag, "CTF_Flag").State.Team
@@ -43,8 +39,8 @@ local function killfeedServer(root)
                 data = {
                     Type = "Kill",
                     Killer = attacker,
-                    DeadPing = participant:GetNetworkPing(),
-                    KillerPing = attacker:GetNetworkPing(),
+                    DeadPing = participant:GetNetworkPing() * 2,
+                    KillerPing = attacker:GetNetworkPing() * 2,
                     Distance = getDistance(character, attackingCharacter),
                     Weapon = weapon,
                 }

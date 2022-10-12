@@ -78,10 +78,6 @@ local function killfeedClient(root)
 		toggle.Text = main.Visible and '>' or '<'
 	end)
 
-	-- PingRemote.OnClientEvent:Connect(function()
-	-- 	PingRemote:FireServer()
-	-- end)
-
 	local i = 0
 	local elements = {}
 
