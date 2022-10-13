@@ -7,6 +7,11 @@ local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 
 local LocalPlayer = Players.LocalPlayer
 
+local settings = {}
+for _, entry in GameEnum.Settings do
+	settings[entry.name] = entry
+end
+
 local function mapType(setting)
 	if setting.type == "range" then
 		return CmdrUtils.constrainedInteger(setting.payload.min, setting.payload.max)
@@ -22,19 +27,9 @@ local function mapType(setting)
 	return setting.type
 end
 
-local array = {}
-for _, value in GameEnum.Settings do
-	table.insert(array, {
-		Name = value.name;
-		Type = mapType(value);
-		Description = value.description;
-	})
-end
-table.freeze(array)
-
-local function getId(setting)
-	for key, _setting in GameEnum.Settings do
-		if setting.Name == _setting.name then
+local function getId(settingName)
+	for key, setting in GameEnum.Settings do
+		if setting.name == settingName then
 			return key
 		end
 	end
@@ -45,34 +40,27 @@ return {
 	Aliases = {"setting"};
 	Description = "Changes a local setting.";
 	Group = "Any";
-	Args = {
-		function(context)
-			return {
-				Type = context.Cmdr.Util.MakeEnumType("setting", array);
-				Name = "setting name",
-				Description = "The name of the setting"
-			}
-		end,
-		function(context)
-			local arg1 = context:GetArgument(1)
-			if arg1:Validate() then
-				local setting = arg1:GetValue()
-				local arg = table.clone(setting)
+	Args = CmdrUtils.keyValueArgs("setting", function()
+		return settings
+	end, function(setting, _, context)
+		local arg = {
+			Name = setting.name;
+			Type = mapType(setting);
+			Description = setting.description;
+		}
 
-				if LocalPlayer then
-					local value = RoduxFeatures.selectors.getSavedSetting(context:GetStore("Common").Store:getState(), nil, getId(setting))
-					arg.Description ..= "\n\nCurrent value: " .. tostring(value)
-				end
-
-				return arg
-			end
+		local value
+		if LocalPlayer then
+			value = RoduxFeatures.selectors.getSavedSetting(context:GetStore("Common").Store:getState(), nil, setting.key)
 		end
-	};
 
-	Run = function(context, setting, value)
+		return arg, value
+	end);
+
+	Run = function(context, settingName, value)
 		local store = context:GetStore("Common").Store
 
-		local id = getId(setting)
+		local id = getId(settingName)
 		store:dispatch(RoduxFeatures.actions.saveSettings(context.Executor.UserId, {[id] = value}))
 	end;
 }

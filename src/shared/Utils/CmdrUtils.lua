@@ -26,6 +26,56 @@ local function getValidateMsg(typeName, min, max)
 		else ("%s must be between %d and %d."):format(capitalTypeName, min, max)
 end
 
+function CmdrUtils.keyValueArgs(enumName, getKeyValues, mapValue)
+	mapValue = mapValue or function(...)
+		return ...
+	end
+
+	local entries = {}
+	
+	return {
+		function(context)
+			entries = getKeyValues(context)
+
+			local options = {}
+			for key in entries do
+				table.insert(options, key)
+			end
+
+            return {
+                Type = context.Cmdr.Util.MakeEnumType(enumName, options);
+                Name = "option name";
+            }
+		end,
+		function(context)
+			local arg1 = context:GetArgument(1)
+			if arg1:Validate() == false then
+				return
+			end
+
+            local cmdrType, currentValue = mapValue(entries[arg1:GetValue()], arg1:GetValue(), context)
+            local rawType = cmdrType
+            if type(cmdrType) == "function" then
+                rawType = cmdrType(context)
+            end
+
+            if type(rawType) == "table" then
+                rawType = table.clone(rawType)
+                rawType.Optional = false
+                rawType.Default = nil
+
+				if currentValue ~= nil then
+					rawType.Description =
+						(rawType.Description and (rawType.Description .. "\n\n") or "")
+						.. "Current value: " .. tostring(currentValue)
+				end
+            end
+
+			return rawType
+		end
+	}
+end
+
 function CmdrUtils.constrainedInteger(min, max)
 	local type = CmdrUtils.constrainedNumber(min, max)
 	local validateMsg = getValidateMsg("integer", min, max)
