@@ -253,7 +253,7 @@ function Scrimmage:_resolveWinner()
     end)
 
     if scores[1].score >= self.config.maxScore then
-        if self.config.winByTwo then
+        if self.config.wb2 then
             if (scores[1].score - scores[2].score) >= 2 then
                 return GameState.TeamWon, scores[1].team
             else
@@ -290,7 +290,10 @@ function Scrimmage:GamePaused(condition, reason)
     end
 
     for player, data in self.fightingPlayers do
-        player.Team = data.team
+        -- Roblox will throw an error if you try to set the team of a disconnected player. WTH
+        if player.Parent then
+            player.Team = data.team
+        end
     end
 
     local function onFightingPlayerAdded(player)
@@ -396,7 +399,7 @@ function Scrimmage:GameRunning()
                 player:LoadCharacter()
 
                 -- Recheck the conditions since LoadCharacter yields the thread.
-                if connection.Connected and player.Team == team then
+                if connection.Connected and player.Parent and player.Team == team then
                     local refreshedData = self.fightingPlayers[player] or data
 
                     if data and data.isDead then
@@ -534,62 +537,52 @@ function Scrimmage:GameRunning()
                 startingHealth[data.player] = data.humanoid.Health
             end
 
-            self.promise = self:resolveGameState()
-                :andThen(function(fn)
-                    if fn then
-                        local message = fn()
-                        if message then
-                            self:announce(message)
+            self.promise = self:checkForTie():andThen(function(winningTeam)
+                local tags = {}
+                local isTied = winningTeam == nil
+
+                if isTied then
+                    table.insert(tags, strings.tie)
+
+                    if self.config.tiesCount then
+                        tags[1] ..= " " .. strings.winTagTiesCount
+
+                        for _, team in self.fightingTeams do
+                            self:addPointToTeam(team)
                         end
                     end
+                else
+                    table.insert(tags, strings.win:format(winningTeam.Name))
+                    self:addPointToTeam(winningTeam)
+                end
 
-                    -- Be sure to reset startingHealth if the player had already died.
-                    for player, data in self.fightingPlayers do
-                        data.startingHealth = startingHealth[player] or 100
-                    end
+                local gameState, gameWinningTeam = self:_resolveWinner()
 
-                    self:changeState("GamePaused", makeTimer(2))
-                end)
-                :catch(warn)
+                local message
+                if gameState == GameState.TeamWon then
+                    message = strings.wonGame:format(gameWinningTeam.Name)
+                elseif gameState == GameState.WinByTwo then
+                    table.insert(tags, strings.winTagWb2)
+                elseif gameState == GameState.Tied then
+                    table.insert(tags, strings.winTagTied)
+                end
+
+                if not message then
+                    message = table.concat(tags, "\n") .. if tags[2] then "." else ""
+                end
+
+                self:announce(message)
+
+                -- Be sure to reset startingHealth if the player had already died.
+                for player, data in self.fightingPlayers do
+                    data.startingHealth = if isTied then 100 else startingHealth[player] or 100
+                end
+
+                self:changeState("GamePaused", makeTimer(2))
+            end)
+            :catch(warn)
         end
     end))
-end
-
-function Scrimmage:resolveGameState()
-    return self:checkForTie():andThen(function(winningTeam)
-        local isTied = winningTeam == nil
-
-        return Promise.resolve(function()
-            local tags = {}
-
-            if isTied then
-                table.insert(tags, strings.tie)
-
-                if self.config.tiesCount then
-                    tags[1] ..= " " .. strings.winTagTiesCount
-
-                    for _, team in self.fightingTeams do
-                        self:addPointToTeam(team)
-                    end
-                end
-            else
-                table.insert(tags, strings.win:format(winningTeam.Name))
-                self:addPointToTeam(winningTeam)
-            end
-
-            local gameState, gameWinningTeam = self:_resolveWinner()
-
-            if gameState == GameState.TeamWon then
-                return strings.wonGame:format(gameWinningTeam.Name)
-            elseif gameState == GameState.WinByTwo then
-                table.insert(tags, strings.winTagWb2)
-            elseif gameState == GameState.Tied then
-                table.insert(tags, strings.winTagTied)
-            end
-
-            return table.concat(tags, "\n") .. if tags[2] then "." else ""
-        end)
-    end)
 end
 
 function Scrimmage:addPointToTeam(team)
