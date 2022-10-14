@@ -14,10 +14,11 @@ local canRun = require(CmdrArena.Hooks.canRun)
 
 local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerName)
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
-local LitUtils = require(ReplicatedStorage.Common.Utils.LitUtils)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local actions = RoduxFeatures.actions
 local selectors = RoduxFeatures.selectors
+
+local LockCommands = require(script.LockCommands)
 
 local CmdrService = {
 	Name = "CmdrService";
@@ -28,7 +29,7 @@ local CmdrService = {
 	};
 	
 	Cmdr = Cmdr;
-	_lockedCommands = {};
+    _lockCommands = LockCommands.new(Root.Store);
 	_logs = {};
 }
 
@@ -109,18 +110,10 @@ function CmdrService:_setupCmdr()
 	end)
 
 	Cmdr:RegisterHook("BeforeRun", function(context)
-		local locked = self._lockedCommands[context.Name:lower()]
-		if not locked or context.Executor == nil then
-			return
-		end
-		
-		local state = Root.Store:getState()
-
-		local byAdmin = selectors.getAdmin(state, locked.userId)
-		if selectors.getAdmin(state, context.Executor.UserId) < byAdmin then
-			local tierName = GameEnum.AdminTiersByValue[byAdmin]
-			return string.format("This command is locked by %s %s.", LitUtils.getIndefiniteArticle(tierName), tierName)
-		end
+		return self._lockCommands:beforeRun(
+            context.Executor and context.Executor.UserId,
+            self.Cmdr.Registry:GetCommand(context.Name)
+        )
 	end)
 	
 	Cmdr:RegisterHook("AfterRun", function(context)
@@ -161,49 +154,17 @@ function CmdrService:_setupCmdr()
 end
 
 function CmdrService:LockCommand(commandName, byUserId)
-	commandName = commandName:lower()
-
-	local command = self.Cmdr.Registry.Commands[commandName]
-	if command == nil then
-		return 0
-	end
-
-	-- If anyone can run this command, don't lock it.
-	if canRun.anyGroups[command.Group] then
-		return 1, string.format("Cannot lock %q: isn't admin bound.", commandName)
-	end
-	
-	local locked = self._lockedCommands[commandName]
-	local admin = selectors.getAdmin(Root.Store:getState(), byUserId)
-
-	if locked and selectors.getAdmin(Root.Store:getState(), locked.userId) >= admin then
-		return 2, string.format("Cannot lock %q: already locked by an admin of equal or greater rank.", commandName)
-	end
-	
-	self._lockedCommands[commandName] = {userId = byUserId}
-
-	return 3, string.format("Locked %q.", commandName)
+	return self._lockCommands:lockCommand(
+        byUserId,
+        self.Cmdr.Registry:GetCommand(commandName)
+    )
 end
 
 function CmdrService:UnlockCommand(commandName, byUserId)
-	commandName = commandName:lower()
-
-	local locked = self._lockedCommands[commandName]
-	if locked == nil then
-		return 0, string.format("Cannot unlock %q: command isn't locked.", commandName)
-	end
-
-	local admin = selectors.getAdmin(Root.Store:getState(), byUserId)
-	local byAdmin = selectors.getAdmin(Root.Store:getState(), locked.userId)
-
-	if locked and byAdmin > admin then
-		local tierName = GameEnum.AdminTiersByValue[byAdmin]
-		return 1, string.format("Cannot unlock %q: locked by %s %s.", commandName, LitUtils.getIndefiniteArticle(tierName), tierName)
-	end
-	
-	self._lockedCommands[commandName] = nil
-
-	return 2, string.format("Unlocked %q.", commandName)
+	return self._lockCommands:unlockCommand(
+        byUserId,
+        self.Cmdr.Registry:GetCommand(commandName)
+    )
 end
 
 function CmdrService:OnPlayerLoaded(player)

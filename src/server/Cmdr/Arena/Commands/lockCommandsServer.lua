@@ -3,7 +3,7 @@ return function(context, commands)
     local userId = context.Executor.UserId
 
     for _, commandName in ipairs(commands) do
-        local _, msg = CmdrService:LockCommand(commandName, userId)
+        local msg = CmdrService:LockCommand(commandName, userId)
 
         if msg then
             context:Reply(msg)
