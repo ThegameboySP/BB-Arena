@@ -26,6 +26,7 @@ local CmdrService = {
 		CmdrLoaded = Root.remoteProperty(false);
 		CommandExecuted = Root.remoteEvent();
 		Warning = Root.remoteEvent();
+		Reply = Root.remoteEvent();
 	};
 	
 	Cmdr = Cmdr;
@@ -94,18 +95,17 @@ function CmdrService:_setupCmdr()
 	
 	Cmdr.Registry:RegisterHook("BeforeRun", function(context)
 		if context.Executor and not self:CanRun(context.Executor, context.Group) then
-			local msg = "You don't have permission to run this command."
-			
-			if context.Executor then
-				self.Client.Warning:FireClient(context.Executor, msg)
-			end
-			
-			return msg
+			return "You don't have permission to run this command."
 		end
 
-		context.State.Warnings = {}
-		context.Warn = function(msg)
-			table.insert(context.State.Warnings, msg)
+		context.Warn = function(_, msg)
+			self.Client.Warning:FireClient(context.Executor, msg)
+		end
+
+		local reply = context.Reply
+		context.Reply = function(_, msg)
+			self.Client.Reply:FireClient(context.Executor, msg)
+			reply(context, msg)
 		end
 	end)
 
@@ -140,10 +140,6 @@ function CmdrService:_setupCmdr()
 				Name = context.Name;
 				Response = context.Response;
 			})
-			
-			for _, warning in ipairs(context.State.Warnings) do
-				self.Client.Warning:FireClient(context.Executor, warning)
-			end
 		end)
 	end)
 	

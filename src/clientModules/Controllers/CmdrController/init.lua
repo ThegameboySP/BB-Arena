@@ -31,6 +31,10 @@ function CmdrController:OnInit()
 		CmdrNotifications:AddMessage(str, true, ERROR_COLOR)
 	end)
 
+	CmdrService.Reply:Connect(function(str)
+		CmdrNotifications:AddMessage(str, false)
+	end)
+
 	local CmdrClient = require(ReplicatedStorage.CmdrClient)
 	self.Cmdr = CmdrClient
 end
@@ -88,11 +92,8 @@ function CmdrController:OnStart()
 		if r1 == false then
 			CmdrNotifications:AddMessage(err, true, ERROR_COLOR)
 			dispatcher:EvaluateAndRun(("reply %q %s"):format(("%q: -> %s"):format(cmd, err), "255,73,73"))
-		else
-			if msg ~= "Command executed." then
-				CmdrNotifications:AddMessage(msg, false)
-			end
-
+		elseif msg ~= "" and msg ~= "Command executed." then
+			CmdrNotifications:AddMessage(msg, false)
 			dispatcher:EvaluateAndRun(("reply %q %s"):format(("%q: -> %s"):format(cmd, msg), "255,255,255"))
 		end
 	end)
