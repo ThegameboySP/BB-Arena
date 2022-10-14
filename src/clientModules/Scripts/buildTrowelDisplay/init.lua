@@ -9,6 +9,9 @@ local getLocalSetting = RoduxFeatures.selectors.getLocalSetting
 
 local Trail = script.Trail
 
+local MIN_BEAM_LENGTH = 0.3
+local MAX_BEAM_LENGTH = 0.6
+
 local function getPosition(character, name)
     local part = character:FindFirstChild(name)
     if part then
@@ -16,6 +19,17 @@ local function getPosition(character, name)
     end
 
     return Vector3.zero
+end
+
+local function mapTransparency(alpha)
+    return NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 1),
+        NumberSequenceKeypoint.new(math.max(0, 0 + (1 - alpha) * 0.3), 0.6),
+        NumberSequenceKeypoint.new(math.max(0, 0 + (1 - alpha) * 0.7), 0.6),
+        -- -0.6 is some arbitrary number that will make the beam's length animation look better
+        NumberSequenceKeypoint.new(math.clamp(0 + (1 - math.max(0, alpha - 0.6)), 0, 1), 1),
+        NumberSequenceKeypoint.new(1, 1)
+    })
 end
 
 local function onBuildingTrowel(player, pos)
@@ -46,16 +60,27 @@ local function onBuildingTrowel(player, pos)
         local startingTime = os.clock()
         local cn
         cn = RunService.Heartbeat:Connect(function()
-            local alpha = TweenService:GetValue((os.clock() - startingTime) / 0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            local delta = os.clock() - startingTime
+            local alpha = TweenService:GetValue(delta / 0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
-            if alpha >= 1 or not character.Parent then
+            if delta > 0.8 or not character.Parent then
                 part.Parent = nil
                 cn:Disconnect()
                 return
             end
 
-            a0.Position = pos + ((getPosition(character, "Head") - pos) * alpha)
-            a1.Position = pos + ((getPosition(character, "Head") - pos) * (alpha - 0.003))
+            local a0Delta = (getPosition(character, "Head") - pos) * (alpha + 0.003)
+            local a1Delta = ((getPosition(character, "Head") - pos) * alpha)
+            local a0ClampedDelta =
+                a0Delta.Unit * (a1Delta.Magnitude + math.clamp(
+                    (a0Delta - a1Delta).Magnitude,
+                    MIN_BEAM_LENGTH,
+                    MAX_BEAM_LENGTH)
+                )
+
+            a0.Position = pos + a0ClampedDelta
+            a1.Position = pos + a1Delta
+            trail.Transparency = mapTransparency(delta / 0.4)
         end)
     end
 end
