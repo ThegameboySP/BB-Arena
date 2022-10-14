@@ -1,32 +1,16 @@
-local function mapStatNames(stats)
-    local names = {}
-
-    for name in pairs(stats) do
-        table.insert(names, name)
-    end
-
-    return names
-end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
 return function(context, players, name, value)
-    local root = context:GetStore("Common").Root
-    local StatService = root:GetService("StatService")
+    local store = context:GetStore("Common").Root.Store
 
-    local statNames = mapStatNames(StatService:GetRegisteredStats())
-    local fuzzyFinder = context.Cmdr.Util.MakeFuzzyFinder(statNames)
-    local results = fuzzyFinder(name)
+    for _, player in players do
+        local userId = player.UserId
+        local oldValue = store:getState().stats.visualStats[player.UserId][name]
+        store:dispatch(RoduxFeatures.actions.setStatVisual(userId, name, value))
 
-    if results[1] then
-        for _, player in pairs(players) do
-            local userId = player.UserId
-            local oldValue = root.Store:getState().stats.visualStats[player.UserId][results[1]]
-            StatService:SetStatVisual(userId, results[1], value)
-
-            context:Reply(string.format("%s %q %s -> %s", tostring(player), results[1], tostring(oldValue), tostring(value)))
-        end
-
-        return ""
+        context:Reply(string.format("%s %q %s -> %s", tostring(player), name, tostring(oldValue), tostring(value)))
     end
-    
-    return string.format("%q is not a valid stat name", name)
+
+    return ""
 end

@@ -7,7 +7,7 @@ return {
 	Aliases = {"gcon"};
 	Description = "Configures the current gamemode's options.";
 	Group = "Admin";
-	Args = CmdrUtils.keyValueArgs("Option", function(context)
+	Args = CmdrUtils.keyValueArgs("Option", 1, function(context)
         local currentGamemode = context:GetStore("Common").Root:GetSingleton("Gamemode").CurrentGamemode
         if currentGamemode == nil then
             return {}

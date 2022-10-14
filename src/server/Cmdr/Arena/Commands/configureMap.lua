@@ -7,7 +7,7 @@ return {
 	Aliases = {"mcon"};
 	Description = "Configures the current map's options.";
 	Group = "Admin";
-    Args = CmdrUtils.keyValueArgs("Option", function(context)
+    Args = CmdrUtils.keyValueArgs("Option", 1, function(context)
         local mapScript = context:GetStore("Common").Root:GetSingleton("Map").MapScript
         if mapScript == nil or not mapScript.Options then
             return {}

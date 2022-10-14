@@ -40,7 +40,7 @@ return {
 	Aliases = {"setting"};
 	Description = "Changes a local setting.";
 	Group = "Any";
-	Args = CmdrUtils.keyValueArgs("setting", function()
+	Args = CmdrUtils.keyValueArgs("setting", 1, function()
 		return settings
 	end, function(setting, _, context)
 		local arg = {

@@ -11,7 +11,7 @@ return {
     AutoExec = {
         'alias "sTrowels|Sets whether spectator trowels are allowed or not" gvar spectatorsCanBuildTrowels $1{boolean|toggle}';
     };
-    Args = CmdrUtils.keyValueArgs("variable", function()
+    Args = CmdrUtils.keyValueArgs("variable", 1, function()
         return Root.globals
     end, function(remoteProperty, name)
         return {

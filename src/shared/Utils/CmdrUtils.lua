@@ -26,7 +26,7 @@ local function getValidateMsg(typeName, min, max)
 		else ("%s must be between %d and %d."):format(capitalTypeName, min, max)
 end
 
-function CmdrUtils.keyValueArgs(enumName, getKeyValues, mapValue)
+function CmdrUtils.keyValueArgs(enumName, argIndex, getKeyValues, mapValue)
 	mapValue = mapValue or function(...)
 		return ...
 	end
@@ -48,7 +48,7 @@ function CmdrUtils.keyValueArgs(enumName, getKeyValues, mapValue)
             }
 		end,
 		function(context)
-			local arg1 = context:GetArgument(1)
+			local arg1 = context:GetArgument(argIndex)
 			if arg1:Validate() == false then
 				return
 			end
