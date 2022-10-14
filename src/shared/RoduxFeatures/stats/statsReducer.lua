@@ -206,10 +206,16 @@ return RoduxUtils.createReducer({
 
         local initializedStats = {}
         local visibleRegisteredStats = {}
+
         for id, stat in registeredStats do
-            if stat.gamemodeId == gamemodeId and stat.show then
+            if stat.gamemodeId == gamemodeId then
+                if stat.show then
+                    visibleRegisteredStats[id] = true
+                end
+
                 initializedStats[id] = stat.default
-                visibleRegisteredStats[id] = true
+            elseif defaultStats[id] then
+                initializedStats[id] = defaultStats[id]
             end
         end
 

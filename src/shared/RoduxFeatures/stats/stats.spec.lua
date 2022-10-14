@@ -3,11 +3,13 @@ local reducer = RoduxFeatures.reducer
 local actions = RoduxFeatures.actions
 
 return function()
-    it("should initialize a gamemode's stats when it starts", function()
+    it("should initialize a gamemode's stats and reset the rest when it starts", function()
         local state = reducer(nil, actions.userJoined(1))
+        state = reducer(state, actions.incrementStatRaw(1, "KOs", 1))
         state = reducer(state, actions.gamemodeStarted("CTF"))
 
         expect(state.stats.visualStats[1].CTF_captures).to.equal(0)
+        expect(state.stats.visualStats[1].KOs).to.equal(0)
         expect(state.stats.visibleRegisteredStats.CTF_captures).to.equal(true)
     end)
 
