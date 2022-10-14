@@ -133,4 +133,7 @@ return function(registry)
 	registry:RegisterType("arenaPlayers", playersType, {
 		Prefixes = "% teamPlayers";
 	})
+
+	registry.Types.player = registry.Types.arenaPlayer
+	registry.Types.players = registry.Types.arenaPlayers
 end

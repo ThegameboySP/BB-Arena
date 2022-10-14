@@ -86,4 +86,7 @@ return function(registry)
 
 	registry:RegisterType("arenaPlayerId", playerIdType)
 	registry:RegisterType("arenaPlayerIds", cmdr.Util.MakeListableType(playerIdType))
+
+    registry.Types.playerId = registry.Types.arenaPlayerId
+    registry.Types.playerIds = registry.Types.arenaPlayerIds
 end
