@@ -31,7 +31,7 @@ return function(target)
 		onClosed = function()
 			Roact.unmount(tree)
 		end;
-        activeMap = 1;
+        activeMap = 2;
 	})
     
 	roactTree = Roact.createElement(RoactRodux.StoreProvider, {

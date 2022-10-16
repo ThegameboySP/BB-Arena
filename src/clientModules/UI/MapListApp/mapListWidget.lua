@@ -163,7 +163,7 @@ local function mapListWidget(props, hooks)
 		local isActive = props.activeMap == entry.mapInfo["Map name"]
 		local isSelected = selected == entry.mapInfo["Map name"]
 
-		table.insert(rowElements, e("TextButton", {
+		table.insert(rowElements, isActive and 2 or (#rowElements + 1), e("TextButton", {
 			BackgroundTransparency = 0.6;
 			BackgroundColor3 = if isSelected then theme.accent elseif isActive then theme.text else theme.foreground;
 			Text = "";
@@ -173,7 +173,7 @@ local function mapListWidget(props, hooks)
 			end;
 		}, nextRowElements))
 
-		table.insert(rowElements, e("Frame", {
+		table.insert(rowElements, isActive and 3 or (#rowElements + 1), e("Frame", {
 			Size = UDim2.new(0.1, 0, 0, 100);
 			BorderColor3 = theme.border;
 		}))
