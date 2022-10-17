@@ -9,5 +9,5 @@ return function()
     local payload = HttpService:GetAsync("http://ip-api.com/json/")
     local info = HttpService:JSONDecode(payload)
 
-    return string.format("%s, %s, %s", info.city, info.region, info.country)
+    return string.format("%s, %s", info.region, info.country)
 end
