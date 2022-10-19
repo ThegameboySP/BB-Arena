@@ -44,7 +44,7 @@ local function setReferee(userId, isReferee, byUser)
     end
 end
 
-local function setUserWhitelisted(userId, byUser, isWhitelisted)
+local function setUserWhitelisted(userId, isWhitelisted, byUser)
     return function(store)
         local state = store:getState()
         local whitelistedBy = state.users.whitelisted[userId]
@@ -62,13 +62,13 @@ local function setUserWhitelisted(userId, byUser, isWhitelisted)
     end
 end
 
-local function setServerLocked(lockingUserId, isLocked)
+local function setServerLocked(isLocked, lockingUserId)
     return function(store)
         local state = store:getState()
 
         if
             isLocked ~= (not not state.users.serverLockedBy)
-            and getAdmin(state, lockingUserId) >= getAdmin(state, state.users.serverLockedBy)
+            or getAdmin(state, lockingUserId) >= getAdmin(state, state.users.serverLockedBy)
         then
             store:dispatch({
                 type = "users_setServerLocked";
@@ -80,14 +80,14 @@ local function setServerLocked(lockingUserId, isLocked)
 
             if isLocked then
                 for userId in pairs(state.users.activeUsers) do
-                    store:dispatch(setUserWhitelisted(userId, lockingUserId, true))
+                    store:dispatch(setUserWhitelisted(userId, true, lockingUserId))
                 end
             end
         end
     end
 end
 
-local function setUserBanned(userId, byUser, isBanned)
+local function setUserBanned(userId, isBanned, byUser)
     return function(store)
         local state = store:getState()
         local bannedBy = state.users.banned[userId]

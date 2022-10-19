@@ -8,7 +8,7 @@ return function(context, userIds)
 
     for _, userId in pairs(userIds) do
         local state = store:getState()
-        store:dispatch(actions.setUserWhitelisted(userId, true))
+        store:dispatch(actions.setUserWhitelisted(userId, true, context.Executor.UserId))
 
         if store:getState() ~= state then
             context:Reply(string.format("Successfully whitelisted %s", userId))

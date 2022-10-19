@@ -7,7 +7,7 @@ return function (context)
 	local store = context:GetStore("Common").Store
     local state = store:getState()
 
-	store:dispatch(actions.setServerLocked(context.Executor.UserId, true))
+	store:dispatch(actions.setServerLocked(true, context.Executor.UserId))
 	if store:getState() == state then
 		return "Server is already locked."
 	end

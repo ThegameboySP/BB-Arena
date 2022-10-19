@@ -23,7 +23,7 @@ return function(context, players)
 
     for _, userId in mapUserIds(players) do
         local state = store:getState()
-        store:dispatch(actions.setUserBanned(userId, context.Executor.UserId, true))
+        store:dispatch(actions.setUserBanned(userId, true, context.Executor.UserId))
 
         if store:getState() ~= state then
             root:GetFullNameByUserId(userId):andThen(function(name)

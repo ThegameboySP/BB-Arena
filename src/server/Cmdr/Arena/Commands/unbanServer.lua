@@ -39,7 +39,7 @@ return function (context, userIds)
             continue
         end
 
-        store:dispatch(actions.setUserBanned(userId, context.Executor.UserId, false))
+        store:dispatch(actions.setUserBanned(userId, false, context.Executor.UserId))
         
         root:GetFullNameByUserId(userId):andThen(function(name)
             context:Reply(string.format("Successfully unbanned %s.", name))
