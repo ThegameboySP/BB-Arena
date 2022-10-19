@@ -143,9 +143,12 @@ function CmdrService:_setupCmdr()
 		end)
 	end)
 	
+	require(CmdrArena.processCommands)(Cmdr.Registry)
+
 	-- Replicate to all clients.
 	CmdrArena.Hooks.Parent = CmdrReplicated
 	CmdrArena.registerTypes.Parent = CmdrReplicated
+	CmdrArena.processCommands.Parent = CmdrReplicated
 	self.Client.CmdrLoaded:Set(true)
 end
 

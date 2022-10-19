@@ -47,6 +47,7 @@ function CmdrController:OnStart()
 	common.Store = Root.Store
 
 	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, Root.globals.mapInfo:Get())
+	require(CmdrReplicated.processCommands)(CmdrClient.Registry)
 	CmdrClient.Registry.Types.player = CmdrClient.Registry.Types.arenaPlayer
 	CmdrClient.Registry.Types.players = CmdrClient.Registry.Types.arenaPlayers
 	
