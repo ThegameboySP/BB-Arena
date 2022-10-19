@@ -9,7 +9,7 @@ local function setStatVisual(userId, name, value)
     }
 end
 
-local function incrementStatRaw(userId, name, amount)
+local function incrementStat(userId, name, amount)
     return {
         type = "stats_increment";
         payload = {
@@ -18,20 +18,6 @@ local function incrementStatRaw(userId, name, amount)
             amount = amount;
         };
     }
-end
-
-local function incrementStat(userId, name, amount)
-    return function(store)
-        local state = store:getState()
-        local isVisible = state.stats.visibleRegisteredStats[name]
-
-        local action = incrementStatRaw(userId, name, amount)
-        action.meta = {
-            interestedUserIds = if isVisible then nil else {};
-        }
-        
-        store:dispatch(action)
-    end
 end
 
 local function resetUsersStats(userIds)
@@ -43,9 +29,19 @@ local function resetUsersStats(userIds)
     }
 end
 
+local function initializeUserStats(userId, stats)
+    return {
+        type = "stats_initializeUser";
+        payload = {
+            userId = userId;
+            stats = stats;
+        };
+    }
+end
+
 return {
     setStatVisual = setStatVisual;
-    incrementStatRaw = incrementStatRaw;
     incrementStat = incrementStat;
     resetUsersStats = resetUsersStats;
+    initializeUserStats = initializeUserStats;
 }

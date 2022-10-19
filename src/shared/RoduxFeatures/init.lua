@@ -29,7 +29,7 @@ local middlewares = {}
 local serializers = {}
 local serializersArray = {}
 
-for _, module in pairs(script:GetChildren()) do
+for _, module in script.slices:GetChildren() do
     local feature = require(module)
     if type(feature) ~= "table" then
         continue
@@ -61,26 +61,22 @@ for _, module in pairs(script:GetChildren()) do
         end
     end
 
-    if feature.middlewares then
-        for middlewareName, middleware in pairs(feature.middlewares) do
-            if middlewares[middlewareName] then
-                error(string.format("Duplicate middleware name %q", middlewareName))
-            end
-
-            middlewares[middlewareName] = middleware
-        end
-    end
-
     if feature.serializers then
-        for _, entry in ipairs(feature.serializers) do
-            if serializers[entry.actionName] then
+        for actionName, entry in pairs(feature.serializers) do
+            if serializers[actionName] then
                 error(string.format("Duplicate action serializer %q", entry.actionName))
             end
 
-            serializers[entry.actionName] = entry
-            table.insert(serializersArray, entry)
+            table.insert(serializersArray, {
+                actionName = actionName;
+                entry = entry;
+            })
         end
     end
+end
+
+for _, child in script.middlewares:GetChildren() do
+    middlewares[child.Name] = require(child)
 end
 
 local reducer = combineReducers(reducers)
@@ -89,9 +85,10 @@ table.sort(serializersArray, function(a, b)
     return a.actionName > b.actionName
 end)
 
-for index, entry in serializersArray do
-    entry.id = string.char(index)
-    serializers[entry.id] = entry
+for index, tbl in serializersArray do
+    tbl.entry.id = string.char(index)
+    serializers[tbl.entry.id] = tbl.entry
+    serializers[tbl.actionName] = tbl.entry
 end
 
 function actions.merge(with)
@@ -101,9 +98,13 @@ function actions.merge(with)
     }
 end
 
-function actions.serialize()
+function actions.serialize(userId, serialized)
     return {
         type = "rodux_serialize";
+        payload = {
+            userId = userId;
+            serialized = serialized;
+        };
     }
 end
 

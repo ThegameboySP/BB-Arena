@@ -6,16 +6,26 @@ local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
 local LocalPlayer = Players.LocalPlayer
 
-local function deserializeAction(serialized, actionType)
+local function deserializeAction(serialized, actionType, state)
     local serializers = RoduxFeatures.serializers[actionType]
     if serializers then
-        return serializers.deserialize(serialized)
+        return serializers.deserialize(serialized, state)
     end
 
     error(("No deserializer for action %q"):format(string.byte(actionType)))
 end
 
-local function makeClientMiddleware(requestRemote)
+local function serializeAction(action, state)
+    local serializers = RoduxFeatures.serializers[action.type]
+    
+    if serializers and serializers.serialize then
+        return serializers.serialize(action, state), serializers.id
+    end
+
+    return action
+end
+
+local function makeClientMiddleware(requestRemote, root)
     return function(nextDispatch)
         return function(action)
             local meta = action.meta
@@ -23,8 +33,8 @@ local function makeClientMiddleware(requestRemote)
                 return
             end
     
-            if meta and meta.serverRemote and not meta.dispatchedByServer then
-                requestRemote:FireServer(unpack(meta.serverRemote))
+            if meta and meta.serverInterested and not meta.dispatchedByServer then
+                requestRemote:FireServer(serializeAction(action, root.Store:getState()))
     
                 if meta.interestedUserIds and not table.find(meta.interestedUserIds, LocalPlayer.UserId) then
                     return
@@ -47,14 +57,14 @@ local function roduxClient(root)
         root.Store = Rodux.Store.new(
             RoduxFeatures.reducer,
             deserialized,
-            { Rodux.thunkMiddleware, makeClientMiddleware(requestRemote) }
+            { Rodux.thunkMiddleware, makeClientMiddleware(requestRemote, root) }
         )
     end)
 
     actionDispatchedRemote.OnClientEvent:Connect(function(action, serializedType)
         local resolvedAction = action
-        if type(action) == "string" then
-            resolvedAction = deserializeAction(action, serializedType)
+        if serializedType then
+            resolvedAction = deserializeAction(action, serializedType, root.Store:getState())
         end
 
         resolvedAction.meta = resolvedAction.meta or {}

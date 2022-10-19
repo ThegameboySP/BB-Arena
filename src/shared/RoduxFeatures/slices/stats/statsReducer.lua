@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local t = require(ReplicatedStorage.Packages.t)
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
-local RoduxUtils = require(script.Parent.Parent.RoduxUtils)
+local RoduxUtils = require(script.Parent.Parent.Parent.RoduxUtils)
 
 local Dictionary = Llama.Dictionary
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
@@ -77,16 +77,30 @@ for _, gamemode in Gamemodes:GetChildren() do
     end
 end
 
+local registeredStatArray = {}
 for _, stat in registeredStats do
     stat.priority = stat.priority or -1
+    stat.friendlyName = stat.friendlyName or stat.name
     assert(checkRegisteredStat(stat))
 
+    table.insert(registeredStatArray, stat)
+end
+
+table.sort(registeredStatArray, function(a, b)
+    return a.name > b.name
+end)
+
+for index, stat in registeredStatArray do
+    stat.id = index
+    registeredStats[stat.id] = stat
     defaultStats[stat.name] = stat.default
 end
 
 return RoduxUtils.createReducer({
     alltimeStats = {};
     serverStats = {};
+    -- Server stats that are displayed to the user.
+    -- This is separate since users can manually change their stats.
     visualStats = {};
     ranks = {};
 
@@ -128,6 +142,14 @@ return RoduxUtils.createReducer({
         return Dictionary.merge(state, patch)
     end;
 
+    stats_initializeUser = function(state, action)
+        local payload = action.payload
+
+        return Dictionary.mergeDeep(state, {
+            alltimeStats = {[payload.userId] = payload.stats};
+            rank = payload.stats.KOs and {[payload.userId] = calculateRank(payload.stats.KOs)};
+        })
+    end;
     stats_setVisual = function(state, action)
         local payload = action.payload
 
@@ -168,14 +190,6 @@ return RoduxUtils.createReducer({
 
         return Dictionary.mergeDeep(state, {
             visualStats = patch;
-        })
-    end;
-    game_userDataFetched = function(state, action)
-        local data = action.payload.data
-
-        return Dictionary.mergeDeep(state, {
-            alltimeStats = {[action.payload.userId] = data.stats};
-            ranks = {[action.payload.userId] = calculateRank(data.stats.KOs)};
         })
     end;
     game_gamemodeEnded = function(state, action)

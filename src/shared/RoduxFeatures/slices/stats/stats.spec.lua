@@ -1,11 +1,11 @@
-local RoduxFeatures = require(script.Parent.Parent)
+local RoduxFeatures = require(script.Parent.Parent.Parent)
 local reducer = RoduxFeatures.reducer
 local actions = RoduxFeatures.actions
 
 return function()
     it("should initialize a gamemode's stats and reset the rest when it starts", function()
         local state = reducer(nil, actions.userJoined(1))
-        state = reducer(state, actions.incrementStatRaw(1, "KOs", 1))
+        state = reducer(state, actions.incrementStat(1, "KOs", 1))
         state = reducer(state, actions.gamemodeStarted("CTF"))
 
         expect(state.stats.visualStats[1].CTF_captures).to.equal(0)
@@ -24,8 +24,8 @@ return function()
 
     it("should increment a stat", function()
         local state = reducer(nil, actions.userJoined(1))
-        state = reducer(state, actions.incrementStatRaw(1, "KOs", 2))
-        state = reducer(state, actions.incrementStatRaw(1, "KOs", 1))
+        state = reducer(state, actions.incrementStat(1, "KOs", 2))
+        state = reducer(state, actions.incrementStat(1, "KOs", 1))
 
         expect(state.stats.visualStats[1].KOs).to.equal(3)
         expect(state.stats.serverStats[1].KOs).to.equal(3)
@@ -34,8 +34,8 @@ return function()
 
     it("should serialize and deserialize properly", function()
         local state = reducer(nil, actions.userJoined(1))
-        state = reducer(state, actions.incrementStatRaw(1, "KOs", 1))
-        state = reducer(state, actions.serialize())
+        state = reducer(state, actions.incrementStat(1, "KOs", 1))
+        state = reducer(state, actions.serialize(1))
 
         state = reducer(nil, actions.deserialize(state))
 

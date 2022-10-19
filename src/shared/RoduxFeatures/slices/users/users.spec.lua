@@ -1,7 +1,7 @@
 local Rodux = require(game:GetService("ReplicatedStorage").Packages.Rodux)
 local Dictionary = require(game:GetService("ReplicatedStorage").Packages.Llama).Dictionary
 
-local RoduxFeatures = require(script.Parent.Parent)
+local RoduxFeatures = require(script.Parent.Parent.Parent)
 local reducer = RoduxFeatures.reducer
 local actions = RoduxFeatures.actions
 local selectors = RoduxFeatures.selectors
@@ -9,15 +9,15 @@ local selectors = RoduxFeatures.selectors
 return function()
     describe("serialization", function()
         local function serializeCase()
-            return reducer({
-                users = {
-                    banned = {[2] = true};
-                    whitelisted = {[2] = true};
-                    admins = {[2] = true};
-                    referees = {[2] = true};
-                    activeUsers = {[2] = true};
-                };
-            }, RoduxFeatures.actions.serialize())
+            local store = Rodux.Store.new(reducer, nil, { Rodux.thunkMiddleware })
+
+            store:dispatch(actions.userJoined(2))
+            store:dispatch(actions.setUserBanned(2, nil, true))
+            store:dispatch(actions.setUserWhitelisted(2, nil, true))
+            store:dispatch(actions.setAdmin(2, 1))
+            store:dispatch(actions.setReferee(2, true))
+
+            return reducer(store:getState(), actions.serialize(2))
         end
 
         it("should serialize properly", function()

@@ -18,19 +18,6 @@ function gameActions.gamemodeEnded(gamemodeId)
     }
 end
 
-function gameActions.userDataFetched(userId, data)
-    return {
-        type = "game_userDataFetched";
-        payload = {
-            userId = userId;
-            data = data;
-        };
-        meta = {
-            interestedUserIds = {userId};
-        };
-    }
-end
-
 function gameActions.mapChanged(mapId)
     return {
         type = "game_mapChanged";

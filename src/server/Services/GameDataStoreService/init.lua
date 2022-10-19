@@ -3,12 +3,13 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
 local DataStoreService = require(ServerScriptService.Packages.MockDataStoreService)
-local Llama = require(ReplicatedStorage.Packages.Llama)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local Root = require(ReplicatedStorage.Common.Root)
+
+local updateSave = require(script.updateSave)
 
 local GameDataStoreService = {
     Name = "GameDataStoreService";
@@ -16,7 +17,19 @@ local GameDataStoreService = {
 
     _isLoaded = {};
     _playerSettingsState = {};
+    _playerStatsState = {};
 }
+
+function GameDataStoreService:_shouldUpdate(userId)
+    local state = Root.Store:getState()
+
+    return 
+        self._isLoaded[userId]
+        and (
+            self._playerSettingsState[userId] ~= state.users.userSettings[userId]
+            or self._playerStatsState[userId] ~= state.stats.serverStats[userId]
+        )
+end
 
 -- A simple DataStore wrapper. Only handles pushing/pulling and caching.
 function GameDataStoreService:OnStart()
@@ -39,10 +52,15 @@ function GameDataStoreService:OnStart()
         local isConnected = player:IsDescendantOf(game)
 
         if isConnected then
-            self._playerSettingsState[userId] = store:getState().users.userSettings[userId]
+            local state = store:getState()
+            self._playerSettingsState[userId] = state.users.userSettings[userId]
+            self._playerStatsState[userId] = state.stats.serverStats[userId]
 
+            -- Dispatch individual actions instead of one for data successfully fetched.
+            -- You can enforce replication rules and there's less redundancy.
             if data then
                 store:dispatch(RoduxFeatures.actions.saveSettings(userId, data.settings))
+                store:dispatch(RoduxFeatures.actions.initializeUserStats(userId, data.stats or {}))
             end
         end
 
@@ -60,29 +78,25 @@ function GameDataStoreService:OnStart()
 
     Players.PlayerRemoving:Connect(function(player)
         local userId = player.UserId
-        local playerSettingsState = self._playerSettingsState[userId]
         local state = store:getState()
-        local isLoaded = self._isLoaded[userId]
+        local shouldUpdate = self:_shouldUpdate(userId)
 
         self._isLoaded[userId] = nil
         self._playerSettingsState[userId] = nil
+        self._playerStatsState[userId] = nil
 
-        -- If player leaves before data is fetched, don't update.
-        -- If no change occurred in user's settings, don't update.
-        if
-            not isLoaded
-            or playerSettingsState == state.users.userSettings[userId]
-        then
+        if not shouldUpdate then
             warn("[GameDataStoreService]", "Not updating", player, "data")
             return
         end
 
         local ok, err = pcall(function()
             PlayerData:UpdateAsync(userId, function(data)
-                return Llama.Dictionary.mergeDeep(data or {}, {
-                    version = "0.0.1";
+                return updateSave({
+                    version = "0.0.2";
                     settings = state.users.userSettings[userId];
-                })
+                    stats = state.stats.serverStats[userId];
+                }, data)
             end)
         end)
 

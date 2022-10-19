@@ -136,8 +136,7 @@ local function saveSettings(userId, settings)
             settings = settings;
         };
         meta = {
-            serverRemote = {"SaveSettings", settings};
-            interestedUserIds = {userId};
+            serverInterested = true;
         }
     }
 end

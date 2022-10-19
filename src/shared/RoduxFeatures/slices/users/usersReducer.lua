@@ -5,7 +5,7 @@ local Llama = require(ReplicatedStorage.Packages.Llama)
 local Dictionary = Llama.Dictionary
 
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
-local RoduxUtils = require(script.Parent.Parent.RoduxUtils)
+local RoduxUtils = require(script.Parent.Parent.Parent.RoduxUtils)
 
 local defaultSettings = {}
 for key, value in GameEnum.Settings do
@@ -36,7 +36,7 @@ return Rodux.createReducer({
         })
     end;
 
-    rodux_serialize = function(state)
+    rodux_serialize = function(state, action)
         local serialized = {}
 
         serialized.banned = RoduxUtils.numberIndicesToString(state.banned)
@@ -44,6 +44,18 @@ return Rodux.createReducer({
         serialized.admins = RoduxUtils.numberIndicesToString(state.admins)
         serialized.referees = RoduxUtils.numberIndicesToString(state.referees)
         serialized.activeUsers = RoduxUtils.numberIndicesToString(state.activeUsers)
+
+        serialized.userSettings = {}
+        
+        for userId, userSettings in state.userSettings do
+            if userId == action.payload.userId then
+                serialized.userSettings[tostring(userId)] = userSettings
+            else
+                serialized.userSettings[tostring(userId)] = {
+                    weaponTheme = userSettings.weaponTheme;
+                }
+            end
+        end
 
         return serialized
     end;
@@ -56,6 +68,7 @@ return Rodux.createReducer({
         patch.admins = RoduxUtils.stringIndicesToNumber(serialized.admins)
         patch.referees = RoduxUtils.stringIndicesToNumber(serialized.referees)
         patch.activeUsers = RoduxUtils.stringIndicesToNumber(serialized.activeUsers)
+        patch.userSettings = RoduxUtils.stringIndicesToNumber(serialized.userSettings)
 
         return Dictionary.merge(state, patch)
     end;
