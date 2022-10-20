@@ -36,4 +36,15 @@ function gameActions.setMapInfo(mapInfo)
     }
 end
 
+function gameActions.playerDied(userId, killerId, cause)
+    return {
+        type = "game_playerDied";
+        payload = {
+            userId = userId;
+            killerId = killerId;
+            deathCause = cause;
+        }
+    }
+end
+
 return gameActions

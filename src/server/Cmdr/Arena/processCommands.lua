@@ -1,5 +1,5 @@
 return function(registry)
-    for _, command in registry:GetCommands() do
+    for _, command in registry.Commands do
         local args = command.Args
         if args == nil then
             continue

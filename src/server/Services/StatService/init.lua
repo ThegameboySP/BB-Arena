@@ -15,13 +15,13 @@ local StatService = {
 }
 
 function StatService:OnInit()
-    EventBus.playerDied:Connect(function(victim, killer)
+    EventBus.playerDied:Connect(function(victim, info)
         if victim.Team ~= Teams.Spectators then
-            self:IncrementStat(victim.UserId, "WOs", 1)
-
-            if killer and killer ~= victim then
-                self:IncrementStat(killer.UserId, "KOs", 1)
-            end
+            Root.Store:dispatch(actions.playerDied(
+                victim.UserId,
+                info.killer and info.killer.UserId,
+                info.cause
+            ))
         end
     end)
 end

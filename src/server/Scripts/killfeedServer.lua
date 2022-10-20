@@ -14,7 +14,7 @@ local function killfeedServer(root)
     local remote = root:getRemoteEvent("Killfeed")
     local componentManager = root:GetService("MapService").ClonerManager.Manager
 
-    EventBus.participantDied:Connect(function(participant, attacker, creatorValue)
+    EventBus.participantDied:Connect(function(participant, info)
         local character = participant.Character
         local flag = character:FindFirstChild("Flag")
         
@@ -23,14 +23,14 @@ local function killfeedServer(root)
             flagTeam = componentManager:GetComponent(flag, "CTF_Flag").State.Team
         end
         
-        local attackingCharacter = attacker and attacker.Character
+        local attackingCharacter = info.killer and info.killer.Character
         
         local data = {}
 
-        if attackingCharacter and CollectionService:HasTag(attacker, "ParticipatingPlayer") then
-            local weapon = creatorValue:GetAttribute("WeaponImageId")
+        if attackingCharacter and CollectionService:HasTag(info.killer, "ParticipatingPlayer") then
+            local weapon = info.weaponImageId
 
-            if attacker == participant then
+            if info.killer == participant then
                 data = {
                     Type = "SK",
                     Weapon = weapon,
@@ -38,9 +38,9 @@ local function killfeedServer(root)
             else
                 data = {
                     Type = "Kill",
-                    Killer = attacker,
+                    Killer = info.killer,
                     DeadPing = participant:GetNetworkPing() * 2,
-                    KillerPing = attacker:GetNetworkPing() * 2,
+                    KillerPing = info.killer:GetNetworkPing() * 2,
                     Distance = getDistance(character, attackingCharacter),
                     Weapon = weapon,
                 }
@@ -48,6 +48,7 @@ local function killfeedServer(root)
         else
             data = {
                 Type = "Died",
+                DeathCause = info.cause,
             }
         end
         

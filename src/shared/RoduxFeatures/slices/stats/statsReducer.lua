@@ -8,17 +8,18 @@ local RoduxUtils = require(script.Parent.Parent.Parent.RoduxUtils)
 local Dictionary = Llama.Dictionary
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
-local function add(tbl, key, amount)
-    local value = 0
-    if tbl then
-        value = tbl[key]
+local function addFromTable(source, delta)
+    local clone = table.clone(source)
+
+    for key, amount in delta do
+        if type(clone[key]) == "number" then
+            clone[key] = clone[key] + amount
+        else
+            clone[key] = amount
+        end
     end
 
-    if type(value) ~= "number" then
-        value = 0
-    end
-
-    return value + amount
+    return clone
 end
 
 local function calculateRank(kos)
@@ -96,6 +97,26 @@ for index, stat in registeredStatArray do
     defaultStats[stat.name] = stat.default
 end
 
+local DEFAULT_STAT_KEYS = {"alltimeStats", "serverStats", "visualStats"}
+
+local function increment(state, userId, keys, delta)
+    local patch = {}
+    for _, key in keys do
+        patch[key] = {
+            [userId] = addFromTable(state[key][userId], delta);
+        }
+    end
+
+    local final = Dictionary.mergeDeep(state, patch)
+    if delta.KOs and (table.find(keys, "serverStats") or table.find(keys, "alltimeStats")) then
+        return Dictionary.mergeDeep(final, {
+            ranks = {[userId] = calculateRank(final.alltimeStats[userId])};
+        })
+    end
+
+    return final
+end
+
 return RoduxUtils.createReducer({
     alltimeStats = {};
     serverStats = {};
@@ -158,29 +179,9 @@ return RoduxUtils.createReducer({
         })
     end;
     stats_increment = function(state, action)
-        local payload = action.payload
-
-        local rank
-        if payload.name == "KOs" then
-            rank = calculateRank(add(state.alltimeStats[payload.userId], "KOs", payload.amount))
-        end
-
-        local patch = {}
-        for _, key in {"alltimeStats", "serverStats", "visualStats"} do
-            patch[key] = {
-                [payload.userId] = {
-                    [payload.name] = add(state[key][payload.userId], payload.name, payload.amount);
-                };
-            }
-        end
-
-        return Dictionary.mergeDeep(
-            state,
-            patch,
-            rank and {
-                ranks = {[payload.userId] = rank};
-            }
-        )
+        return increment(state, action.payload.userId, DEFAULT_STAT_KEYS, {
+            [action.payload.name] = action.payload.amount;
+        })
     end;
     stats_resetUsers = function(state, action)
         local patch = {}
@@ -191,6 +192,28 @@ return RoduxUtils.createReducer({
         return Dictionary.mergeDeep(state, {
             visualStats = patch;
         })
+    end;
+    game_playerDied = function(state, action)
+        local payload = action.payload
+
+        local newState
+        if payload.deathCause == GameEnum.DeathCause.Admin then
+            newState = increment(state, payload.userId, {"visualStats"}, {
+                WOs = 1
+            })
+        else
+            newState = increment(state, payload.userId, DEFAULT_STAT_KEYS, {
+                WOs = 1
+            })
+        end
+
+        if payload.deathCause ~= GameEnum.DeathCause.Admin and payload.killerId and payload.userId ~= payload.killerId then
+            return increment(newState, payload.killerId, DEFAULT_STAT_KEYS, {
+                KOs = 1;
+            })
+        end
+
+        return newState
     end;
     game_gamemodeEnded = function(state, action)
         local gamemodeId = action.payload.gamemodeId
@@ -249,12 +272,15 @@ return RoduxUtils.createReducer({
             serverStats = {[action.payload.userId] = Llama.None};
             alltimeStats = {[action.payload.userId] = Llama.None};
             visualStats = {[action.payload.userId] = Llama.None};
+            ranks = {[action.payload.userId] = Llama.None};
         })
     end;
     users_joined = function(state, action)
         return Dictionary.mergeDeep(state, {
             serverStats = {[action.payload.userId] = defaultStats};
             visualStats = {[action.payload.userId] = defaultStats};
+            alltimeStats = {[action.payload.userId] = defaultStats};
+            ranks = {[action.payload.userId] = GameEnum.Ranks.F};
         })
     end;
 })

@@ -1,3 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+
 local RoduxFeatures = require(script.Parent.Parent.Parent)
 local reducer = RoduxFeatures.reducer
 local actions = RoduxFeatures.actions
@@ -43,5 +47,14 @@ return function()
         expect(state.stats.serverStats[1].KOs).to.equal(1)
         expect(state.stats.alltimeStats[1].KOs).to.equal(1)
         expect(type(state.stats.ranks[1])).to.equal("number")
+    end)
+
+    it("should only increment visual stats when the cause of death was admin commands", function()
+        local state = reducer(nil, actions.userJoined(1))
+        state = reducer(state, actions.playerDied(1, nil, GameEnum.DeathCause.Admin))
+
+        expect(state.stats.visualStats[1].WOs).to.equal(1)
+        expect(state.stats.serverStats[1].WOs).to.equal(0)
+        expect(state.stats.alltimeStats[1].WOs).to.equal(0)
     end)
 end

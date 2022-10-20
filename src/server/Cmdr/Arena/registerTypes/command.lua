@@ -5,7 +5,7 @@ return function (registry)
 		Transform = function (text)
             local commandNames = {}
 
-            for _, command in registry:GetCommands() do
+            for _, command in registry.Commands do
                 table.insert(commandNames, command.Name)
 
                 if command.Aliases then

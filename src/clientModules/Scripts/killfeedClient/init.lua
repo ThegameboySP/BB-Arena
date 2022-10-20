@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
 local RichText = require(ReplicatedStorage.Common.Utils.RichText)
+local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 
 local KillfeedGui = script.KillfeedGui
 
@@ -37,15 +38,15 @@ local DIED_DEFAULT = {
 }
 
 local DIED_SPECIAL = {
-	Void = {
+	[GameEnum.DeathCause.Void] = {
 		Color = Color3.new(0.0862745, 0.0862745, 0.0862745);
 		Message = "falling into the void"
 	};
-	Lava =  {
+	[GameEnum.DeathCause.Lava] =  {
 		Color = Color3.new(1, 0.25098, 0);
 		Message = "burning in lava"
 	};
-	Admin =  {
+	[GameEnum.DeathCause.Admin] =  {
 		Color = Color3.new(0.5, 0.5, 0.5);
 		Message = "admin commands"
 	};

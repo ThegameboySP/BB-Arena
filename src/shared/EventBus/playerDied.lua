@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Effects = require(ReplicatedStorage.Common.Utils.Effects)
+local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 
 return function(EventBus)
     local playerDied = EventBus.playerDied
@@ -45,7 +46,16 @@ return function(EventBus)
                         trackingPlayers[player]:Fire(creator)
                     end
 
-                    playerDied:Fire(player, creator, creatorValue)
+                    local deathCause = humanoid:GetAttribute("DeathCause")
+                    if not deathCause and not character:FindFirstChildWhichIsA("BasePart", true) then
+                        deathCause = GameEnum.DeathCause.Void
+                    end
+
+                    playerDied:Fire(player, {
+                        killer = creator;
+                        cause = deathCause;
+                        weaponImageId = creatorValue and creatorValue:GetAttribute("WeaponImageId");
+                    })
                 end
             end)
 

@@ -85,6 +85,26 @@ function Root:GetUserIdByName(name)
     return self._userIdsByName[name]
 end
 
+function Root:KillCharacter(character, cause)
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then
+        return
+    end
+
+    local player = Players:GetPlayerFromCharacter(character)
+    if player == nil then
+        return
+    end
+
+    -- Override dumb legacy hit info.
+    while humanoid:FindFirstChild("creator") do
+        humanoid:FindFirstChild("creator").Parent = nil
+    end
+
+    humanoid:SetAttribute("DeathCause", cause)
+    humanoid.Health = 0
+end
+
 function Root:RegisterServices(services)
     for name, service in pairs(services) do
         self:RegisterService(name, service)
