@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 local TextService = game:GetService("TextService")
 local Players = game:GetService("Players")
 
@@ -92,6 +93,26 @@ local function settingEntry(props, hooks)
 
     local theme = hooks.useContext(ThemeContext)
     local isPrompting, setIsPrompting = hooks.useState(false)
+    local keybindCallback, setKeybindCallback = hooks.useState(nil)
+
+    hooks.useEffect(function()
+        if keybindCallback then
+            local connection
+            connection = UserInputService.InputBegan:Connect(function(input, gp)
+                if gp then
+                    return
+                end
+
+                if input.KeyCode and input.KeyCode ~= Enum.KeyCode.Unknown then
+                    keybindCallback.callback(input.KeyCode)
+                end
+            end)
+
+            return function()
+                connection:Disconnect()
+            end
+        end
+    end)
     
     local prompt = nil
 
@@ -173,6 +194,28 @@ local function settingEntry(props, hooks)
             onPressed = function()
                 props.onPrompt(true)
                 setIsPrompting(true)
+            end;
+        })
+    elseif setting.type == "keybind" then
+        control = e(button, {
+            position = UDim2.new(1, -10, 0.5, 0);
+            anchor = Vector2.new(1, 0.5);
+            text =
+                if keybindCallback and keybindCallback.name == setting.name
+                then "Waiting for input..."
+                else string.format("Press for keybind...\n%q", tostring(setting.value));
+            color = theme.background;
+            textColor = theme.text;
+            textSize = 20;
+
+            onPressed = function()
+                setKeybindCallback({
+                    name = setting.name;
+                    callback = function(keycode)
+                        setKeybindCallback(nil)
+                        props.onSettingChanged(setting.id, keycode.Name)
+                    end;
+                })
             end;
         })
     end

@@ -3,6 +3,25 @@ local ForcefieldThemes = require(script.Parent.ForcefieldThemes)
 
 local array = {
     {
+        key = "bombJumpKeybind";
+        group = "input";
+
+        default = "F";
+        type = "keybind";
+        name = "Bomb jump keybind";
+        description = "Disabled for mobile.";
+    },
+    {
+        key = "bombJumpDefault";
+        group = "input";
+
+        default = false;
+        type = "boolean";
+        name = "Bomb jump combo";
+        description = "Whether the stopping, spawning a bomb, and jumping combo results in a bomb jump. This setting is always enabled for mobile.";
+        invalidates = {"bombJumpKeybind"};
+    },
+    {
         key = "lighting";
         group = "place";
 

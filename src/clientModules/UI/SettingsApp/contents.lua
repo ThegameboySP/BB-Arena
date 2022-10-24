@@ -29,10 +29,16 @@ local function contents(props, hooks)
         local con = props.selectEvent:Connect(function(getCategory)
             local index = table.find(props.categories, getCategory())
 
-            local children = self.listRef:getValue().Parent:GetChildren()
+            local categories = {}
+            for _, child in self.listRef:getValue().Parent:GetChildren() do
+                if child:IsA("Frame") then
+                    categories[string.byte(child.Name)] = child
+                end
+            end
+
             local y = 0
-            for i=1, index-1 do
-                local child = children[i]
+            for i = 1, index-1 do
+                local child = categories[i]
                 y += child.AbsoluteSize.Y
             end
 
@@ -116,12 +122,17 @@ local function contents(props, hooks)
         [Roact.Change.CanvasPosition] = function()
             local currentY = self.listRef:getValue().Parent.Parent.CanvasPosition.Y
 
-            local y = -1
-            for _, child in pairs(self.listRef:getValue().Parent:GetChildren()) do
-                if not child:IsA("GuiObject") then
+            local categories = {}
+            for _, child in self.listRef:getValue().Parent:GetChildren() do
+                if not child:IsA("Frame") then
                     continue
                 end
 
+                categories[string.byte(child.Name)] = child
+            end
+
+            local y = -1
+            for _, child in categories do
                 y += child.AbsoluteSize.Y
 
                 if

@@ -24,11 +24,13 @@ local typeMap = {
     boolean = "switch";
     range = "range";
     enum = "enum";
+    keybind = "keybind";
 }
 
 local groupMap = {
     place = "Place Settings";
     tool = "Tool Settings";
+    input = "Input";
 }
 
 SettingsApp = RoactRodux.connect(
@@ -65,6 +67,10 @@ SettingsApp = RoactRodux.connect(
         return Llama.Dictionary.merge(props, {
             settingRecords = settingRecords;
             settingCategories = {
+                {
+                    name = "Input";
+                    imageId = "http://www.roblox.com/asset/?id=4893250303";
+                },
                 {
                     name = "Place Settings";
                     imageId = "http://www.roblox.com/asset/?id=1317886354";

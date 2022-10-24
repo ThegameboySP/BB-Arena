@@ -22,6 +22,8 @@ local function mapType(setting)
 		end
 
 		return CmdrUtils.enum(setting.name, array)
+	elseif setting.type == "keybind" then
+		return "userInput"
 	end
 
 	return setting.type
@@ -61,6 +63,11 @@ return {
 		local store = context:GetStore("Common").Store
 
 		local id = getId(settingName)
+
+		if GameEnum.Settings[id].type == "keybind" then
+			value = value.Name
+		end
+		
 		store:dispatch(RoduxFeatures.actions.saveSettings(context.Executor.UserId, {[id] = value}))
 	end;
 }
