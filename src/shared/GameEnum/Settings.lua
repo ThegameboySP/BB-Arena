@@ -93,7 +93,7 @@ local array = {
         key = "practiceWeaponDisplay";
         group = "tool";
 
-        default = true;
+        default = false;
         type = "boolean";
         name = "Practice superball visualization";
         description = "Whether the superball's trajectory is shown before firing while under the Practice team";

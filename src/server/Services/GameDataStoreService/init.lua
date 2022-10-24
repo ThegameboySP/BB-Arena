@@ -9,6 +9,7 @@ local Signal = require(ReplicatedStorage.Packages.Signal)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local Root = require(ReplicatedStorage.Common.Root)
 
+local updaters = require(script.updaters)
 local updateSave = require(script.updateSave)
 
 local GameDataStoreService = {
@@ -58,11 +59,26 @@ function GameDataStoreService:OnStart()
             self._playerSettingsState[userId] = state.users.userSettings[userId]
             self._playerStatsState[userId] = state.stats.serverStats[userId]
 
-            -- Dispatch individual actions instead of one for data successfully fetched.
-            -- You can enforce replication rules and there's less redundancy.
             if returned then
+                local index
+                for i, updater in updaters do
+                    if updater.onVersion == returned.version then
+                        index = i
+                        break
+                    end
+                end
+
+                if index then
+                    for i = index, #updaters do
+                        local updater = updaters[i]
+                        returned = updater.step(returned)
+                    end
+                end
+
+                -- Dispatch individual actions instead of one for data successfully fetched.
+                -- You can enforce replication rules and there's less redundancy.
                 store:dispatch(RoduxFeatures.actions.saveSettings(userId, returned.settings))
-                store:dispatch(RoduxFeatures.actions.initializeUserStats(userId, returned.stats or {}))
+                store:dispatch(RoduxFeatures.actions.initializeUserStats(userId, returned.stats))
             end
         end
 
@@ -95,7 +111,7 @@ function GameDataStoreService:OnStart()
         local ok, err = pcall(function()
             PlayerData:UpdateAsync(userId, function(data)
                 return updateSave({
-                    version = "0.0.2";
+                    version = "0.0.3";
                     settings = state.users.userSettings[userId];
                     stats = state.stats.serverStats[userId];
                 }, data)
