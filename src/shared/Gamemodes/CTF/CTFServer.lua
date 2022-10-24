@@ -1,5 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 local Components = require(ReplicatedStorage.Common.Components)
 local RichText = require(ReplicatedStorage.Common.Utils.RichText)
@@ -7,6 +9,9 @@ local RichText = require(ReplicatedStorage.Common.Utils.RichText)
 local CTFServer = {}
 CTFServer.__index = CTFServer
 CTFServer.UpdateEvent = RunService.Heartbeat
+
+local trowelOverlapParams = OverlapParams.new()
+trowelOverlapParams.FilterType = Enum.RaycastFilterType.Whitelist
 
 function CTFServer.new(service, binder)
     return setmetatable({
@@ -131,6 +136,16 @@ function CTFServer:OnInit(config, teams)
     end
 
     local updateConnection = self.UpdateEvent:Connect(function()
+        -- Prevent players from troweling the flag to prevent capture.
+        for _, flag in flags do
+            trowelOverlapParams.FilterDescendantsInstances = CollectionService:GetTagged("TrowelWallBrick")
+            if flag.State.State == "Docked" then
+                for _, part in Workspace:GetPartBoundsInRadius(flag.Instance.Position, 3, trowelOverlapParams) do
+                    part.Parent = nil
+                end
+            end
+        end
+
         for _, flag in flags do
             flagPositions[flag] = flag.Instance.Position
         end
