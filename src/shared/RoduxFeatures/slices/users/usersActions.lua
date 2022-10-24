@@ -6,7 +6,9 @@ local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local usersSelectors = require(script.Parent.usersSelectors)
 local getAdmin = usersSelectors.getAdmin
 
-local function setAdmin(userId, admin, byUser)
+local actions = {}
+
+function actions.setAdmin(userId, admin, byUser)
     return function(store)
         local state = store:getState()
         
@@ -25,7 +27,7 @@ local function setAdmin(userId, admin, byUser)
     end
 end
 
-local function setReferee(userId, isReferee, byUser)
+function actions.setReferee(userId, isReferee, byUser)
     return function(store)
         local state = store:getState()
         
@@ -44,7 +46,7 @@ local function setReferee(userId, isReferee, byUser)
     end
 end
 
-local function setUserWhitelisted(userId, isWhitelisted, byUser)
+function actions.setUserWhitelisted(userId, isWhitelisted, byUser)
     return function(store)
         local state = store:getState()
         local whitelistedBy = state.users.whitelisted[userId]
@@ -62,7 +64,7 @@ local function setUserWhitelisted(userId, isWhitelisted, byUser)
     end
 end
 
-local function setServerLocked(isLocked, lockingUserId)
+function actions.setServerLocked(isLocked, lockingUserId)
     return function(store)
         local state = store:getState()
 
@@ -80,14 +82,14 @@ local function setServerLocked(isLocked, lockingUserId)
 
             if isLocked then
                 for userId in pairs(state.users.activeUsers) do
-                    store:dispatch(setUserWhitelisted(userId, true, lockingUserId))
+                    store:dispatch(actions.setUserWhitelisted(userId, true, lockingUserId))
                 end
             end
         end
     end
 end
 
-local function setUserBanned(userId, isBanned, byUser)
+function actions.setUserBanned(userId, isBanned, byUser)
     return function(store)
         local state = store:getState()
         local bannedBy = state.users.banned[userId]
@@ -110,7 +112,7 @@ local function setUserBanned(userId, isBanned, byUser)
     end
 end
 
-local function userJoined(userId)
+function actions.userJoined(userId)
     return {
         type = "users_joined";
         payload = {
@@ -119,7 +121,7 @@ local function userJoined(userId)
     }
 end
 
-local function userLeft(userId)
+function actions.userLeft(userId)
     return {
         type = "users_left";
         payload = {
@@ -128,7 +130,19 @@ local function userLeft(userId)
     }
 end
 
-local function saveSettings(userId, settings)
+function actions.datastoreFetchFailed(userId)
+    return {
+        type = "users_datastoreFetchFailed";
+        payload = {
+            userId = userId;
+        };
+        meta = {
+            interestedUserIds = {userId};
+        }
+    }
+end
+
+function actions.saveSettings(userId, settings)
     return {
         type = "users_saveSettings";
         payload = {
@@ -141,7 +155,7 @@ local function saveSettings(userId, settings)
     }
 end
 
-local function setLocalSetting(id, value)
+function actions.setLocalSetting(id, value)
     return {
         type = "users_setLocalSetting";
         payload = {
@@ -154,11 +168,11 @@ local function setLocalSetting(id, value)
     }
 end
 
-local function flushSaveSettings()
+function actions.flushSaveSettings()
     return function(store)
         local state = store:getState()
 
-        store:dispatch(saveSettings(Players.LocalPlayer and Players.LocalPlayer.UserId or 0, state.users.locallyEditedSettings))
+        store:dispatch(actions.saveSettings(Players.LocalPlayer and Players.LocalPlayer.UserId or 0, state.users.locallyEditedSettings))
 
         store:dispatch({
             type = "users_flushSaveSettings";
@@ -170,7 +184,7 @@ local function flushSaveSettings()
     end
 end
 
-local function cancelLocalSettings()
+function actions.cancelLocalSettings()
     return {
         type = "users_cancelLocalSettings";
         payload = {};
@@ -180,7 +194,7 @@ local function cancelLocalSettings()
     }
 end
 
-local function cancelLocalSetting(id)
+function actions.cancelLocalSetting(id)
     return {
         type = "users_cancelLocalSetting";
         payload = {
@@ -192,7 +206,7 @@ local function cancelLocalSetting(id)
     }
 end;
 
-local function restoreDefaultSettings()
+function actions.restoreDefaultSettings()
     return {
         type = "users_restoreDefaultSettings";
         payload = {};
@@ -202,19 +216,4 @@ local function restoreDefaultSettings()
     }
 end
 
-return {
-    setAdmin = setAdmin;
-    setReferee = setReferee;
-    setServerLocked = setServerLocked;
-    setUserBanned = setUserBanned;
-    setUserWhitelisted = setUserWhitelisted;
-    userJoined = userJoined;
-    userLeft = userLeft;
-    
-    saveSettings = saveSettings;
-    setLocalSetting = setLocalSetting;
-    flushSaveSettings = flushSaveSettings;
-    cancelLocalSettings = cancelLocalSettings;
-    cancelLocalSetting = cancelLocalSetting;
-    restoreDefaultSettings = restoreDefaultSettings;
-}
+return actions

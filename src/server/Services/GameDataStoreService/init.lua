@@ -40,27 +40,29 @@ function GameDataStoreService:OnStart()
     local function onPlayerAdded(player)
         local userId = player.UserId
 
-        local data
-        local ok, err = pcall(function()
-            data = PlayerData:GetAsync(userId)
-        end)
+        local promise = Promise.new(function(resolve)
+            resolve(PlayerData:GetAsync(userId))
+        end):timeout(10)
 
-        if not ok then
-            warn("[GameDataStoreService]", "Failed to fetch player data:", err)
+        local status, returned = promise:awaitStatus()
+
+        if status == Promise.Status.Rejected then
+            warn("[GameDataStoreService]", "Failed to fetch player data:", returned)
+            store:dispatch(RoduxFeatures.actions.datastoreFetchFailed(userId))
         end
 
         local isConnected = player:IsDescendantOf(game)
 
-        if isConnected then
+        if isConnected and status == Promise.Status.Resolved then
             local state = store:getState()
             self._playerSettingsState[userId] = state.users.userSettings[userId]
             self._playerStatsState[userId] = state.stats.serverStats[userId]
 
             -- Dispatch individual actions instead of one for data successfully fetched.
             -- You can enforce replication rules and there's less redundancy.
-            if data then
-                store:dispatch(RoduxFeatures.actions.saveSettings(userId, data.settings))
-                store:dispatch(RoduxFeatures.actions.initializeUserStats(userId, data.stats or {}))
+            if returned then
+                store:dispatch(RoduxFeatures.actions.saveSettings(userId, returned.settings))
+                store:dispatch(RoduxFeatures.actions.initializeUserStats(userId, returned.stats or {}))
             end
         end
 

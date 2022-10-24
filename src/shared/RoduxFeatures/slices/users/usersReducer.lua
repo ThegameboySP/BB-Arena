@@ -20,6 +20,8 @@ return Rodux.createReducer({
     referees = {};
     activeUsers = {};
 
+    usersFailedDatastore = {};
+
     userSettings = {};
     locallyEditedSettings = {};
 }, {
@@ -33,6 +35,12 @@ return Rodux.createReducer({
     users_left = function(state, action)
         return Dictionary.mergeDeep(state, {
             activeUsers = {[action.payload.userId] = Llama.None};
+            usersFailedDatastore = {[action.payload.userId] = Llama.None};
+        })
+    end;
+    users_datastoreFetchFailed = function(state, action)
+        return Dictionary.mergeDeep(state, {
+            usersFailedDatastore = {[action.payload.userId] = true};
         })
     end;
 
