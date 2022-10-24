@@ -7,11 +7,6 @@ local Dictionary = Llama.Dictionary
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local RoduxUtils = require(script.Parent.Parent.Parent.RoduxUtils)
 
-local defaultSettings = {}
-for key, value in GameEnum.Settings do
-    defaultSettings[key] = value.default
-end
-
 return Rodux.createReducer({
     serverLockedBy = nil;
     banned = {};
@@ -29,12 +24,13 @@ return Rodux.createReducer({
     users_joined = function(state, action)
         return Dictionary.mergeDeep(state, {
             activeUsers = {[action.payload.userId] = true};
-            userSettings = {[action.payload.userId] = defaultSettings};
+            userSettings = {[action.payload.userId] = {}};
         })
     end;
     users_left = function(state, action)
         return Dictionary.mergeDeep(state, {
             activeUsers = {[action.payload.userId] = Llama.None};
+            userSettings = {[action.payload.userId] = Llama.None};
             usersFailedDatastore = {[action.payload.userId] = Llama.None};
         })
     end;
@@ -85,8 +81,17 @@ return Rodux.createReducer({
     users_saveSettings = function(state, action)
         local payload = action.payload
 
+        local toSave = {}
+        for id, value in payload.settings do
+            if type(value) == "table" and value.default then
+                toSave[id] = Llama.None
+            else
+                toSave[id] = value
+            end
+        end
+
         return Dictionary.mergeDeep(state, {
-            userSettings = {[payload.userId] = payload.settings};
+            userSettings = {[payload.userId] = toSave};
         })
     end;
     users_setLocalSetting = function(state, action)
@@ -110,9 +115,10 @@ return Rodux.createReducer({
         })
     end;
     users_restoreDefaultSettings = function(state)
+        local default = {default = true}
         local defaultsById = {}
-        for id, setting in GameEnum.Settings do
-            defaultsById[id] = setting.default
+        for id in GameEnum.Settings do
+            defaultsById[id] = default
         end
 
         return Dictionary.mergeDeep(state, {

@@ -52,9 +52,13 @@ local function getSavedSetting(state, userId, settingId)
 end
 
 local function getLocalSetting(state, settingId)
-    local overriddedSetting = state.users.locallyEditedSettings[settingId]
-    if overriddedSetting ~= nil then
-        return overriddedSetting
+    local value = state.users.locallyEditedSettings[settingId]
+    if value ~= nil then
+        if type(value) == "table" and value.default then
+            return GameEnum.Settings[settingId].default
+        else
+            return value
+        end
     end
 
     return getSavedSetting(state, LocalPlayer and LocalPlayer.UserId or 0, settingId)

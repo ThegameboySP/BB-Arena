@@ -5,6 +5,7 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local getSavedSetting = RoduxFeatures.selectors.getSavedSetting
 local getLocalSetting = RoduxFeatures.selectors.getLocalSetting
 
 local LocalPlayer = Players.LocalPlayer
@@ -76,7 +77,7 @@ local function respectSettings(root)
                 local player = Players:GetPlayerByUserId(userId)
                 
                 if player and player ~= LocalPlayer then
-                    Players:GetPlayerByUserId(userId):WaitForChild("Theme").Value = settings.weaponTheme
+                    Players:GetPlayerByUserId(userId):WaitForChild("Theme").Value = getSavedSetting(new, userId, "weaponTheme")
                 end
             end
         end
