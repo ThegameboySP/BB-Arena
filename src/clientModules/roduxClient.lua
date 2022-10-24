@@ -1,9 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
+local IsDebug = RunService:IsStudio() and ReplicatedStorage:FindFirstChild("Configuration"):GetAttribute("IsDebug")
 local LocalPlayer = Players.LocalPlayer
 
 local function deserializeAction(serialized, actionType, state)
@@ -57,7 +59,7 @@ local function roduxClient(root)
         root.Store = Rodux.Store.new(
             RoduxFeatures.reducer,
             deserialized,
-            { Rodux.thunkMiddleware, makeClientMiddleware(requestRemote, root) }
+            { Rodux.thunkMiddleware, makeClientMiddleware(requestRemote, root), IsDebug and RoduxFeatures.middlewares.loggerMiddleware or nil }
         )
     end)
 

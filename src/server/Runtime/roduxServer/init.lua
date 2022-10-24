@@ -1,6 +1,9 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+
+local IsDebug = RunService:IsStudio() and ReplicatedStorage:FindFirstChild("Configuration"):GetAttribute("IsDebug")
 
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 local t = require(ReplicatedStorage.Packages.t)
@@ -116,7 +119,7 @@ local function roduxServer(root)
     root.Store = Rodux.Store.new(
         RoduxFeatures.reducer,
         nil,
-        { Rodux.thunkMiddleware, makeServerMiddleware(actionDispatchedRemote, root) }
+        { Rodux.thunkMiddleware, makeServerMiddleware(actionDispatchedRemote, root), IsDebug and RoduxFeatures.middlewares.loggerMiddleware or nil }
     )
 
     root.Store:dispatch(actions.merge(initState()))
