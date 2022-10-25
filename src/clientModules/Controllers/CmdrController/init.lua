@@ -68,7 +68,7 @@ function CmdrController:OnStart()
 	CmdrClient.Registry:RegisterHook("BeforeRun", function() end)
 	
 	for _, eventModule in Events:GetChildren() do
-		CmdrClient:HandleEvent(eventModule.Name, require(eventModule))
+		require(eventModule)(CmdrClient)
 	end
 	
 	LOCAL_PLAYER.Chatted:Connect(function(message)

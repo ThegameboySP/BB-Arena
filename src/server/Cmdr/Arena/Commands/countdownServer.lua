@@ -1,7 +1,12 @@
 local Players = game:GetService("Players")
 
 return function (context, seconds)
-    task.spawn(function()
+    local store = context:GetStore("Countdown")
+    if store.coroutine then
+        coroutine.close(store.coroutine)
+    end
+
+    store.coroutine = task.spawn(function()
         for i = seconds, 0, -1 do
             for _, player in Players:GetPlayers() do
                 if i > 0 then

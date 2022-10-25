@@ -9,7 +9,7 @@ return function (context, text)
 	
 	local filterResult = TextService:FilterStringAsync(text, context.Executor.UserId, Enum.TextFilterContext.PublicChat)
 	local function onPlayerAdded(player)
-		context:SendEvent(player, "Objective", filterResult:GetChatForUserAsync(player.UserId), context.Executor)
+		player:SetAttribute("Objective", filterResult:GetChatForUserAsync(player.UserId))
 	end
 	
 	for _, player in Players:GetPlayers() do
