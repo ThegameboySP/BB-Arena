@@ -3,6 +3,15 @@ local ForcefieldThemes = require(script.Parent.ForcefieldThemes)
 
 local array = {
     {
+        key = "showToolHints";
+        group = "input";
+
+        default = true;
+        type = "boolean";
+        name = "Show tool hints";
+        description = "Whether to show hints for equipped tools.";
+    },
+    {
         key = "bombJumpKeybind";
         group = "input";
 

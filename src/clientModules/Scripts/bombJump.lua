@@ -6,6 +6,7 @@ local RunService = game:GetService("RunService")
 local Effects = require(ReplicatedStorage.Common.Utils.Effects)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local getSavedSetting = RoduxFeatures.selectors.getSavedSetting
+local getLocalSetting = RoduxFeatures.selectors.getLocalSetting
 
 local LocalPlayer = Players.LocalPlayer
 local UserId = LocalPlayer.UserId
@@ -50,12 +51,15 @@ local function bombJump(root)
     }))
 
     local keybindName
+    local showToolHints = false
+
     local undo
     local function onUpdate(new, old)
         if
             old == nil
             or getSavedSetting(new, UserId, "bombJumpKeybind") ~= getSavedSetting(old, UserId, "bombJumpKeybind")
             or getSavedSetting(new, UserId, "bombJumpDefault") ~= getSavedSetting(old, UserId, "bombJumpDefault")
+            or getLocalSetting(new, "showToolHints") ~= getLocalSetting(old, "showToolHints")
         then
             if undo then
                 undo()
@@ -82,6 +86,8 @@ local function bombJump(root)
                     end
                 end
             end
+
+            showToolHints = getLocalSetting(new, "showToolHints")
         end
     end
 
@@ -106,7 +112,7 @@ local function bombJump(root)
 
     RunService.Heartbeat:Connect(function()
         if equippingTool then
-            if _G.BB.TrueMobile then
+            if _G.BB.TrueMobile or not showToolHints then
                 textLabel.Text = ""
             elseif equippingTool.canBombJump then
                 if keybindName then
