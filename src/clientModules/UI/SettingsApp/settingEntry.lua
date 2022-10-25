@@ -13,6 +13,7 @@ local rangeSlider = require(script.Parent.Parent.Presentational.rangeSlider)
 local list = require(script.Parent.Parent.Presentational.list)
 local button = require(script.Parent.Parent.Presentational.button)
 local window = require(script.Parent.Parent.Presentational.window)
+local textBox = require(script.Parent.Parent.Presentational.textBox)
 
 local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
@@ -85,11 +86,20 @@ end
 
 modal = RoactHooks.new(Roact)(modal)
 
+local function getDescriptionSize(type)
+    if type == "image" then
+        return Vector2.new(600, 1000)
+    else
+        return Vector2.new(682, 1000)
+    end
+end
+
 local function settingEntry(props, hooks)
     local setting = props.setting
     -- The font size shrinks slower than its surrounding text label. Adding an extra line is easy.
-    local descriptionBounds = TextService:GetTextSize(setting.description .. "\n", DESCRIPTION_TEXT_SIZE, Enum.Font.Gotham, Vector2.new(682, 1000))
-    descriptionBounds = Vector2.new(682, descriptionBounds.Y)
+    local descriptionSize = getDescriptionSize(props.setting.type)
+    local descriptionBounds = TextService:GetTextSize(setting.description .. "\n", DESCRIPTION_TEXT_SIZE, Enum.Font.Gotham, descriptionSize)
+    descriptionBounds = Vector2.new(descriptionSize.X, descriptionBounds.Y)
 
     local theme = hooks.useContext(ThemeContext)
     local isPrompting, setIsPrompting = hooks.useState(false)
@@ -229,6 +239,33 @@ local function settingEntry(props, hooks)
                     end;
                 })
             end;
+        })
+    elseif setting.type == "image" then
+        control = Roact.createFragment({
+            e(textBox, {
+                inactive = not setting.valid;
+                position = UDim2.new(1, -10, 0.5, 0);
+                anchor = Vector2.new(1, 0.5);
+                text = setting.value;
+                color = theme.background;
+                textColor = theme.text;
+                textSize = 20;
+    
+                canScroll = false;
+                maxScreenSpace = Vector2.new(140, 24);
+    
+                onTyped = function(text)
+                    props.onSettingChanged(setting.id, text)
+                end;
+            }),
+            e("ImageLabel", {
+                Position = UDim2.new(1, -160, 0.5, 0);
+                AnchorPoint = Vector2.new(1, 0.5);
+                Size = UDim2.fromOffset(85, 85);
+
+                BackgroundTransparency = 1;
+                Image = "rbxassetid://" .. setting.value;
+            })
         })
     end
 

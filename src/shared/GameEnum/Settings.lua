@@ -38,6 +38,30 @@ local array = {
         };
     },
     {
+        key = "weaponCrosshairId";
+        group = "input";
+
+        default = "507449825";
+        type = "contentImage";
+        name = "Weapon crosshair ID";
+        description = "The ID of your weapons' crosshair";
+        mobile = {
+            valid = false;
+        };
+    },
+    {
+        key = "weaponCrosshairReloadingId";
+        group = "input";
+
+        default = "507449806";
+        type = "contentImage";
+        name = "Weapon reloading crosshair ID";
+        description = "The ID of your weapons' reloading crosshair";
+        mobile = {
+            valid = false;
+        };
+    },
+    {
         key = "lighting";
         group = "place";
 

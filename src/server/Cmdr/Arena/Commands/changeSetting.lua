@@ -24,6 +24,8 @@ local function mapType(setting)
 		return CmdrUtils.enum(setting.name, array)
 	elseif setting.type == "keybind" then
 		return "userInput"
+	elseif setting.type == "contentImage" then
+		return "string"
 	end
 
 	return setting.type

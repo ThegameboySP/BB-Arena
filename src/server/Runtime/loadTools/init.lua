@@ -12,6 +12,7 @@ local settings = {
 	RocketRiding = false,
 	RocketsExplodeSBs = true, -- WIP
 	TagLifetime = 10,
+	NativeCrosshair = false,
 	
 	-- TEAM SETTINGS --
 	SpectatorTeamActive = true,   -- Spectators can't take or deal dmg.
@@ -93,7 +94,6 @@ local settings = {
 		Themes = true;
 		ThemesHighGraphics = true;
 	},
-
 }
 
 local function loadTools()

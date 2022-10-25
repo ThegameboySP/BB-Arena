@@ -26,6 +26,7 @@ local typeMap = {
     range = "range";
     enum = "enum";
     keybind = "keybind";
+    contentImage = "image";
 }
 
 local groupMap = {
