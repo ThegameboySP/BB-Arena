@@ -32,11 +32,11 @@ local function capDelta(maxSize, pos, size, anchorPoint, delta)
     local anchorDelta = Vector2.new(0.5, 0.5) - anchorPoint
     pos += size * anchorDelta
 
-    if (pos - size/2).X < 0 then
-        pos = Vector2.new(pos.X + (size.X/2 - pos.X), pos.Y)
+    if (pos - size/2).X < (-size.X * 0.5) then
+        pos = Vector2.new(pos.X + (size.X/2 - pos.X) - size.X * 0.5, pos.Y)
     
-    elseif (pos + size/2).X > maxSize.X then
-        pos = Vector2.new(pos.X - ((pos.X + size.X/2) - maxSize.X), pos.Y)
+    elseif (pos + size/2).X > (maxSize.X + size.X * 0.5) then
+        pos = Vector2.new((pos.X - ((pos.X + size.X/2) - maxSize.X) + size.X * 0.5), pos.Y)
     end
 
     if (pos - size/2).Y < 0 then
