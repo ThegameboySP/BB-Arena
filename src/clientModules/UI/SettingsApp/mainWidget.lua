@@ -68,7 +68,7 @@ local function mainWidget(props, hooks)
 			ContentsContainer = e("ImageLabel", {
 				BackgroundTransparency = 1;
 				Position = UDim2.new(0, 100 + SIDE_BAR_LENGTH, 0, 20);
-				Size = UDim2.new(1, -100 - SIDE_BAR_LENGTH, 1, -100);
+				Size = UDim2.new(1, -100 - SIDE_BAR_LENGTH, 1, -88);
 
 				Image = "rbxassetid://rbxassetid://10848356902";
 			}, {

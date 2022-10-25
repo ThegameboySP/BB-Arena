@@ -260,6 +260,8 @@ local function settingEntry(props, hooks)
             TextColor3 = theme.highContrast;
             Visible = setting.isChanged;
 
+            ZIndex = 2;
+
             [Roact.Event.MouseButton1Down] = function()
                 props.onSettingCanceled(setting.id)
             end;
