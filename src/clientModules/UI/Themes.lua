@@ -25,11 +25,11 @@ local Themes = {
     });
     Blue = darkmode({
         accent = Color3.fromRGB(62, 149, 216);
-        button = Color3.fromRGB(2, 106, 185);
-        lessImportantButton = Color3.fromRGB(53, 128, 185);
+        button = Color3.fromRGB(62, 149, 216);
+        lessImportantButton = Color3.fromRGB(33, 35, 39);
     });
 }
 
-Themes.default = Themes.Purple
+Themes.default = Themes.Blue
 
 return Themes
