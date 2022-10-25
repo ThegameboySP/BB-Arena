@@ -22,7 +22,7 @@ local function percentSlider(props, hooks)
             props.onChanged(value * range + props.min)
         end;
     }), {
-        Range = e("TextBox", {
+        Range = e(props.inactive and "TextLabel" or "TextBox", {
             [Roact.Ref] = textboxRef;
 
             AutomaticSize = Enum.AutomaticSize.XY;
@@ -30,14 +30,14 @@ local function percentSlider(props, hooks)
             Position = UDim2.new(0.5, 0, 1, 35);
 
             BackgroundTransparency = 1;
-            TextColor3 = theme.title;
+            TextColor3 = if props.inactive then theme.title:Lerp(theme.inactive, 0.6) else theme.title;
             Font = Enum.Font.Gotham;
             TextSize = 28;
 
             RichText = true;
             Text = string.format([[<font size="18">%d%s —</font> %d%s <font size="18">— %d%s</font>]], props.min, sign, props.value, sign, props.max, sign);
 
-            [Roact.Event.FocusLost] = function(enterPressed)
+            [Roact.Event.FocusLost] = if props.inactive then nil else function(enterPressed)
                 if enterPressed then
                     local text = textboxRef:getValue().Text:match("(.+)$")
                     

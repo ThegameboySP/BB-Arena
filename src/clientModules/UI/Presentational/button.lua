@@ -4,11 +4,15 @@ local TextService = game:GetService("TextService")
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
 
+local ThemeContext = require(script.Parent.Parent.ThemeContext)
+
 local e = Roact.createElement
 
-local function button(props)
+local function button(props, hooks)
+	local theme = hooks.useContext(ThemeContext)
+
     local textBounds = TextService:GetTextSize(props.text, props.textSize, Enum.Font.Gotham, props.minSize or Vector2.new(math.huge, math.huge))
-	
+
 	local padding = props.padding or 20
     textBounds += Vector2.new(padding, padding)
 
@@ -19,7 +23,7 @@ local function button(props)
 		)
 	end
 
-	return e("ImageButton", {
+	return e(props.inactive and "ImageLabel" or "ImageButton", {
 		Size = UDim2.fromOffset(textBounds.X, textBounds.Y);
 		Position = props.position;
 		AnchorPoint = props.anchor;
@@ -30,10 +34,12 @@ local function button(props)
 		SliceScale = 0.5;
 
 		BackgroundTransparency = 1;
-		ImageColor3 = props.color;
+		ImageColor3 = if props.inactive then props.color:Lerp(theme.inactive, 0.6) else props.color;
 
-		[Roact.Event.MouseButton1Click] = function()
-			props.onPressed()
+		[Roact.Event.MouseButton1Click] = if props.inactive then nil else function()
+			if not props.inactive then
+				props.onPressed()
+			end
 		end;
 	}, {
         TextLabel = e("TextLabel", {
@@ -41,7 +47,7 @@ local function button(props)
             Size = UDim2.fromScale(1, 1);
             BackgroundTransparency = 1;
 
-            TextColor3 = props.textColor;
+            TextColor3 = if props.inactive then props.textColor:Lerp(theme.inactive, 0.6) else props.textColor;
             Text = props.text;
             TextSize = props.textSize;
         })

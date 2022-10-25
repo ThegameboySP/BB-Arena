@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactRodux = require(ReplicatedStorage.Packages.RoactRodux)
@@ -35,6 +36,7 @@ local groupMap = {
 
 SettingsApp = RoactRodux.connect(
     function(state, props)
+        local settingRecordsByGroup = {}
         local settingRecords = {}
 
         for id, setting in GameEnum.Settings do
@@ -42,11 +44,12 @@ SettingsApp = RoactRodux.connect(
             local savedValue = RoduxFeatures.selectors.getSavedSetting(state, nil, id)
 
             local group = groupMap[setting.group] or error("Unknown group: " .. tostring(setting.group))
-            if not settingRecords[group] then
-                settingRecords[group] = {}
+            if not settingRecordsByGroup[group] then
+                settingRecordsByGroup[group] = {}
             end
-            
-            table.insert(settingRecords[group], {
+
+            local record = {
+                valid = true;
                 name = setting.name;
                 type = typeMap[setting.type] or error("Unknown type: " .. tostring(setting.type));
                 payload = setting.payload;
@@ -55,17 +58,39 @@ SettingsApp = RoactRodux.connect(
                 id = id;
                 order = setting.order;
                 isChanged = value ~= savedValue;
-            })
+            }
+
+            if setting.mobile and UserInputService.TouchEnabled then
+                if setting.mobile.value ~= nil then
+                    record.value = setting.mobile.value
+                end
+
+                if setting.mobile.valid ~= nil then
+                    record.valid = setting.mobile.valid
+                end
+            end
+
+            table.insert(settingRecordsByGroup[group], record)
+            settingRecords[id] = record
         end
 
-        for _, records in settingRecords do
+        for id, setting in settingRecords do
+            if GameEnum.Settings[id].invalidates and setting.value == true then
+                
+                for _, invalidatesId in GameEnum.Settings[id].invalidates do
+                    settingRecords[invalidatesId].valid = false
+                end
+            end
+        end
+        
+        for _, records in settingRecordsByGroup do
             table.sort(records, function(a, b)
                 return a.order < b.order
             end)
         end
 
         return Llama.Dictionary.merge(props, {
-            settingRecords = settingRecords;
+            settingRecords = settingRecordsByGroup;
             settingCategories = {
                 {
                     name = "Input";

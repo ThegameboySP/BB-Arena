@@ -6,10 +6,13 @@ local array = {
         key = "bombJumpKeybind";
         group = "input";
 
-        default = "F";
+        default = "E";
         type = "keybind";
         name = "Bomb jump keybind";
         description = "Disabled for mobile.";
+        mobile = {
+            valid = false;
+        };
     },
     {
         key = "bombJumpDefault";
@@ -20,6 +23,10 @@ local array = {
         name = "Bomb jump combo";
         description = "Whether the stopping, spawning a bomb, and jumping combo results in a bomb jump. This setting is always enabled for mobile.";
         invalidates = {"bombJumpKeybind"};
+        mobile = {
+            valid = false;
+            value = true;
+        };
     },
     {
         key = "lighting";

@@ -97,14 +97,18 @@ local function settingEntry(props, hooks)
 
     hooks.useEffect(function()
         if keybindCallback then
-            local connection
-            connection = UserInputService.InputBegan:Connect(function(input, gp)
-                if gp then
-                    return
-                end
+            if not setting.valid then
+                keybindCallback.callback(nil)
+                return
+            end
 
+            local connection
+            connection = UserInputService.InputBegan:Connect(function(input)
                 if input.KeyCode and input.KeyCode ~= Enum.KeyCode.Unknown then
                     keybindCallback.callback(input.KeyCode)
+                    connection:Disconnect()
+                else
+                    keybindCallback.callback(nil)
                 end
             end)
 
@@ -153,6 +157,7 @@ local function settingEntry(props, hooks)
     local control
     if setting.type == "switch" then
         control = e(switch, {
+            inactive = not setting.valid;
             value = setting.value;
             anchor = Vector2.new(1, 0.5);
             position = UDim2.new(1, -10, 0.5, 0);
@@ -162,6 +167,7 @@ local function settingEntry(props, hooks)
         })
     elseif setting.type == "slider" then
         control = e(percentSlider, {
+            inactive = not setting.valid;
             value = setting.value;
             anchor = Vector2.new(1, 0.5);
             position = UDim2.new(1, -10, 0.5, 0);
@@ -171,6 +177,7 @@ local function settingEntry(props, hooks)
         })
     elseif setting.type == "range" then
         control = e(rangeSlider, {
+            inactive = not setting.valid;
             value = setting.value;
             min = setting.payload.min;
             max = setting.payload.max;
@@ -184,6 +191,7 @@ local function settingEntry(props, hooks)
         })
     elseif setting.type == "enum" then
         control = e(button, {
+            inactive = not setting.valid;
             position = UDim2.new(1, -10, 0.5, 0);
             anchor = Vector2.new(1, 0.5);
             text = string.format("Press for list...\n%q", tostring(setting.value));
@@ -198,6 +206,7 @@ local function settingEntry(props, hooks)
         })
     elseif setting.type == "keybind" then
         control = e(button, {
+            inactive = not setting.valid;
             position = UDim2.new(1, -10, 0.5, 0);
             anchor = Vector2.new(1, 0.5);
             text =
@@ -213,7 +222,10 @@ local function settingEntry(props, hooks)
                     name = setting.name;
                     callback = function(keycode)
                         setKeybindCallback(nil)
-                        props.onSettingChanged(setting.id, keycode.Name)
+
+                        if keycode then
+                            props.onSettingChanged(setting.id, keycode.Name)
+                        end
                     end;
                 })
             end;

@@ -49,15 +49,15 @@ local function slider(props, hooks)
 		SliceScale = 1;
 
         BackgroundTransparency = 1;
-        ImageColor3 = theme.accent;
+        ImageColor3 = if props.inactive then theme.accent:Lerp(theme.inactive, 0.6) else theme.accent;
     }, {
         Roact.createFragment(props[Roact.Children]),
 
-        Marker = e("ImageButton", {
-            [Roact.Event.MouseButton1Down] = function()
+        Marker = e(props.inactive and "ImageLabel" or "ImageButton", {
+            [Roact.Event.MouseButton1Down] = if props.inactive then nil else function()
                 self.held = true
             end;
-            [Roact.Event.InputEnded] = function(_, input)
+            [Roact.Event.InputEnded] = if props.inactive then nil else function(_, input)
                 if input.UserInputType ~= Enum.UserInputType.MouseButton1 then
                     return
                 end
@@ -75,7 +75,7 @@ local function slider(props, hooks)
             SliceScale = 1;
 
             BackgroundTransparency = 1;
-            ImageColor3 = theme.highContrast;
+            ImageColor3 = if props.inactive then theme.highContrast:Lerp(theme.inactive, 0.6) else theme.highContrast;
 
             ZIndex = 2;
         });

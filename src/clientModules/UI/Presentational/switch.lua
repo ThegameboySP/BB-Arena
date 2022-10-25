@@ -10,7 +10,7 @@ local ThemeContext = require(script.Parent.Parent.ThemeContext)
 local function switch(props, hooks)
 	local theme = hooks.useContext(ThemeContext)
 	
-	return e("ImageButton", {
+	return e(props.inactive and "ImageLabel" or "ImageButton", {
 		Size = UDim2.fromOffset(80, 30);
 		Position = props.position;
 		AnchorPoint = props.anchor;
@@ -21,10 +21,17 @@ local function switch(props, hooks)
 		SliceScale = 1;
 
 		BackgroundTransparency = 1;
-		ImageColor3 = props.value and theme.accent or theme.inactive;
+		ImageColor3 =
+			if props.inactive and props.value
+			then theme.accent:Lerp(theme.inactive, 0.6)
+			elseif not props.inactive and props.value
+			then theme.accent
+			else theme.inactive;
 
-		[Roact.Event.MouseButton1Click] = function()
-			props.onChanged()
+		[Roact.Event.MouseButton1Click] = if props.inactive then nil else function()
+			if not props.inactive then
+				props.onChanged()
+			end
 		end;
 	}, {
 		Circle = e("ImageLabel", {
@@ -38,7 +45,7 @@ local function switch(props, hooks)
 			SliceCenter = Rect.new(Vector2.new(15, 15), Vector2.new(15, 15));
 	
 			BackgroundTransparency = 1;
-			ImageColor3 = theme.highContrast;
+			ImageColor3 = if props.inactive then theme.highContrast:Lerp(theme.inactive, 0.6) else theme.highContrast;
 		})
 	})
 end
