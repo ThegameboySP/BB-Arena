@@ -1,3 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Sounds = ReplicatedStorage.Assets.Sounds
+
 local WeaponThemes = require(script.Parent.WeaponThemes)
 local ForcefieldThemes = require(script.Parent.ForcefieldThemes)
 
@@ -12,18 +16,6 @@ local array = {
         description = "Whether to show hints for equipped tools.";
     },
     {
-        key = "bombJumpKeybind";
-        group = "input";
-
-        default = "E";
-        type = "keybind";
-        name = "Bomb jump keybind";
-        description = "Disabled for mobile.";
-        mobile = {
-            valid = false;
-        };
-    },
-    {
         key = "bombJumpDefault";
         group = "input";
 
@@ -35,6 +27,18 @@ local array = {
         mobile = {
             valid = false;
             value = true;
+        };
+    },
+    {
+        key = "bombJumpKeybind";
+        group = "input";
+
+        default = "E";
+        type = "keybind";
+        name = "Bomb jump keybind";
+        description = "Disabled for mobile.";
+        mobile = {
+            valid = false;
         };
     },
     {
@@ -71,33 +75,6 @@ local array = {
         description = "The brightness of the game world";
     },
     {
-        key = "musicVolume";
-        group = "place";
-
-        default = 0.5;
-        type = "percentage";
-        name = "Music volume";
-        description = "The volume of the in-game music";
-    },
-    {
-        key = "mapVolume";
-        group = "place";
-
-        default = 0.5;
-        type = "percentage";
-        name = "Map volume";
-        description = [[The volume of the ambient sounds in maps. Includes "music" found in maps as well]];
-    },
-    {
-        key = "gamemodeVolume";
-        group = "place";
-
-        default = 0.5;
-        type = "percentage";
-        name = "Gamemode volume";
-        description = "The volume of gamemode sound effects";
-    },
-    {
         key = "fieldOfView";
         group = "place";
 
@@ -122,42 +99,6 @@ local array = {
         description = "The theme of forcefields. Only applies to your screen";
     },
     {
-        key = "weaponVolume";
-        group = "tool";
-
-        default = 0.5;
-        type = "percentage";
-        name = "Tools volume";
-        description = "The volume of the toolset. With this, you don't have to sacrifice your hearing to play!";
-    },
-    {
-        key = "trowelVisualization";
-        group = "tool";
-
-        default = true;
-        type = "boolean";
-        name = "Trowel visualization";
-        description = "Whether the position and orientation of your trowel is shown before firing. Press Q while equipping trowel to toggle";
-    },
-    {
-        key = "trowelBuildDisplay";
-        group = "tool";
-
-        default = true;
-        type = "boolean";
-        name = "Trowel build display";
-        description = "Whether a line is drawn between a trowel and the player who fired it";
-    },
-    {
-        key = "practiceWeaponDisplay";
-        group = "tool";
-
-        default = false;
-        type = "boolean";
-        name = "Practice superball visualization";
-        description = "Whether the superball's trajectory is shown before firing while under the Practice team";
-    },
-    {
         key = "weaponTheme";
         group = "tool";
 
@@ -177,6 +118,78 @@ local array = {
         type = "boolean";
         name = "Fancy tools themes";
         description = "Whether themes have extra decorations. This can be distracting. Only applies to your screen";
+    },
+    {
+        key = "neonWeapons";
+        group = "tool";
+
+        type = "boolean";
+        default = true;
+        name = "Neon tools";
+        description = "Whether all tools and projectiles should be neon. Only applies to your screen";
+    },
+    {
+        key = "trowelBuildDisplay";
+        group = "tool";
+
+        default = true;
+        type = "boolean";
+        name = "Trowel build display";
+        description = "Whether a line is drawn between a trowel and the player who fired it";
+    },
+    {
+        key = "trowelVisualization";
+        group = "tool";
+
+        default = true;
+        type = "boolean";
+        name = "Trowel visualization";
+        description = "Whether the position and orientation of your trowel is shown before firing. Press Q while equipping trowel to toggle";
+    },
+    {
+        key = "practiceWeaponDisplay";
+        group = "tool";
+
+        default = false;
+        type = "boolean";
+        name = "Practice superball visualization";
+        description = "Whether the superball's trajectory is shown before firing while under the Practice team";
+    },
+    {
+        key = "weaponVolume";
+        group = "sounds";
+
+        default = 0.5;
+        type = "percentage";
+        name = "Tools volume";
+        description = "The volume of the toolset. With this, you don't have to sacrifice your hearing to play!";
+    },
+    {
+        key = "musicVolume";
+        group = "sounds";
+
+        default = 0.5;
+        type = "percentage";
+        name = "Music volume";
+        description = "The volume of the in-game music";
+    },
+    {
+        key = "mapVolume";
+        group = "sounds";
+
+        default = 0.5;
+        type = "percentage";
+        name = "Map volume";
+        description = [[The volume of the ambient sounds in maps. Includes "music" found in maps as well]];
+    },
+    {
+        key = "gamemodeVolume";
+        group = "sounds";
+
+        default = 0.5;
+        type = "percentage";
+        name = "Gamemode volume";
+        description = "The volume of gamemode sound effects";
     },
     {
         key = "neonWeapons";

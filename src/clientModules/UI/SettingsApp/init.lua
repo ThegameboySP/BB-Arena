@@ -32,7 +32,8 @@ local typeMap = {
 local groupMap = {
     place = "Place Settings";
     tool = "Tool Settings";
-    input = "Input";
+    input = "Input Settings";
+    sounds = "Sound Settings";
 }
 
 SettingsApp = RoactRodux.connect(
@@ -94,16 +95,20 @@ SettingsApp = RoactRodux.connect(
             settingRecords = settingRecordsByGroup;
             settingCategories = {
                 {
-                    name = "Input";
+                    name = "Input Settings";
                     imageId = "http://www.roblox.com/asset/?id=4893250303";
+                },
+                {
+                    name = "Tool Settings";
+                    imageId = "http://www.roblox.com/asset/?id=491253460";
                 },
                 {
                     name = "Place Settings";
                     imageId = "http://www.roblox.com/asset/?id=1317886354";
                 },
                 {
-                    name = "Tool Settings";
-                    imageId = "http://www.roblox.com/asset/?id=491253460";
+                    name = "Sound Settings";
+                    imageId = "http://www.roblox.com/asset/?id=7203392850";
                 },
             };
         })
