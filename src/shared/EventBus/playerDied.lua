@@ -39,7 +39,7 @@ return function(EventBus)
                         return
                     end
                     
-                    local creatorValue = humanoid:WaitForChild("creator", 0.1)
+                    local creatorValue = humanoid:FindFirstChild("creator")
                     local creator = creatorValue and creatorValue.Value
 
                     if trackingPlayers[player] then

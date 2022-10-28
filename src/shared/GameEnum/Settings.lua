@@ -192,13 +192,16 @@ local array = {
         description = "The volume of gamemode sound effects";
     },
     {
-        key = "neonWeapons";
-        group = "tool";
+        key = "dieSound";
+        group = "sounds";
 
-        type = "boolean";
-        default = true;
-        name = "Neon tools";
-        description = "Whether all tools and projectiles should be neon. Only applies to your screen";
+        default = nil;
+        type = "contentSound";
+        payload = {
+            defaultSound = Sounds.DefaultDied;
+        };
+        name = "Die sound";
+        description = "The ID of the sound that plays when someone dies";
     },
 }
 

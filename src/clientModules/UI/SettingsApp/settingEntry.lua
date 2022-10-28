@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local SoundService = game:GetService("SoundService")
 local TextService = game:GetService("TextService")
 local Players = game:GetService("Players")
 
@@ -89,6 +90,8 @@ modal = RoactHooks.new(Roact)(modal)
 local function getDescriptionSize(type)
     if type == "image" then
         return Vector2.new(600, 1000)
+    elseif type == "sound" then
+        return Vector2.new(650, 100)
     else
         return Vector2.new(682, 1000)
     end
@@ -265,6 +268,49 @@ local function settingEntry(props, hooks)
 
                 BackgroundTransparency = 1;
                 Image = "rbxassetid://" .. setting.value;
+            })
+        })
+    elseif setting.type == "sound" then
+        control = Roact.createFragment({
+            e(textBox, {
+                inactive = not setting.valid;
+                position = UDim2.new(1, -10, 0.5, 0);
+                anchor = Vector2.new(1, 0.5);
+                text = setting.value and setting.value or "";
+                color = theme.background;
+                textColor = theme.text;
+                textSize = 20;
+    
+                canScroll = false;
+                maxScreenSpace = Vector2.new(140, 24);
+    
+                onTyped = function(text)
+                    if tonumber(text) then
+                        props.onSettingChanged(setting.id, text)
+                    end
+                end;
+            }),
+            e("ImageButton", {
+                Position = UDim2.new(1, -160, 0.5, 0);
+                AnchorPoint = Vector2.new(1, 0.5);
+                Size = UDim2.fromOffset(30, 30);
+
+                BackgroundTransparency = 1;
+                Image = "http://www.roblox.com/asset/?id=7203392850";
+
+                [Roact.Event.MouseButton1Down] = function()
+                    local sound
+                    if setting.value == nil and setting.payload and setting.payload.defaultSound then
+                        sound = setting.payload.defaultSound
+                    else
+                        sound = Instance.new("Sound")
+                        sound.SoundId = "rbxassetid://" .. setting.value
+                    end
+
+                    if sound then
+                        SoundService:PlayLocalSound(sound)
+                    end
+                end;
             })
         })
     end

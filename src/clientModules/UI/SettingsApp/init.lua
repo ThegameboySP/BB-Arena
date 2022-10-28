@@ -27,6 +27,7 @@ local typeMap = {
     enum = "enum";
     keybind = "keybind";
     contentImage = "image";
+    contentSound = "sound";
 }
 
 local groupMap = {

@@ -6,6 +6,7 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 
 local Root = require(ReplicatedStorage.Common.Root)
+local SoundPlayer = require(ReplicatedStorage.Common.Utils.SoundPlayer)
 local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
 local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerName)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
@@ -172,6 +173,7 @@ local function init()
     RemoteProperties.Name = "RemoteProperties"
     RemoteProperties.Parent = ReplicatedStorage
     
+    Root.SoundPlayer = SoundPlayer.new()
     Root.globals = {}
     for key, value in pairs(defaultGlobalValues) do
         Root.globals[key] = RemoteProperty.new(RemoteProperties, key)
@@ -204,6 +206,9 @@ end
 
 removeStudioInstances()
 loadTools()
+while not _G.BB do
+    task.wait()
+end
 
 init()
 registerRodux()

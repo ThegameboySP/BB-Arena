@@ -1,9 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 local SoundService = game:GetService("SoundService")
 local Workspace = game:GetService("Workspace")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 
+local EventBus = require(ReplicatedStorage.Common.EventBus)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local getSavedSetting = RoduxFeatures.selectors.getSavedSetting
 local getLocalSetting = RoduxFeatures.selectors.getLocalSetting
@@ -12,17 +14,32 @@ local LocalPlayer = Players.LocalPlayer
 
 local function respectSettings(root)
     local weaponGroup = SoundService:FindFirstChild("Tools")
-    local projectiles = Workspace:FindFirstChild("Projectiles")
 
     local colorCorrection = Instance.new("ColorCorrectionEffect")
     colorCorrection.Name = "IlluminanceCorrection"
     colorCorrection.Parent = Lighting
 
+    local diedSound
+
+    EventBus.playerDied:Connect(function(player)
+        if diedSound then
+            local part = player.Character:FindFirstChild("HumanoidRootPart")
+            if part then
+                local died = part:FindFirstChild("Died")
+                if died then
+                    died.Volume = 0
+                end
+            end
+
+            root.SoundPlayer:Play3DSound(diedSound, part.Position)
+        end
+    end)
+
     local function onDescendantAdded(descendant)
         if descendant:IsA("Sound") then
             if
                 descendant:FindFirstAncestorWhichIsA("Tool")
-                or descendant:IsDescendantOf(projectiles)
+                or descendant:IsDescendantOf(Workspace)
                 or descendant:FindFirstAncestor("ToolObjects")
             then
                 descendant.SoundGroup = weaponGroup
@@ -70,6 +87,17 @@ local function respectSettings(root)
 
         if old == nil or getLocalSetting(new, "weaponTheme") ~= getLocalSetting(old, "weaponTheme") then
             LocalPlayer:WaitForChild("Theme").Value = getLocalSetting(new, "weaponTheme")
+        end
+
+        if old == nil or getLocalSetting(new, "dieSound") ~= getLocalSetting(old, "dieSound") then
+            local dieSoundId = getLocalSetting(new, "dieSound")
+            if dieSoundId then
+                local sound = Instance.new("Sound")
+                sound.SoundId = "rbxassetid://" .. tostring(dieSoundId)
+                diedSound = sound
+            else
+                diedSound = nil
+            end
         end
 
         if old == nil or new.users.userSettings ~= old.users.userSettings then

@@ -7,6 +7,7 @@ local Root = require(ReplicatedStorage.Common.Root)
 local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
 local roduxClient = require(ReplicatedStorage.ClientModules.roduxClient)
+local SoundPlayer = require(ReplicatedStorage.Common.Utils.SoundPlayer)
 
 local notificationGUI = require(ReplicatedStorage.ClientModules.UI.notificationGUI)
 local hintGUI = require(ReplicatedStorage.ClientModules.UI.hintGUI)
@@ -110,6 +111,8 @@ end
 
 local function init()
     Root.globals = {}
+    Root.SoundPlayer = SoundPlayer.new()
+
     for _, child in pairs(RemoteProperties:GetChildren()) do
         Root.globals[child.Name] = RemoteProperty.new(RemoteProperties, child.Name)
     end
