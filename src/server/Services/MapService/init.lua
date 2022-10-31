@@ -18,7 +18,7 @@ local reconcileTeams = require(script.reconcileTeams)
 
 local Components = require(ReplicatedStorage.Common.Components)
 
-local metaDefinition = t.strictInterface({
+local metaDefinition = t.interface({
     Teams = t.map(t.string, t.BrickColor);
 
     IslandTopColor = t.optional(t.Color3);
