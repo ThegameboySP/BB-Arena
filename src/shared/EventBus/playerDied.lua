@@ -46,14 +46,9 @@ return function(EventBus)
                         trackingPlayers[player]:Fire(creator)
                     end
 
-                    local deathCause = humanoid:GetAttribute("DeathCause")
-                    if not deathCause and not character:FindFirstChildWhichIsA("BasePart", true) then
-                        deathCause = GameEnum.DeathCause.Void
-                    end
-
                     playerDied:Fire(player, {
                         killer = creator;
-                        cause = deathCause;
+                        cause = humanoid:GetAttribute("DeathCause");
                         weaponImageId = creatorValue and creatorValue:GetAttribute("WeaponImageId");
                     })
                 end
