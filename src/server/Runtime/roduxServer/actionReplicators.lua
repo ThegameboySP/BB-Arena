@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
-local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+local Settings = require(ReplicatedStorage.Common.StaticData.Settings)
 local actions = RoduxFeatures.actions
 
 return {
@@ -23,7 +23,7 @@ return {
         replicate = function(users, action)
             local replicateSettings = {}
             for settingName, setting in action.payload.settings do
-                if GameEnum.Settings[settingName].replicateToAll then
+                if Settings[settingName].replicateToAll then
                     replicateSettings[settingName] = setting
                 end
             end
@@ -53,7 +53,7 @@ return {
 
             for settingName in settings do
                 -- Client must have exploited to send this message.
-                if not GameEnum.Settings[settingName] then
+                if not Settings[settingName] then
                     return
                 end
             end

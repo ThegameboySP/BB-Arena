@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
+local RoactSpring = require(ReplicatedStorage.Packages.RoactSpring)
 local e = Roact.createElement
 
 local button = require(script.Parent.Parent.Presentational.button)
@@ -15,35 +16,46 @@ local SIDE_BAR_LENGTH = 4
 
 local function mainWidget(props, hooks)
 	local categoryBinding, setCategory = hooks.useBinding(props.settingCategories[1])
-	local isActiveBinding, setIsActive = hooks.useBinding(true)
+	local isDisabled, setIsDisabled = hooks.useState(false)
+	local outerRef = hooks.useBinding()
+
+	local styles, api = RoactSpring.useSpring(hooks, function()
+		return {
+			disabledAlpha = 0;
+			disabledTransparency = 1;
+		}
+	end)
 
 	local theme = hooks.useContext(ThemeContext)
-	local value = hooks.useValue()
-
-	value.outerRef = value.outerRef or Roact.createRef()
 	
 	local selectEvent = Instance.new("BindableEvent")
 
 	return e("Frame", {
-		[Roact.Ref] = value.outerRef;
+		[Roact.Ref] = outerRef;
+
+		Size = UDim2.fromScale(1, 1);
+		Position = styles.disabledAlpha:map(function(alpha)
+			return UDim2.new(0, 0, alpha, 20)
+		end);
 
 		BackgroundTransparency = 1;
-		Size = UDim2.fromScale(1, 1);
-
-		Visible = isActiveBinding:map(function(isActive)
-			return isActive
-		end);
 	}, {
 		Window = e(window, {
-			size = UDim2.new(0, 1000, 0, 700 - 60);
-			aspectRatio = 2;
+			size = UDim2.new(0, 1000, 0, 500);
 			image = "rbxassetid://9206592117";
 			imageSize = Vector2.new(50, 50);
 			name = "Settings";
 			useExitButton = false;
+			draggable = not isDisabled;
 
-			outerRef = value.outerRef;
+			outerRef = outerRef;
 		}, {
+			DisabledOverlay = e("Frame", {
+				Size = UDim2.new(1, 0, 1, 0);
+				BackgroundColor3 = Color3.new(0, 0, 0);
+				BackgroundTransparency = styles.disabledTransparency;
+				ZIndex = 5;
+			});
 			PanelContainer = e("Frame", {
 				BackgroundTransparency = 1;
 				Position = UDim2.new(0, 0, 0, 20);
@@ -51,7 +63,7 @@ local function mainWidget(props, hooks)
 			}, {
 				Panel = e(sidePanel, {
 					size = UDim2.new(0, 100, 1, 0);
-					iconSize = UDim2.fromOffset(80, 80);
+					iconSize = UDim2.fromOffset(70, 70);
 					dividerColor = theme.border;
 					activeCategory = categoryBinding;
 					
@@ -88,7 +100,18 @@ local function mainWidget(props, hooks)
 					end;
 
 					onPrompt = function(isPrompting)
-						setIsActive(not isPrompting)
+						local promise = api.start({
+							disabledAlpha = if isPrompting then 1 else 0;
+							disabledTransparency = if isPrompting then 0 else 1;
+						})
+
+						if isPrompting then
+							setIsDisabled(true)
+						else
+							promise:finally(function()
+								setIsDisabled(false)
+							end)
+						end
 					end;
 				});
 			});

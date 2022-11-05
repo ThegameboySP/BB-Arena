@@ -4,10 +4,13 @@ local SoundService = game:GetService("SoundService")
 local TextService = game:GetService("TextService")
 local Players = game:GetService("Players")
 
+local Llama = require(ReplicatedStorage.Packages.Llama)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
+local Dictionary = Llama.Dictionary
 local e = Roact.createElement
 
+local HUDConstants = require(ReplicatedStorage.ClientModules.UI.HUDConstants)
 local switch = require(script.Parent.Parent.Presentational.switch)
 local percentSlider = require(script.Parent.Parent.Presentational.percentSlider)
 local rangeSlider = require(script.Parent.Parent.Presentational.rangeSlider)
@@ -15,6 +18,7 @@ local list = require(script.Parent.Parent.Presentational.list)
 local button = require(script.Parent.Parent.Presentational.button)
 local window = require(script.Parent.Parent.Presentational.window)
 local textBox = require(script.Parent.Parent.Presentational.textBox)
+local inventoryHotkeys = require(script.Parent.Parent.Presentational.inventoryHotkeys)
 
 local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
@@ -24,68 +28,89 @@ local MARGIN = 6
 local TITLE_TEXT_SIZE = 28
 local DESCRIPTION_TEXT_SIZE = 24
 
-local function modal(props, hooks)
-    local self = hooks.useValue()
-    self.outerRef = self.outerRef or Roact.createRef()
+local function modal(props)
+    return e(window, {
+        size = UDim2.fromOffset(400, 400);
+        name = props.name;
+        outerRef = props.outerRef;
 
-    return e(Roact.Portal, {
-        target = Container
+        useExitButton = false;
+        draggable = true;
     }, {
-        Modal = e("ScreenGui", {
-            [Roact.Ref] = self.outerRef;
-
-            ResetOnSpawn = false;
+        List = e("Frame", {
+            BackgroundTransparency = 0;
+            BackgroundColor3 = props.theme.background;
+            BorderSizePixel = 0;
+            Size = UDim2.new(1, 0, 1, 0);
         }, {
-            Window = e(window, {
-                size = UDim2.fromOffset(800, 400);
-                aspectRatio = 1;
-                name = props.name;
-                outerRef = self.outerRef;
+            List = e(list, {
+                padding = 15;
+            }, props.list);
 
-                useExitButton = false;
-
-                onClosed = function()
-                    props.onFinished(false)
-                end;
+            Bottom = e("Frame", {
+                BackgroundTransparency = 0;
+                BackgroundColor3 = props.theme.foreground;
+                BorderSizePixel = 0;
+                AnchorPoint = Vector2.new(0.5, 0);
+                Size = UDim2.new(1, 0, 0, 50);
+                Position = UDim2.new(0.5, 0, 1, 0);
             }, {
-                List = e("Frame", {
-                    BackgroundTransparency = 0;
-                    BackgroundColor3 = props.theme.background;
-                    BorderSizePixel = 0;
-                    Size = UDim2.new(1, 0, 1, 0);
-                }, {
-                    List = e(list, {
-                        padding = 15;
-                    }, props.list);
-    
-                    Bottom = e("Frame", {
-                        BackgroundTransparency = 0;
-                        BackgroundColor3 = props.theme.foreground;
-                        BorderSizePixel = 0;
-                        AnchorPoint = Vector2.new(0.5, 0);
-                        Size = UDim2.new(1, 0, 0, 50);
-                        Position = UDim2.new(0.5, 0, 1, 0);
-                    }, {
-                        Confirm = e(button, {
-                            anchor = Vector2.new(0.5, 1);
-                            position = UDim2.new(0.5, 0, 1, 0);
-                            text = "Confirm";
-                            textSize = 24;
-                            textColor = props.theme.highContrast;
-                            color = props.theme.background;
+                Confirm = e(button, {
+                    anchor = Vector2.new(0.5, 1);
+                    position = UDim2.new(0.5, 0, 1, 0);
+                    text = "Confirm";
+                    textSize = 24;
+                    textColor = props.theme.highContrast;
+                    color = props.theme.background;
 
-                            onPressed = function()
-                                props.onFinished(true)
-                            end;
-                        })
-                    });
+                    onPressed = function()
+                        props.onFinished(true)
+                    end;
                 })
-            })
+            });
         })
     })
 end
 
 modal = RoactHooks.new(Roact)(modal)
+
+local function toolOrderModal(props, hooks)
+    local items, setItems = hooks.useState(props.items)
+
+    return e("Frame", {
+        Size = UDim2.new(1, 0, 1, 0);
+        Position = UDim2.new(0, 0, 0, -60);
+
+        BackgroundTransparency = 1;
+    }, {
+        e(button, {
+            position = UDim2.new(0.5, 0, 1, -66 -HUDConstants.HUD_PADDING*2);
+            anchor = Vector2.new(0.5, 1);
+
+            text = "Done";
+            textSize = 20;
+            onPressed = function()
+                props.onOrderChanged(items)
+            end;
+        }),
+        e("Frame", {
+            Size = UDim2.new(1, 0, 1, 0);
+            Position = UDim2.new(0, 0, 1, -HUDConstants.HUD_PADDING*2);
+            AnchorPoint = Vector2.new(0, 1);
+
+            BackgroundTransparency = 1;
+        }, {
+            Items = e(inventoryHotkeys, Dictionary.merge(props, {
+                items = items;
+                onOrderChanged = function(newOrder)
+                    setItems(newOrder)
+                end;
+            }))
+        });
+    })
+end
+
+toolOrderModal = RoactHooks.new(Roact)(toolOrderModal)
 
 local function getDescriptionSize(type)
     if type == "image" then
@@ -105,8 +130,9 @@ local function settingEntry(props, hooks)
     descriptionBounds = Vector2.new(descriptionSize.X, descriptionBounds.Y)
 
     local theme = hooks.useContext(ThemeContext)
-    local isPrompting, setIsPrompting = hooks.useState(false)
+    local prompt, setPrompt = hooks.useState(nil)
     local keybindCallback, setKeybindCallback = hooks.useState(nil)
+    local outerRef = hooks.useBinding()
 
     hooks.useEffect(function()
         if keybindCallback then
@@ -130,10 +156,8 @@ local function settingEntry(props, hooks)
             end
         end
     end)
-    
-    local prompt = nil
 
-    if isPrompting then
+    if prompt == "enum" then
         local listItems = {}
 
         for name in setting.payload do
@@ -160,10 +184,24 @@ local function settingEntry(props, hooks)
             theme = theme;
             list = listItems;
             name = setting.name;
+            outerRef = outerRef;
             onFinished = function()
                 props.onPrompt(false)
-                setIsPrompting(false)
+                setPrompt(nil)
             end;
+        })
+    end
+
+    if prompt then
+        prompt = e(Roact.Portal, {
+            target = Container
+        }, {
+            Modal = e("ScreenGui", {
+                [Roact.Ref] = outerRef;
+                ResetOnSpawn = false;
+            }, {
+                Prompt = prompt;
+            })
         })
     end
 
@@ -214,7 +252,7 @@ local function settingEntry(props, hooks)
 
             onPressed = function()
                 props.onPrompt(true)
-                setIsPrompting(true)
+                setPrompt("enum")
             end;
         })
     elseif setting.type == "keybind" then
@@ -310,6 +348,61 @@ local function settingEntry(props, hooks)
                     if sound then
                         SoundService:PlayLocalSound(sound)
                     end
+                end;
+            })
+        })
+    elseif setting.type == "toolOrder" then
+        local items = {}
+        for _, itemName in setting.value do
+            table.insert(items, {
+                name = itemName;
+                thumbnail = HUDConstants[itemName:upper() .. "_THUMBNAIL"];
+            })
+        end
+
+        control = Roact.createFragment({
+            e("Frame", {
+                Position = UDim2.new(1, -118, 0.5, 40);
+                AnchorPoint = Vector2.new(1, 0.5);
+                ZIndex = 2;
+            }, {
+                UIScale = e("UIScale", {
+                    Scale = 0.5;
+                });
+                tools = e(inventoryHotkeys, {
+                    items = items;
+                    scaleBinding = Roact.createBinding(0.05);
+                    rootRef = outerRef;
+                })
+            }),
+            e(button, {
+                inactive = not setting.valid;
+                position = UDim2.new(1, -10, 0.5, -16);
+                anchor = Vector2.new(1, 0.5);
+                text = "Press for tool order...";
+                color = theme.background;
+                textColor = theme.text;
+                textSize = 20;
+    
+                onPressed = function()
+                    props.onPrompt(true)
+    
+                    setPrompt(e(toolOrderModal, {
+                            items = items;
+                            rootRef = outerRef;
+                            scaleBinding = props.scaleBinding;
+                            onOrderChanged = function(newItems)
+                                local order = {}
+                                for _, item in newItems do
+                                    table.insert(order, item.name)
+                                end
+    
+                                props.onSettingChanged(setting.id, order)
+                                props.onPrompt(false)
+                                setPrompt(nil)
+                            end;
+                        })
+                    )
                 end;
             })
         })

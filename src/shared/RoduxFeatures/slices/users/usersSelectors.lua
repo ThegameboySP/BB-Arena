@@ -1,8 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+local Settings = require(ReplicatedStorage.Common.StaticData.Settings)
 
 local function getAdmin(state, userId)
     return state.users.admins[userId] or 0
@@ -40,8 +41,19 @@ local function isUserBanned(state, userId)
     return canUserBeKickedBy(state, userId, bannerId)
 end
 
+local function getDefaultForSetting(setting)
+    return
+        if UserInputService.TouchEnabled and setting.mobile and setting.mobile.default ~= nil
+        then setting.mobile.default
+        else setting.default
+end
+
 local function getSavedSetting(state, userId, settingId)
-    local default = GameEnum.Settings[settingId].default
+    if not Settings[settingId] then
+        return nil
+    end
+    
+    local default = getDefaultForSetting(Settings[settingId])
 
     local userSettings = state.users.userSettings[userId or LocalPlayer and LocalPlayer.UserId or 0]
     if userSettings then
@@ -52,10 +64,14 @@ local function getSavedSetting(state, userId, settingId)
 end
 
 local function getLocalSetting(state, settingId)
+    if not Settings[settingId] then
+        return nil
+    end
+    
     local value = state.users.locallyEditedSettings[settingId]
     if value ~= nil then
         if type(value) == "table" and value.default then
-            return GameEnum.Settings[settingId].default
+            return getDefaultForSetting(Settings[settingId])
         else
             return value
         end

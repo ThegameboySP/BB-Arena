@@ -2,10 +2,27 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Sounds = ReplicatedStorage.Assets.Sounds
 
+local ForcefieldThemes = require(ReplicatedStorage.Common.GameEnum.ForcefieldThemes)
 local WeaponThemes = require(script.Parent.WeaponThemes)
-local ForcefieldThemes = require(script.Parent.ForcefieldThemes)
 
 local array = {
+    {
+        key = "weaponOrder";
+        group = "input";
+
+        default = {
+            "Sword",
+            "Slingshot",
+            "Rocket",
+            "Trowel",
+            "Bomb",
+            "Superball",
+            "PaintballGun",
+        };
+        type = "toolOrder";
+        name = "Tool order";
+        description = "The hotkey order of your tools";
+    },
     {
         key = "showToolHints";
         group = "input";
@@ -36,6 +53,18 @@ local array = {
         default = "E";
         type = "keybind";
         name = "Bomb jump keybind";
+        description = "Disabled for mobile.";
+        mobile = {
+            valid = false;
+        };
+    },
+    {
+        key = "trowelVisualizationKeybind";
+        group = "input";
+
+        default = "Q";
+        type = "keybind";
+        name = "Trowel visualization keybind";
         description = "Disabled for mobile.";
         mobile = {
             valid = false;
@@ -144,7 +173,7 @@ local array = {
         default = true;
         type = "boolean";
         name = "Trowel visualization";
-        description = "Whether the position and orientation of your trowel is shown before firing. Press Q while equipping trowel to toggle";
+        description = "Whether the position and orientation of your trowel is shown before firing";
     },
     {
         key = "practiceWeaponDisplay";
@@ -201,7 +230,7 @@ local array = {
             defaultSound = Sounds.DefaultDied;
         };
         name = "Die sound";
-        description = "The ID of the sound that plays when someone dies";
+        description = "The ID of the sound that plays when someone dies. This replaces the default OOF sound";
     },
 }
 

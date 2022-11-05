@@ -49,57 +49,97 @@ local function capDelta(maxSize, pos, size, anchorPoint, delta)
     -- Change anchor point back to its original value.
     pos -= size * anchorDelta
 
-    local change = roundv2(pos - originalPos)
-    return UDim2.fromOffset(change.X, change.Y)
+    return roundv2(pos - originalPos)
 end
 
 local function v2(v3)
     return Vector2.new(v3.X, v3.Y)
 end
 
--- Draggable must not be under UIScale or any other constraint that means 1 UDim != 1 real pixel. It should be near the top.
+local function getScale(binding)
+    return if binding then binding:getValue() else 1
+end
+
 -- topRef is the active GuiObject that takes input.
--- rootRef is the top level GuiObject that moves the rest with itself.
+-- positionBinding = {set(), binding}
+-- scaleBinding? = binding
 -- outerRef is the containing GuiObject which represents the allowable space to drag.
 local function draggable(props, hooks)
+    local state = hooks.useValue()
+
     hooks.useEffect(function()
         local connections = {}
 
-        local lastMousePosition = Vector3.zero
-        local lastTopPosition
-        local lastRootPosition
-        local isPressed = false
+        if props.enabled then
+            state.lastMousePosition = state.lastMousePosition or Vector3.zero
+            state.lastTopPosition = state.lastTopPosition or nil
+            state.lastRootPosition = state.lastRootPosition or nil
 
-        table.insert(connections, UserInputService.InputBegan:Connect(function(input)
-            if listeningInput[input.UserInputType] and within(props.topRef:getValue(), input.Position) then
-                lastTopPosition = props.topRef:getValue().AbsolutePosition
-                lastRootPosition = props.rootRef:getValue().Position
-                lastMousePosition = input.Position
-                isPressed = true
+            state.hasDragged = if state.hasDragged then state.hasDragged else false
+
+            local tolerance = props.tolerance or 0
+
+            table.insert(connections, UserInputService.InputBegan:Connect(function(input)
+                if listeningInput[input.UserInputType] and within(props.topRef:getValue(), input.Position) then
+                    state.lastTopPosition = props.topRef:getValue().AbsolutePosition
+                    state.lastRootPosition = props.positionBinding.binding:getValue()
+                    state.lastMousePosition = input.Position
+                    state.isPressed = true
+                end
+            end))
+
+            table.insert(connections, UserInputService.InputEnded:Connect(function(input)
+                if listeningInput[input.UserInputType] then
+                    state.isPressed = false
+
+                    if state.hasDragged and props.onDragReleased then
+                        props.onDragReleased()
+                    end
+
+                    state.hasDragged = false
+                end
+            end))
+
+            local function onMoved(delta)
+                if state.isPressed then
+                    local top = props.topRef:getValue()
+
+                    local cappedDelta = capDelta(
+                        props.outerRef:getValue().AbsoluteSize,
+                        state.lastTopPosition,
+                        top.AbsoluteSize,
+                        top.AnchorPoint,
+                        v2(delta)
+                    ) / getScale(props.scaleBinding)
+
+                    if state.hasDragged or cappedDelta.Magnitude >= tolerance then
+                        props.positionBinding.set(state.lastRootPosition + UDim2.fromOffset(cappedDelta.X, cappedDelta.Y))
+
+                        if not state.hasDragged then
+                            state.hasDragged = true
+
+                            if props.onDragBegin then
+                                props.onDragBegin()
+                            end
+                        end
+
+                        if props.onDragged then
+                            props.onDragged(cappedDelta)
+                        end
+                    end
+                end
             end
-        end))
 
-        table.insert(connections, UserInputService.InputEnded:Connect(function(input)
-            if listeningInput[input.UserInputType] then
-                isPressed = false
-            end
-        end))
+            table.insert(connections, UserInputService.InputChanged:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                    onMoved(input.Position - state.lastMousePosition)
+                end
+            end))
 
-        table.insert(connections, UserInputService.InputChanged:Connect(function(input)
-            if isPressed and input.UserInputType == Enum.UserInputType.MouseMovement then
-                local root = props.rootRef:getValue()
-                local top = props.topRef:getValue()
-                local delta = input.Position - lastMousePosition
-
-                root.Position = lastRootPosition + capDelta(
-                    props.outerRef:getValue().AbsoluteSize,
-                    lastTopPosition,
-                    top.AbsoluteSize,
-                    top.AnchorPoint,
-                    v2(delta)
-                )
-            end
-        end))
+            table.insert(connections, UserInputService.TouchMoved:Connect(function(input)
+                onMoved(input.Position - state.lastMousePosition)
+            end))
+        end
         
         return function()
             for _, connection in connections do
@@ -114,7 +154,7 @@ local function draggable(props, hooks)
         Position = props.position;
         AnchorPoint = props.anchorPoint;
         -- Use Active so that dragging the element sinks the input.
-        Active = true;
+        Active = props.enabled;
     }, props[Roact.Children])
 end
 

@@ -11,14 +11,10 @@ local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
 local function window(props, hooks)
 	local theme = hooks.useContext(ThemeContext)
-	local value = hooks.useValue()
-
-	value.topRef = value.topRef or Roact.createRef()
-	value.rootRef = value.rootRef or Roact.createRef()
+	local topRef = hooks.useBinding()
+    local positionBinding, setPositionBinding = hooks.useBinding(UDim2.new(0.5, 0, 0.5, 0))
 
 	return e("ImageLabel", {
-        [Roact.Ref] = value.rootRef;
-        
         BackgroundTransparency = 1;
         
         ImageColor3 = theme.background;
@@ -28,25 +24,24 @@ local function window(props, hooks)
         SliceScale = 0.1;
         
         AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
+        Position = positionBinding,
         Size = props.size;
     }, {
         UIScale = e(AutoUIScale, {
             minScaleRatio = 0.5;
         });
-        UIAspectRatioConstraint = e("UIAspectRatioConstraint", {
-            AspectRatio = props.aspectRatio;
-        });
         Top = e(draggable, {
-            topRef = value.topRef;
-            rootRef = value.rootRef;
+            topRef = topRef;
+            positionBinding = {binding = positionBinding, set = setPositionBinding};
             outerRef = props.outerRef;
 
-            position = UDim2.new(0, 0, 0, -60);
+            enabled = props.draggable;
+
+            anchorPoint = Vector2.new(0, 1);
             size = UDim2.new(1, 0, 0, 60)
         }, {
             Title = e("ImageLabel", {
-                [Roact.Ref] = value.topRef;
+                [Roact.Ref] = topRef;
 
                 ImageColor3 = theme.foreground;
                 Image = "rbxassetid://9264443152";

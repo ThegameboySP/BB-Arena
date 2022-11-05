@@ -8,17 +8,20 @@ local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
 local e = Roact.createElement
 
+local listeningInput = {
+    [Enum.UserInputType.MouseButton1] = true;
+    [Enum.UserInputType.Touch] = true;
+}
+
 local function slider(props, hooks)
     local barRef = hooks.useState(Roact.createRef())
     local self = hooks.useValue()
     local theme = hooks.useContext(ThemeContext)
 
     hooks.useEffect(function()
-        local con = UserInputService.InputChanged:Connect(function(input)
-            if input.UserInputType ~= Enum.UserInputType.MouseMovement then
-                return
-            end
+        local connections = {}
 
+        local function onMoved(position)
             if not self.held then
                 return
             end
@@ -27,12 +30,24 @@ local function slider(props, hooks)
             local min = rbxBar.AbsolutePosition.X
             local max = min + rbxBar.AbsoluteSize.X
 
-            local percent = (math.clamp(input.Position.X, min, max) - min) / (max - min)
+            local percent = (math.clamp(position.X, min, max) - min) / (max - min)
             props.onChanged(percent)
-        end)
+        end
+
+        table.insert(connections, UserInputService.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then
+                onMoved(input.Position)
+            end
+        end))
+
+        table.insert(connections, UserInputService.TouchMoved:Connect(function(input)
+            onMoved(input.Position)
+        end))
 
         return function()
-            con:Disconnect()
+            for _, connection in connections do
+                connection:Disconnect()
+            end
         end
     end, self)
 
@@ -58,11 +73,9 @@ local function slider(props, hooks)
                 self.held = true
             end;
             [Roact.Event.InputEnded] = if props.inactive then nil else function(_, input)
-                if input.UserInputType ~= Enum.UserInputType.MouseButton1 then
-                    return
+                if listeningInput[input.UserInputType] then
+                    self.held = false
                 end
-
-                self.held = false
             end;
 
             Size = UDim2.fromOffset(20, 20);

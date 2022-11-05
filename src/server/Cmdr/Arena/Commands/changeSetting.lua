@@ -1,16 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+local Settings = require(ReplicatedStorage.Common.StaticData.Settings)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 
 local LocalPlayer = Players.LocalPlayer
-
-local settings = {}
-for _, entry in GameEnum.Settings do
-	settings[entry.name] = entry
-end
 
 local function mapType(setting)
 	if setting.type == "range" then
@@ -32,10 +27,20 @@ local function mapType(setting)
 end
 
 local function getId(settingName)
-	for key, setting in GameEnum.Settings do
+	for key, setting in Settings do
 		if setting.name == settingName then
 			return key
 		end
+	end
+end
+
+local settings = {}
+for _, entry in Settings do
+	local type = mapType(entry)
+	if type then
+		local clone = table.clone(entry)
+		clone.type = type
+		settings[entry.name] = clone
 	end
 end
 
@@ -49,7 +54,7 @@ return {
 	end, function(setting, _, context)
 		local arg = {
 			Name = setting.name;
-			Type = mapType(setting);
+			Type = setting.type;
 			Description = setting.description;
 		}
 
@@ -66,7 +71,7 @@ return {
 
 		local id = getId(settingName)
 
-		if GameEnum.Settings[id].type == "keybind" then
+		if Settings[id].type == "keybind" then
 			value = value.Name
 		end
 		

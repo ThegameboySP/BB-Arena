@@ -211,8 +211,7 @@ local function mapListWidget(props, hooks)
 		Size = UDim2.fromScale(1, 1);
 	}, {
 		Window = e(window, {
-			size = UDim2.new(0, 1100, 0, 700);
-			aspectRatio = 2;
+			size = UDim2.new(0, 1100, 0, 550);
 			image = "rbxassetid://10866961648";
 			imageSize = Vector2.new(63, 50);
 			name = "Map list";

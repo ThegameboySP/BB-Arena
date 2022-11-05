@@ -4,7 +4,7 @@ local Rodux = require(ReplicatedStorage.Packages.Rodux)
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local Dictionary = Llama.Dictionary
 
-local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+local Settings = require(ReplicatedStorage.Common.StaticData.Settings)
 local RoduxUtils = require(script.Parent.Parent.Parent.RoduxUtils)
 
 return Rodux.createReducer({
@@ -117,7 +117,7 @@ return Rodux.createReducer({
     users_restoreDefaultSettings = function(state)
         local default = {default = true}
         local defaultsById = {}
-        for id in GameEnum.Settings do
+        for id in Settings do
             defaultsById[id] = default
         end
 

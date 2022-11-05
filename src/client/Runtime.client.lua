@@ -8,6 +8,8 @@ local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
 local roduxClient = require(ReplicatedStorage.ClientModules.roduxClient)
 local SoundPlayer = require(ReplicatedStorage.Common.Utils.SoundPlayer)
+local Tools = require(ReplicatedStorage.ClientModules.Tools)
+local Input = require(ReplicatedStorage.ClientModules.Input)
 
 local notificationGUI = require(ReplicatedStorage.ClientModules.UI.notificationGUI)
 local hintGUI = require(ReplicatedStorage.ClientModules.UI.hintGUI)
@@ -112,6 +114,8 @@ end
 local function init()
     Root.globals = {}
     Root.SoundPlayer = SoundPlayer.new()
+    Root.Input = Input.new(Root)
+    Root.Tools = Tools.new(Root)
 
     for _, child in pairs(RemoteProperties:GetChildren()) do
         Root.globals[child.Name] = RemoteProperty.new(RemoteProperties, child.Name)
@@ -152,6 +156,8 @@ end
 init()
 registerRodux()
 registerRoot()
+Root.Input:Init()
+Root.Tools:Init()
 runScripts()
 
 EventBus:GetPlayerDiedSignal(Players.LocalPlayer):Connect(function()

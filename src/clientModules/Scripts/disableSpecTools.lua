@@ -1,6 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
-local StarterGui = game:GetService("StarterGui")
 local Players = game:GetService("Players")
 
 local Root = require(ReplicatedStorage.Common.Root)
@@ -9,13 +8,6 @@ local spectatorsCanBuildTrowels = Root.globals.spectatorsCanBuildTrowels
 local LocalPlayer = Players.LocalPlayer
 
 local function update()
-    task.spawn(function()
-        repeat task.wait() until pcall(function()
-            local team = LocalPlayer.Team
-            StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, team and CollectionService:HasTag(team, "ToolsEnabled"))
-        end)
-    end)
-    
     local team = LocalPlayer.Team
     if team and not CollectionService:HasTag(team, "ToolsEnabled") then
         if LocalPlayer.Character then

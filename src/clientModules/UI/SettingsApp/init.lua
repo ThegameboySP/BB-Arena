@@ -6,7 +6,7 @@ local RoactRodux = require(ReplicatedStorage.Packages.RoactRodux)
 local Llama = require(ReplicatedStorage.Packages.Llama)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
-local GameEnum = require(ReplicatedStorage.Common.GameEnum)
+local Settings = require(ReplicatedStorage.Common.StaticData.Settings)
 local e = Roact.createElement
 
 local ThemeController = require(script.Parent.ThemeController)
@@ -28,6 +28,7 @@ local typeMap = {
     keybind = "keybind";
     contentImage = "image";
     contentSound = "sound";
+    toolOrder = "toolOrder";
 }
 
 local groupMap = {
@@ -42,7 +43,11 @@ SettingsApp = RoactRodux.connect(
         local settingRecordsByGroup = {}
         local settingRecords = {}
 
-        for id, setting in GameEnum.Settings do
+        for id, setting in Settings do
+            if not typeMap[setting.type] then
+                continue
+            end
+
             local value = RoduxFeatures.selectors.getLocalSetting(state, id)
             local savedValue = RoduxFeatures.selectors.getSavedSetting(state, nil, id)
 
@@ -54,7 +59,7 @@ SettingsApp = RoactRodux.connect(
             local record = {
                 valid = true;
                 name = setting.name;
-                type = typeMap[setting.type] or error("Unknown type: " .. tostring(setting.type));
+                type = typeMap[setting.type];
                 payload = setting.payload;
                 value = value;
                 description = setting.description;
@@ -64,10 +69,6 @@ SettingsApp = RoactRodux.connect(
             }
 
             if setting.mobile and UserInputService.TouchEnabled then
-                if setting.mobile.value ~= nil then
-                    record.value = setting.mobile.value
-                end
-
                 if setting.mobile.valid ~= nil then
                     record.valid = setting.mobile.valid
                 end
@@ -78,9 +79,9 @@ SettingsApp = RoactRodux.connect(
         end
 
         for id, setting in settingRecords do
-            if GameEnum.Settings[id].invalidates and setting.value == true then
+            if Settings[id].invalidates and setting.value == true then
                 
-                for _, invalidatesId in GameEnum.Settings[id].invalidates do
+                for _, invalidatesId in Settings[id].invalidates do
                     settingRecords[invalidatesId].valid = false
                 end
             end
