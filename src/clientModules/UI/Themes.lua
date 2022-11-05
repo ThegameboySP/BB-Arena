@@ -3,8 +3,8 @@ local function darkmode(theme)
     theme.text = Color3.fromRGB(196, 196, 196);
     theme.highContrast = Color3.fromRGB(255, 255, 255);
 
-    theme.background = Color3.fromRGB(24, 26, 29);
-    theme.foreground = Color3.fromRGB(33, 35, 39);
+    theme.background = Color3.fromRGB(16, 17, 19);
+    theme.foreground = Color3.fromRGB(28, 31, 36);
     theme.scrollbar = Color3.fromRGB(117, 117, 117);
     theme.inactive = Color3.fromRGB(117, 117, 117);
     theme.border = Color3.fromRGB(55, 59, 66);
