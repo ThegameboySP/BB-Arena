@@ -40,6 +40,7 @@ local BLACKLISTED_COMMANDS = {
 	respawn = true; -- already have a respawn
 	replace = true; -- replace defines a "map" alias for some reason
 	["goto-place"] = true;
+	["var"] = true; -- this appears to have vulnerabilities in the wrong hands
 }
 
 function CmdrService:CanRun(player, group)
