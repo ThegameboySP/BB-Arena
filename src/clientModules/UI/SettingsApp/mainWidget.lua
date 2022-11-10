@@ -14,9 +14,21 @@ local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
 local SIDE_BAR_LENGTH = 4
 
+local function countTable(t)
+	local c = 0
+	for _ in t do
+		c += 1
+	end
+
+	return c
+end
+
 local function mainWidget(props, hooks)
 	local categoryBinding, setCategory = hooks.useBinding(props.settingCategories[1])
 	local isDisabled, setIsDisabled = hooks.useState(false)
+	local selectedSettings, setSelectedSettings = hooks.useBinding({})
+	local output, setOutput = hooks.useBinding(nil)
+
 	local outerRef = hooks.useBinding()
 
 	local styles, api = RoactSpring.useSpring(hooks, function()
@@ -41,7 +53,7 @@ local function mainWidget(props, hooks)
 		BackgroundTransparency = 1;
 	}, {
 		Window = e(window, {
-			size = UDim2.new(0, 1000, 0, 500);
+			size = UDim2.new(0, 1100, 0, 500);
 			image = "rbxassetid://9206592117";
 			imageSize = Vector2.new(50, 50);
 			name = "Settings";
@@ -95,6 +107,14 @@ local function mainWidget(props, hooks)
 					categoryBinding = categoryBinding;
 					selectEvent = selectEvent.Event;
 
+					selectedSettings = selectedSettings;
+					onSelectedChanged = function(settingId, isSelected)
+						local clone = table.clone(selectedSettings:getValue())
+						clone[settingId] = if isSelected then true else nil
+						setSelectedSettings(clone)
+						setOutput(nil)
+					end;
+
 					onCategoryChanged = function(category)
 						setCategory(category)
 					end;
@@ -114,6 +134,37 @@ local function mainWidget(props, hooks)
 						end
 					end;
 				});
+			});
+
+			Selected = e(button, {
+				position = UDim2.new(0, 116, 1, -10);
+				anchor = Vector2.new(0, 1);
+				minSize = Vector2.new(310, 48);
+				padding = 10;
+
+				textSize = 28;
+				textColor = theme.highContrast;
+				color = theme.lessImportantButton;
+
+				text = Roact.joinBindings({output, selectedSettings}):map(function(values)
+					if values[1] then
+						return values[1]
+					end
+
+					local count = countTable(values[2])
+
+					if count > 0 then
+						return string.format("Clear %d selection%s", count, if count > 1 then "s" else "")
+					end
+
+					return "Click settings to select"
+				end);
+
+				onPressed = function()
+					if next(selectedSettings:getValue()) then
+						setSelectedSettings({})
+					end
+				end;
 			});
 
 			Confirm = e(button, {
@@ -138,7 +189,21 @@ local function mainWidget(props, hooks)
 				color = theme.lessImportantButton;
 				textColor = theme.highContrast;
 				onPressed = function()
-					props.onRestoreDefaults()
+					local selected = selectedSettings:getValue()
+
+					local somethingSelected = next(selected) ~= nil
+					local count = 0
+
+					for _, settings in props.settingRecords do
+						for _, setting in settings do
+							if (not somethingSelected or selected[setting.id]) and setting.default ~= setting.value then
+								count += 1
+							end
+						end
+					end
+
+					props.onRestoreDefaults(if next(selected) then selected else nil)
+					setOutput(string.format("Restored %d default%s", count, if count > 1 or count == 0 then "s" else ""))
 				end;
 			});
 
@@ -150,7 +215,20 @@ local function mainWidget(props, hooks)
 				color = theme.lessImportantButton;
 				textColor = theme.highContrast;
 				onPressed = function()
-					props.onSettingsCanceled()
+					local selected = selectedSettings:getValue()
+
+					local somethingSelected = next(selected) ~= nil
+					local count = 0
+					for _, settings in props.settingRecords do
+						for _, setting in settings do
+							if (not somethingSelected or selected[setting.id]) and setting.isChanged then
+								count += 1
+							end
+						end
+					end
+
+					props.onSettingsCanceled(if next(selected) then selected else nil)
+					setOutput(string.format("Undid %d setting%s", count, if count > 1 or count == 0 then "s" else ""))
 				end;
 			});
 		});

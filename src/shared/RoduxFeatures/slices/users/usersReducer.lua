@@ -104,7 +104,18 @@ return Rodux.createReducer({
             locallyEditedSettings = {};
         })
     end;
-    users_cancelLocalSettings = function(state)
+    users_cancelLocalSettings = function(state, action)
+        if action.payload.settings then
+            local settingsToUndo = {}
+            for settingName in action.payload.settings do
+                settingsToUndo[settingName] = Llama.None
+            end
+
+            return Dictionary.mergeDeep(state, {
+                locallyEditedSettings = settingsToUndo;
+            })
+        end
+
         return Dictionary.merge(state, {
             locallyEditedSettings = {};
         })
@@ -114,10 +125,11 @@ return Rodux.createReducer({
             locallyEditedSettings = {[action.payload.id] = Llama.None}
         })
     end;
-    users_restoreDefaultSettings = function(state)
+    users_restoreDefaultSettings = function(state, action)
         local default = {default = true}
+
         local defaultsById = {}
-        for id in Settings do
+        for id in action.payload.settings or Settings do
             defaultsById[id] = default
         end
 

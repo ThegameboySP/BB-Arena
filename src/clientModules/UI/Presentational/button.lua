@@ -8,23 +8,27 @@ local ThemeContext = require(script.Parent.Parent.ThemeContext)
 
 local e = Roact.createElement
 
-local function button(props, hooks)
-	local theme = hooks.useContext(ThemeContext)
+local function calculateSize(text, textSize, padding, minSize)
+	local textBounds = TextService:GetTextSize(text, textSize, Enum.Font.Gotham, minSize or Vector2.new(math.huge, math.huge))
+    textBounds += Vector2.new(padding or 20, padding or 20)
 
-    local textBounds = TextService:GetTextSize(props.text, props.textSize, Enum.Font.Gotham, props.minSize or Vector2.new(math.huge, math.huge))
-
-	local padding = props.padding or 20
-    textBounds += Vector2.new(padding, padding)
-
-	if props.minSize then
+	if minSize then
 		textBounds = Vector2.new(
-			math.max(props.minSize.X, textBounds.X),
-			math.max(props.minSize.Y, textBounds.Y)
+			math.max(minSize.X, textBounds.X),
+			math.max(minSize.Y, textBounds.Y)
 		)
 	end
 
+	return UDim2.fromOffset(textBounds.X, textBounds.Y)
+end
+
+local function button(props, hooks)
+	local theme = hooks.useContext(ThemeContext)
+
 	return e(props.inactive and "ImageLabel" or "ImageButton", {
-		Size = UDim2.fromOffset(textBounds.X, textBounds.Y);
+		Size = if type(props.text) == "string" then calculateSize(props.text, props.textSize, props.padding, props.minSize) else props.text:map(function(text)
+			return calculateSize(text, props.textSize, props.padding, props.minSize)
+		end);
 		Position = props.position;
 		AnchorPoint = props.anchor;
 
@@ -36,7 +40,7 @@ local function button(props, hooks)
 		BackgroundTransparency = 1;
 		ImageColor3 = if props.inactive then props.color:Lerp(theme.inactive, 0.6) else props.color;
 
-		[Roact.Event.MouseButton1Click] = if props.inactive then nil else function()
+		[Roact.Event.Activated] = if props.inactive then nil else function()
 			if not props.inactive then
 				props.onPressed()
 			end

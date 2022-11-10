@@ -27,6 +27,8 @@ local function settingCategory(props, hooks)
     for index, setting in ipairs(props.settings) do
         children[string.char(i)] = e(settingEntry, {
             setting = setting;
+            selectedSettings = props.selectedSettings;
+            onSelectedChanged = props.onSelectedChanged;
             onSettingChanged = props.onSettingChanged;
             onSettingCanceled = props.onSettingCanceled;
             onPrompt = props.onPrompt;
@@ -54,7 +56,7 @@ local function settingCategory(props, hooks)
 
     children.UIStroke = e("UIStroke", {
         Color = theme.border;
-        Thickness = 1;
+        Thickness = 2;
     })
 
     children.UICorner = e("UICorner", {

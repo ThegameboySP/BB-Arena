@@ -61,6 +61,8 @@ local function contents(props, hooks)
         categoryByName[name] = category
         children[name] = e(settingCategory, {
             settings = props.settings[category.name];
+            selectedSettings = props.selectedSettings;
+            onSelectedChanged = props.onSelectedChanged;
             category = category;
             changedSettings = props.changedSettings;
             onSettingChanged = props.onSettingChanged;

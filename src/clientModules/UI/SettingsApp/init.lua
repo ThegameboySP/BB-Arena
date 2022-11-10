@@ -62,6 +62,7 @@ SettingsApp = RoactRodux.connect(
                 type = typeMap[setting.type];
                 payload = setting.payload;
                 value = value;
+                default = setting.default;
                 description = setting.description;
                 id = id;
                 order = setting.order;
@@ -123,14 +124,14 @@ SettingsApp = RoactRodux.connect(
             onSettingsSaved = function()
                 dispatch(RoduxFeatures.actions.flushSaveSettings())
             end;
-            onSettingsCanceled = function()
-                dispatch(RoduxFeatures.actions.cancelLocalSettings())
+            onSettingsCanceled = function(settings)
+                dispatch(RoduxFeatures.actions.cancelLocalSettings(settings))
             end;
             onSettingCanceled = function(id)
                 dispatch(RoduxFeatures.actions.cancelLocalSetting(id))
             end;
-            onRestoreDefaults = function()
-                dispatch(RoduxFeatures.actions.restoreDefaultSettings())
+            onRestoreDefaults = function(settings)
+                dispatch(RoduxFeatures.actions.restoreDefaultSettings(settings))
             end;
         }
     end

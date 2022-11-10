@@ -7,6 +7,7 @@ local Players = game:GetService("Players")
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
+local RoactSpring = require(ReplicatedStorage.Packages.RoactSpring)
 local Dictionary = Llama.Dictionary
 local e = Roact.createElement
 
@@ -132,6 +133,10 @@ local function settingEntry(props, hooks)
     local theme = hooks.useContext(ThemeContext)
     local prompt, setPrompt = hooks.useState(nil)
     local keybindCallback, setKeybindCallback = hooks.useState(nil)
+    local styles, api = RoactSpring.useSpring(hooks, function()
+        return { selectionOutlineTransparency = 1 }
+    end)
+
     local outerRef = hooks.useBinding()
 
     hooks.useEffect(function()
@@ -408,10 +413,29 @@ local function settingEntry(props, hooks)
         })
     end
 
-    return e("Frame", {
+    return e("TextButton", {
         BackgroundTransparency = 1;
         Size = UDim2.new(1, 0, 0, descriptionBounds.Y + 1 + TITLE_TEXT_SIZE + MARGIN + MARGIN);
+        Text = "";
+
+        [Roact.Event.MouseButton1Click] = if not setting.valid then nil else function()
+            local isSelected = not props.selectedSettings:getValue()[setting.id]
+            props.onSelectedChanged(setting.id, isSelected)
+        end;
     }, {
+        UIStroke = e("UIStroke", {
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+            Color = theme.accent:Lerp(Color3.new(1, 1, 1), 0.5);
+            Transparency = styles.selectionOutlineTransparency;
+            -- TODO: this is bad. fix me.
+            Thickness = props.selectedSettings:map(function(selectedSettings)
+                local isSelected = not selectedSettings[setting.id]
+                local alpha = if isSelected then 1 else 0
+                api.start({ selectionOutlineTransparency = alpha })
+
+                return 2
+            end);
+        });
         Title = e("TextLabel", {
             Text = setting.name;
             Font = Enum.Font.GothamSemibold;

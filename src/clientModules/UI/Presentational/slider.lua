@@ -44,6 +44,12 @@ local function slider(props, hooks)
             onMoved(input.Position)
         end))
 
+        table.insert(connections, UserInputService.InputEnded:Connect(function(input)
+            if listeningInput[input.UserInputType] then
+                self.held = false
+            end
+        end))
+
         return function()
             for _, connection in connections do
                 connection:Disconnect()
@@ -71,11 +77,6 @@ local function slider(props, hooks)
         Marker = e(props.inactive and "ImageLabel" or "ImageButton", {
             [Roact.Event.MouseButton1Down] = if props.inactive then nil else function()
                 self.held = true
-            end;
-            [Roact.Event.InputEnded] = if props.inactive then nil else function(_, input)
-                if listeningInput[input.UserInputType] then
-                    self.held = false
-                end
             end;
 
             Size = UDim2.fromOffset(20, 20);

@@ -184,10 +184,12 @@ function actions.flushSaveSettings()
     end
 end
 
-function actions.cancelLocalSettings()
+function actions.cancelLocalSettings(settings)
     return {
         type = "users_cancelLocalSettings";
-        payload = {};
+        payload = {
+            settings = settings;
+        };
         meta = {
             realm = "client";
         }
@@ -206,10 +208,12 @@ function actions.cancelLocalSetting(id)
     }
 end;
 
-function actions.restoreDefaultSettings()
+function actions.restoreDefaultSettings(settings)
     return {
         type = "users_restoreDefaultSettings";
-        payload = {};
+        payload = {
+            settings = settings;
+        };
         meta = {
             realm = "client";
         }
