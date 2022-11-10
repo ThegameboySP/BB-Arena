@@ -11,21 +11,12 @@ local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
-local t = require(ReplicatedStorage.Packages.t)
 local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
+local Definitions = require(ReplicatedStorage.Common.Definitions)
 
 local reconcileTeams = require(script.reconcileTeams)
 
 local Components = require(ReplicatedStorage.Common.Components)
-
-local metaDefinition = t.interface({
-    Teams = t.map(t.string, t.BrickColor);
-
-    IslandTopColor = t.optional(t.Color3);
-    IslandBaseColor = t.optional(t.Color3);
-	
-	Creator = t.optional(t.string);
-})
 
 local MapService = {
 	Name = "MapService";
@@ -67,13 +58,13 @@ function MapService:OnInit()
 	
     local mapInfo = {}
 	for _, map in pairs(self.Maps:GetChildren()) do
-		local meta = map:FindFirstChild("Meta")
-
-		if meta then
-        	mapInfo[map.Name] = require(meta)
-		else
-			warn(("%q does not have a Meta module"):format(map:GetFullName()))
+		local ok, err = Definitions.map(map)
+		if not ok then
+			warn("[MapService]", string.format("Map %q is not valid: %s. Removing it.", map.Name, err))
+			map.Parent = nil
 		end
+
+		mapInfo[map.Name] = require(map:FindFirstChild("Meta"))
 	end
 
 	Root.globals.mapInfo:Set(table.freeze(mapInfo))
@@ -170,9 +161,8 @@ function MapService:ChangeMap(mapName)
 	if newMap == nil then
 		return false, ("No map name called: %q"):format(mapName)
 	end
-	
-    local meta = require(newMap:FindFirstChild("Meta") or error("No Meta under " .. mapName))
-    assert(metaDefinition(meta))
+
+	local meta = require(newMap:FindFirstChild("Meta"))
 
 	self.ChangingMaps = true
 	self.MapScript = nil
