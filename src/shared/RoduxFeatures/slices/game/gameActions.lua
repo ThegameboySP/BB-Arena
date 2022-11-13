@@ -47,4 +47,17 @@ function gameActions.playerDied(userId, killerId, cause)
     }
 end
 
+function gameActions.setAnonymousFighters(enabled)
+    return function(store)
+        if store:getState().game.anonymousFighters ~= enabled then
+            store:dispatch({
+                type = "game_setAnonymousFighters";
+                payload = {
+                    enabled = enabled;
+                }
+            })
+        end
+    end
+end
+
 return gameActions

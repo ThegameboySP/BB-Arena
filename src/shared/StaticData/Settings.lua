@@ -95,6 +95,15 @@ local array = {
         };
     },
     {
+        key = "enemyDefaultAppearance";
+        group = "place";
+
+        default = false;
+        type = "boolean";
+        name = "Enemies have default appearance";
+        description = "Whether enemies are set as a noob. This is useful in case someone dresses up in a way to camouflage in the map";
+    },
+    {
         key = "lighting";
         group = "place";
 

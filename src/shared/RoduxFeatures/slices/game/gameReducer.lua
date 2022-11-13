@@ -7,6 +7,7 @@ local Dictionary = Llama.Dictionary
 
 return Rodux.createReducer({
     mapInfo = {};
+    anonymousFighters = false;
     gamemodeId = nil;
     mapId = nil;
 }, {
@@ -31,6 +32,11 @@ return Rodux.createReducer({
     game_setMapInfo = function(state, action)
         return Dictionary.merge(state, {
             mapInfo = action.payload.mapInfo;
+        })
+    end;
+    game_setAnonymousFighters = function(state, action)
+        return Dictionary.merge(state, {
+            anonymousFighters = action.payload.enabled;
         })
     end;
 })

@@ -71,7 +71,8 @@
   
       "StarterPlayer": {
         "$properties": {
-          "AutoJumpEnabled": false
+          "AutoJumpEnabled": false,
+          "LoadCharacterAppearance": false
         },
         "StarterPlayerScripts": {
           "Client": {
