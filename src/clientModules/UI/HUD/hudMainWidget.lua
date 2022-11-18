@@ -49,9 +49,13 @@ local function healthbar(props, hooks)
         BorderSizePixel = 0;
         BackgroundColor3 = Color3.fromRGB(180, 29, 29);
     }, {
-        Green = e("Frame", {
-            Size = UDim2.new(props.health / props.maxHealth, 0, 1, 0);
-            BackgroundColor3 = Color3.fromRGB(75, 181, 37);
+        Healthbar = e("Frame", {
+            Size =
+                if props.isGodded then UDim2.new(1, 0, 1, 0)
+                else UDim2.new(props.health / props.maxHealth, 0, 1, 0);
+            BackgroundColor3 =
+                if props.isGodded then Color3.fromRGB(85, 115, 103)
+                else Color3.fromRGB(75, 181, 37);
             BorderSizePixel = 0;
         });
 
@@ -70,7 +74,10 @@ local function healthbar(props, hooks)
 
             FontFace = Font.fromName("RobotoMono", Enum.FontWeight.Bold);
             TextSize = 18;
-            Text = string.format("%d/%d", props.health, props.maxHealth);
+            Text =
+                if props.isGodded then "INVULNERABLE"
+                else string.format("%d/%d", props.health, props.maxHealth);
+
             TextXAlignment = Enum.TextXAlignment.Center;
             TextYAlignment = Enum.TextYAlignment.Center;
             TextColor3 = Color3.fromRGB(255, 255, 255);
@@ -147,7 +154,7 @@ local function hudMainWidget(props, hooks)
         end
     end, {})
 
-    local hasHealthbar = props.health ~= props.maxHealth
+    local hasHealthbar = props.maxHealth ~= props.health or props.isGodded
 
 	return e("Frame", {
         [Roact.Ref] = rootRef;
@@ -204,6 +211,7 @@ local function hudMainWidget(props, hooks)
         
                     health = props.health;
                     maxHealth = props.maxHealth;
+                    isGodded = props.isGodded;
                 });
         
                 Items = e("Frame", {

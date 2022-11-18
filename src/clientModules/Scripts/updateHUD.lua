@@ -103,6 +103,7 @@ local function updateHUD(root)
             toolTip = toolTip;
             health = activeHumanoid and activeHumanoid.Health;
             maxHealth = activeHumanoid and activeHumanoid.MaxHealth;
+            isGodded = activeHumanoid and activeHumanoid:GetAttribute("IsGodded");
 
             failedAction = Input.ActionFailure;
 
