@@ -123,13 +123,13 @@ local function init()
 
     Root.notification = function(msg, options)
         options = options or {}
-        options.sender = options.sender or "Nexus Arena"
+        options.sender = options.sender or "Brickbattle Arena"
 
         notificationGUI(msg, options)
     end
     Root.hint = function(msg, options)
         options = options or {}
-        options.sender = options.sender or "Nexus Arena"
+        options.sender = options.sender or "Brickbattle Arena"
 
         hintGUI(msg, options)
     end
