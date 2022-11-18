@@ -34,7 +34,7 @@ MapList = RoactRodux.connect(
         local mapInfo = {}
 
         for name, info in state.game.mapInfo do
-            table.insert(mapInfo, {
+            mapInfo[name] = {
                 ["Map name"] = name;
                 ["Teams"] = transform(info.teamSize);
                 ["Size"] = transform(info.size);
@@ -42,7 +42,8 @@ MapList = RoactRodux.connect(
                 ["CTF"] = transform(info.supportsCTF);
                 ["Control Points"] = transform(info.supportsControlPoints);
                 ["Creator"] = transform(info.creator);
-            })
+                ["Thumbnail"] = info.thumbnail;
+            }
         end
 
         return Llama.Dictionary.merge(props, {

@@ -3,20 +3,12 @@ local UserInputService = game:GetService("UserInputService")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
+local within = require(ReplicatedStorage.ClientModules.UI.Utils.within)
 
 local listeningInput = {
     [Enum.UserInputType.MouseButton1] = true;
     [Enum.UserInputType.Touch] = true;
 }
-
-local function within(instance, mouse)
-    local pos = instance.AbsolutePosition
-    local size = instance.AbsoluteSize
-
-    return
-        mouse.X >= pos.X and mouse.X <= (pos.X + size.X)
-        and mouse.Y >= pos.Y and mouse.Y <= (pos.Y + size.Y)
-end
 
 local function roundv2(v2)
     return Vector2.new(math.round(v2.X), math.round(v2.Y))

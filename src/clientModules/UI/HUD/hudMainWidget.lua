@@ -82,6 +82,30 @@ end
 
 healthbar = RoactHooks.new(Roact)(healthbar)
 
+local function timer(props)
+    local seconds = math.max(0, props.secondsTimer)
+
+    return e("TextLabel", {
+        Visible = props.secondsTimer > 0;
+
+        Position = UDim2.new(0.5, 0, 0, 28 + 4);
+        Size = UDim2.new(0, 500, 0, 28);
+        AnchorPoint = Vector2.new(0.5, 1);
+
+        BackgroundTransparency = 1;
+        
+        TextSize = 32;
+        FontFace = Font.fromName("RobotoMono", Enum.FontWeight.Bold);
+        TextColor3 = Color3.fromRGB(180, 29, 29):Lerp(Color3.new(1, 1, 1), math.min(1, seconds / 30));
+        TextStrokeTransparency = 0.5;
+        TextXAlignment = Enum.TextXAlignment.Center;
+        TextYAlignment = Enum.TextYAlignment.Bottom;
+        Text = string.format("%d:%02d", seconds / 60, seconds % 60);
+    })
+end
+
+timer = RoactHooks.new(Roact)(timer)
+
 local function hudMainWidget(props, hooks)
     local rootRef = hooks.useBinding()
     local tooltipRef = hooks.useBinding()
@@ -90,7 +114,7 @@ local function hudMainWidget(props, hooks)
     hooks.useEffect(function()
         local root = rootRef:getValue()
 
-        local healthbarGui = root.Contents:FindFirstChild("Healthbar")
+        local healthbarGui = root.Contents:FindFirstChild("Scaled"):FindFirstChild("Healthbar")
         if healthbarGui then
             local itemsLen = #props.items
             local contentSizeX = ITEM_SIZE * itemsLen + ((itemsLen - 1) * PADDING)
@@ -139,51 +163,64 @@ local function hudMainWidget(props, hooks)
 
             BackgroundTransparency = 1;
         }, {
-            UIScale = e(AutoUIScale, {
-                minScaleRatio = 0.8;
-                maxAxisSize = 500;
-                onScaleChanged = setScaleBinding;
+            Timer = e(timer, {
+                secondsTimer = props.secondsTimer;
             });
-    
-            Tooltip = e("TextLabel", {
-                [Roact.Ref] = tooltipRef;
-    
+
+            Scaled = e("Frame", {
+                Visible = props.displayBattleInfo;
+
                 AnchorPoint = Vector2.new(0.5, 1);
-                Position = UDim2.new(0.5, 0, 1, -(ITEM_SIZE + (hasHealthbar and (PADDING + 4*2 + 18) or 0) + PADDING));
-                Size = UDim2.new(0, 300, 0, 20);
-    
-                BackgroundTransparency = 1;
-                FontFace = Font.fromName("Gotham", Enum.FontWeight.Bold);
-                TextColor3 = Color3.new(1, 1, 1);
-                TextSize = 20;
-                TextStrokeTransparency = 0.4;
-    
-                RichText = false;
-                Text = props.toolTip or "";
-            });
-    
-            Healthbar = if not hasHealthbar then nil else e(healthbar, {
-                anchorPoint = Vector2.new(0.5, 1);
-                position = UDim2.new(0.5, 0, 1, -(ITEM_SIZE + PADDING + 4));
-    
-                health = props.health;
-                maxHealth = props.maxHealth;
-            });
-    
-            Items = e("Frame", {
                 Size = UDim2.new(1, 0, 1, 0);
+                Position = UDim2.new(0.5, 0, 1, 0);
                 BackgroundTransparency = 1;
-                ZIndex = 2;
             }, {
-                Items = e(inventoryHotkeys, {
-                    padding = PADDING;
-                    items = props.items;
-                    equippedItemName = props.equippedItemName;
-                    rootRef = rootRef;
-                    scaleBinding = scaleBinding;
-                    onEquipped = props.onEquipped;
+                UIScale = e(AutoUIScale, {
+                    minScaleRatio = 0.8;
+                    maxAxisSize = 500;
+                    onScaleChanged = setScaleBinding;
+                });
+        
+                Tooltip = e("TextLabel", {
+                    [Roact.Ref] = tooltipRef;
+        
+                    AnchorPoint = Vector2.new(0.5, 1);
+                    Position = UDim2.new(0.5, 0, 1, -(ITEM_SIZE + (hasHealthbar and (PADDING + 4*2 + 18) or 0) + PADDING));
+                    Size = UDim2.new(0, 300, 0, 20);
+        
+                    BackgroundTransparency = 1;
+                    FontFace = Font.fromName("RobotoMono", Enum.FontWeight.Bold);
+                    TextColor3 = Color3.new(1, 1, 1);
+                    TextSize = 20;
+                    TextStrokeTransparency = 0.4;
+        
+                    RichText = false;
+                    Text = props.toolTip or "";
+                });
+        
+                Healthbar = if not hasHealthbar then nil else e(healthbar, {
+                    anchorPoint = Vector2.new(0.5, 1);
+                    position = UDim2.new(0.5, 0, 1, -(ITEM_SIZE + PADDING + 4));
+        
+                    health = props.health;
+                    maxHealth = props.maxHealth;
+                });
+        
+                Items = e("Frame", {
+                    Size = UDim2.new(1, 0, 1, 0);
+                    BackgroundTransparency = 1;
+                    ZIndex = 2;
+                }, {
+                    Items = e(inventoryHotkeys, {
+                        padding = PADDING;
+                        items = props.items;
+                        equippedItemName = props.equippedItemName;
+                        rootRef = rootRef;
+                        scaleBinding = scaleBinding;
+                        onEquipped = props.onEquipped;
+                    })
                 })
-            })
+            });
         })
     })
 end

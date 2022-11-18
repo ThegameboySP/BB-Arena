@@ -29,6 +29,7 @@ local function window(props, hooks)
     }, {
         UIScale = e(AutoUIScale, {
             minScaleRatio = 0.5;
+            maxScaleRatio = 2;
         });
         Top = e(draggable, {
             topRef = topRef;

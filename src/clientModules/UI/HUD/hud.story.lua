@@ -64,6 +64,9 @@ return function(target)
 			})
 			Roact.update(tree, e(HUDApp, props))
 		end;
+
+		secondsTimer = 1;
+		displayBattleInfo = true;
 	}
 	
 	local roactTree = e(HUDApp, props)

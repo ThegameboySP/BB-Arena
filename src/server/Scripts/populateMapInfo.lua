@@ -21,7 +21,7 @@ local function populateMapInfo(root)
         local meta = require(map:FindFirstChild("Meta"))
         local size
         if map:IsA("Model") then
-            _, size = map:GetBoundingBox()
+            size = map:GetExtentsSize()
         end
 
         local info = {
@@ -29,6 +29,7 @@ local function populateMapInfo(root)
             size = size;
             creator = meta.Creator;
             teamSize = countTeams(meta.Teams);
+            thumbnail = meta.Thumbnail;
         }
 
         mapInfo[map.Name] = info

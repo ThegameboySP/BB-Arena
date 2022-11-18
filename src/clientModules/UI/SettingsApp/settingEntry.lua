@@ -88,6 +88,8 @@ local function toolOrderModal(props, hooks)
             position = UDim2.new(0.5, 0, 1, -66 -HUDConstants.HUD_PADDING*2);
             anchor = Vector2.new(0.5, 1);
 
+            color = Color3.new(1, 1, 1);
+
             text = "Done";
             textSize = 20;
             onPressed = function()

@@ -16,6 +16,7 @@ if RunService:IsClient() then
     local gui = Instance.new("ScreenGui")
     gui.ResetOnSpawn = false
     gui.Name = "MapList"
+    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = Players.LocalPlayer.PlayerGui
 
     local isOn = false
@@ -32,7 +33,7 @@ if RunService:IsClient() then
                 end;
                 changeToMap = function(mapName)
                     local cmdr = Root:GetService("CmdrController").Cmdr
-                    return cmdr.Dispatcher:EvaluateAndRun("changemap " .. mapName)
+                    return cmdr.Dispatcher:EvaluateAndRun(("changemap %q"):format(mapName))
                 end;
             })
 

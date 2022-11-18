@@ -20,7 +20,10 @@
       "ReplicatedStorage": {
         "$className": "ReplicatedStorage",
         "Assets": {
-          "$path": "assets.rbxmx"
+          "$path": "assets/assets.rbxmx",
+          "Images": {
+            "$path": "assets/Images.lua"
+          }
         },
         "Packages": {
           "$path": "shared-packages.project.json"
@@ -88,6 +91,14 @@
             "AutoAssignable": true,
             "TeamColor": { "BrickColor": 1001 }
           }
+        },
+        "Gladiators": {
+          "$className": "Team",
+          "$properties": {
+            "AutoAssignable": false,
+            "TeamColor": { "BrickColor": 21 },
+            "Tags": ["ToolsEnabled"]
+          }
         }
       },
 
@@ -129,9 +140,6 @@
       "TestService": {
         "$ignoreUnknownInstances": true,
   
-        "DevPackages": {
-          "$path": "dev-packages.project.json"
-        },
         "RunTests": {
           "$path": "runTests.server.lua"
         }

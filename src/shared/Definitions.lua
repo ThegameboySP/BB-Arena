@@ -34,6 +34,7 @@ Definitions.mapMeta = t.interface({
     IslandBaseColor = t.optional(t.Color3);
 	
 	Creator = t.optional(t.string);
+    Thumbnail = t.optional(t.string);
 })
 
 Definitions.map = mapChecker(t.instanceOf("Model", {

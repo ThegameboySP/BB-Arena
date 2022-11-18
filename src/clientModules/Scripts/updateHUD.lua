@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Effects = require(ReplicatedStorage.Common.Utils.Effects)
@@ -67,10 +68,17 @@ local function updateHUD(root)
     local toolTip = ""
 
     local function equipTool(tool)
-        if activeHumanoid then
-            activeHumanoid:UnequipTools()
+        -- I don't know why, but if the character's parent is nil (when spawning),
+        -- the tool is taken out of the DataModel, even when the character supposedly enters it.
+        if activeHumanoid and LocalPlayer.Character and LocalPlayer.Character.Parent then
+            for _, child in LocalPlayer.Character:GetChildren() do
+                if child:IsA("Tool") then
+                    child.Parent = LocalPlayer.Backpack
+                end
+            end
+
             if tool then
-                tool.Parent = activeHumanoid.Parent
+                tool.Parent = LocalPlayer.Character
             end
         end
     end
@@ -78,11 +86,15 @@ local function updateHUD(root)
     local cachedTools = {}
     local cachedMappedTools = {}
     
+    local displayBattleInfo = false
+    
     local function getProps()
         cachedTools = table.freeze(root.Tools:GetEquippedTools())
         cachedMappedTools = table.freeze(mapTools(cachedTools, selectors.getLocalSetting(root.Store:getState(), "weaponOrder")))
 
         local equippedTool = root.Tools:GetEquippedTool()
+
+        local timestamp = ReplicatedStorage:GetAttribute("TimerTimestamp")
 
         return {
             equippedItemName = equippedTool and equippedTool.instance.Name;
@@ -97,6 +109,9 @@ local function updateHUD(root)
             onEquipped = function(itemName)
                 equipTool(getToolInstanceByName(cachedTools, itemName))
             end;
+            
+            displayBattleInfo = displayBattleInfo;
+            secondsTimer = if timestamp then timestamp - Workspace:GetServerTimeNow() else 0;
         }
     end
 
@@ -106,26 +121,14 @@ local function updateHUD(root)
     screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     screenGui.Parent = LocalPlayer.PlayerGui
 
-    local handle
-    local function mount()
-        if not handle then
-            handle = Roact.mount(Roact.createElement(HUD, getProps()), screenGui)
-        end
-    end
-
-    local function unmount()
-        if handle then
-            Roact.unmount(handle)
-            handle = nil
-        end
-    end
+    local handle = Roact.mount(Roact.createElement(HUD, getProps()), screenGui)
 
     local function onTeamChanged()
         local team = LocalPlayer.Team
         if team and CollectionService:HasTag(team, "ToolsEnabled") then
-            mount()
+            displayBattleInfo = true
         else
-            unmount()
+            displayBattleInfo = false
         end
     end
 
@@ -159,7 +162,7 @@ local function updateHUD(root)
 
     root.Input.EquippedItemHotkey:Connect(function(order)
         local item = cachedMappedTools[order]
-        if handle and item then
+        if displayBattleInfo and item then
             local equippedTool = root.Tools:GetEquippedTool()
             if equippedTool and equippedTool.instance.Name == item.name then
                 equipTool(nil)
