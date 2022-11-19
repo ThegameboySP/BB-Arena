@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 
-local Root = require(ReplicatedStorage.Common.Root)
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local t = require(ReplicatedStorage.Packages.t)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -47,8 +46,8 @@ local function loadGamemodes(parent, callback)
 end
 
 function GamemodeService:OnInit()
-    self.MapService = Root:GetService("MapService")
-    self.StatService = Root:GetService("StatService")
+    self.MapService = self.Root:GetService("MapService")
+    self.StatService = self.Root:GetService("StatService")
 
     self.gamemodes = loadGamemodes(Gamemodes, function(module)
         local definition = require(module).definition
@@ -88,7 +87,7 @@ function GamemodeService:GetGamemodes()
 end
 
 function GamemodeService:SetGamemode(name, config)
-    local gamemodeId = Root.Store:getState().game.gamemodeId
+    local gamemodeId = self.Root.Store:getState().game.gamemodeId
     if gamemodeId == name then
         return false, string.format("%q is already set", name)
     end
@@ -124,7 +123,7 @@ function GamemodeService:SetGamemode(name, config)
     self.gamemodeProcess = gamemode.server.new(self, self.binder)
     self.gamemodeProcess:OnInit(config, CollectionService:GetTagged("FightingTeam"))
 
-    Root.Store:dispatch(RoduxFeatures.actions.gamemodeStarted(definition.nameId))
+    self.Root.Store:dispatch(RoduxFeatures.actions.gamemodeStarted(definition.nameId))
     self.GamemodeStarted:Fire(definition)
 
     return true, string.format("Gamemode set to %q", name)
@@ -182,7 +181,7 @@ function GamemodeService:StopGamemode(completedSuccessfully)
         self.binder:Destroy()
         self.binder = nil
 
-        Root.Store:dispatch(RoduxFeatures.actions.gamemodeEnded(nameId))
+        self.Root.Store:dispatch(RoduxFeatures.actions.gamemodeEnded(nameId))
         self.GamemodeOver:Fire({cancelled = not completedSuccessfully})
 
         return true
@@ -228,15 +227,15 @@ function GamemodeService:GetManager()
 end
 
 function GamemodeService:GetRemoteEvent(name)
-    return Root:getRemoteEvent(name)
+    return self.Root:getRemoteEvent(name)
 end
 
 function GamemodeService:SayEvent(msg, options)
-    Root.hint(msg, options)
+    self.Root.hint(msg, options)
 end
 
 function GamemodeService:AnnounceEvent(msg, options)
-    Root.notification(msg, options)
+    self.Root.notification(msg, options)
 end
 
 return GamemodeService

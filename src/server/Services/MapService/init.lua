@@ -67,7 +67,7 @@ function MapService:OnInit()
 		mapInfo[map.Name] = require(map:FindFirstChild("Meta"))
 	end
 
-	Root.globals.mapInfo:Set(table.freeze(mapInfo))
+	self.Root.globals.mapInfo:Set(table.freeze(mapInfo))
 	
 	self.LightingSaves.Name = "LightingSaves"
 	self.LightingSaves.Parent = ReplicatedStorage
@@ -235,7 +235,7 @@ function MapService:ChangeMap(mapName)
 
 	self.ChangingMaps = false
 
-	Root.Store:dispatch(RoduxFeatures.actions.mapChanged(mapName))
+	self.Root.Store:dispatch(RoduxFeatures.actions.mapChanged(mapName))
 	self.MapChanged:Fire(newMap)
 	self.Client.CurrentMap:Set(newMap)
 end

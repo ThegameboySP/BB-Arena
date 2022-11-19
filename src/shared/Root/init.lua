@@ -156,7 +156,7 @@ function Root:GetServerService(name)
         else nil
 end
 
-function Root:Start(tbl)
+function Root:Start()
     assert(self._status == Status.Uninitialized, "Already started root")
 
     task.spawn(function()
@@ -225,16 +225,18 @@ function Root:Start(tbl)
         end)
         
         for _, service in servicesOrder do
+            service.Root = self
+
             if service.OnInit then
                 xpcall(service.OnInit, function(err)
                     task.spawn(error, debug.traceback(err, 2))
-                end, service, tbl)
+                end, service)
             end
         end
     
         for _, service in servicesOrder do
             if service.OnStart then
-                task.spawn(service.OnStart, service, tbl)
+                task.spawn(service.OnStart, service)
             end
         end
     

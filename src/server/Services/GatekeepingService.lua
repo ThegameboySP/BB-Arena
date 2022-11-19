@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
-local Root = require(ReplicatedStorage.Common.Root)
 local LitUtils = require(ReplicatedStorage.Common.Utils.LitUtils)
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
@@ -30,7 +29,7 @@ local function lockedServerMessage(adminLevel)
 end
 
 function GatekeepingService:OnStart()
-    Root.Store.changed:connect(function(new, old)
+    self.Root.Store.changed:connect(function(new, old)
         if new.users == old.users then
             return
         end
@@ -50,7 +49,7 @@ function GatekeepingService:OnStart()
     local function onPlayerAdded(player)
         local bannedMessage
         local lockedMessage
-        local state = Root.Store:getState()
+        local state = self.Root.Store:getState()
 
         if selectors.canUserBeLockKicked(state, player.UserId, state.users.serverLockedBy) then
             lockedMessage = lockedServerMessage(selectors.getAdmin(state, state.users.serverLockedBy))
@@ -68,7 +67,7 @@ function GatekeepingService:OnStart()
         elseif lockedMessage then
             player:Kick(lockedMessage)
         else
-            Root.Store:dispatch(actions.userJoined(player.UserId))
+            self.Root.Store:dispatch(actions.userJoined(player.UserId))
         end
     end
 
@@ -78,8 +77,8 @@ function GatekeepingService:OnStart()
     end
 
     Players.PlayerRemoving:Connect(function(player)
-        if Root.Store:getState().users.activeUsers[player.UserId] then
-            Root.Store:dispatch(actions.userLeft(player.UserId))
+        if self.Root.Store:getState().users.activeUsers[player.UserId] then
+            self.Root.Store:dispatch(actions.userLeft(player.UserId))
         end
     end)
 end

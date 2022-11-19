@@ -1,7 +1,4 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-
-local Root = require(ReplicatedStorage.Common.Root)
 
 local valueClassByType = {
     string = "StringValue";
@@ -36,9 +33,9 @@ function StatController:OnInit()
         self._leaderstats[player.UserId] = nil
     end)
 
-    self:_updateInit(Root.Store:getState().stats)
+    self:_updateInit(self.Root.Store:getState().stats)
 
-    Root.Store.changed:connect(function(new, old)
+    self.Root.Store.changed:connect(function(new, old)
         if new.stats.visualStats ~= old.stats.visualStats then
             for userId, stats in new.stats.visualStats do
                 local oldStats = old.stats.visualStats[userId]
@@ -85,7 +82,7 @@ function StatController:_getOrMakeLeaderstats(userId)
 end
 
 function StatController:_update(userId, name, value)
-    local stats = Root.Store:getState().stats
+    local stats = self.Root.Store:getState().stats
 
     if stats.visibleRegisteredStats[name] then
         local registeredStat = stats.registeredStats[name]
@@ -116,7 +113,7 @@ end
 
 function StatController:_setStatVisibility(name, visible)
     if visible then
-        for userId, values in Root.Store:getState().stats.visualStats do
+        for userId, values in self.Root.Store:getState().stats.visualStats do
             for statName, value in values do
                 if statName == name then
                     self:_update(userId, name, value)

@@ -5,7 +5,6 @@ local UserInputService = game:GetService("UserInputService")
 
 local Events = script.Events
 
-local Root = require(ReplicatedStorage.Common.Root)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 
 local CmdrReplicated = ReplicatedStorage.CmdrReplicated
@@ -21,11 +20,11 @@ local CmdrController = {
 }
 
 function CmdrController:CanRun(player, group)
-	return canRun.canRun(Root.Store:getState().users, player.UserId, group)
+	return canRun.canRun(self.Root.Store:getState().users, player.UserId, group)
 end
 
 function CmdrController:OnInit()
-    local CmdrService = Root:GetServerService("CmdrService")
+    local CmdrService = self.Root:GetServerService("CmdrService")
 
 	CmdrService.Warning:Connect(function(str)
 		CmdrNotifications:AddMessage(str, true, ERROR_COLOR)
@@ -42,11 +41,13 @@ end
 function CmdrController:OnStart()
 	local CmdrClient = self.Cmdr
 
+	task.wait(0.5)
+	
 	local common = CmdrClient.Registry:GetStore("Common")
-	common.Root = Root
-	common.Store = Root.Store
+	common.Root = self.Root
+	common.Store = self.Root.Store
 
-	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, Root.globals.mapInfo:Get())
+	require(CmdrReplicated.registerTypes)(CmdrClient.Registry, self.Root.globals.mapInfo:Get())
 	require(CmdrReplicated.processCommands)(CmdrClient.Registry)
 	CmdrClient.Registry.Types.player = CmdrClient.Registry.Types.arenaPlayer
 	CmdrClient.Registry.Types.players = CmdrClient.Registry.Types.arenaPlayers

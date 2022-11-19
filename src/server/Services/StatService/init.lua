@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Teams = game:GetService("Teams")
 
 local Signal = require(ReplicatedStorage.Packages.Signal)
-local Root = require(ReplicatedStorage.Common.Root)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local actions = RoduxFeatures.actions
@@ -17,7 +16,7 @@ local StatService = {
 function StatService:OnInit()
     EventBus.playerDied:Connect(function(victim, info)
         if victim.Team ~= Teams.Spectators then
-            Root.Store:dispatch(actions.playerDied(
+            self.Root.Store:dispatch(actions.playerDied(
                 victim.UserId,
                 info.killer and info.killer.UserId,
                 info.cause
@@ -27,7 +26,7 @@ function StatService:OnInit()
 end
 
 function StatService:GetRegisteredStats()
-    return Root.Store:getState().stats.registeredStats
+    return self.Root.Store:getState().stats.registeredStats
 end
 
 -- TODO
@@ -36,11 +35,11 @@ end
 -- end
 
 function StatService:SetStatVisual(userId, name, value)
-    Root.Store:dispatch(actions.setStatVisual(userId, name, value))
+    self.Root.Store:dispatch(actions.setStatVisual(userId, name, value))
 end
 
 function StatService:IncrementStat(userId, name, amount)
-    Root.Store:dispatch(actions.incrementStat(userId, name, amount))
+    self.Root.Store:dispatch(actions.incrementStat(userId, name, amount))
     self.StatIncremented:Fire(userId, name, amount)
 end
 

@@ -3,7 +3,6 @@ local CollectionService = game:GetService("CollectionService")
 
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
-local Root = require(ReplicatedStorage.Common.Root)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 
 local GamemodeController = {
@@ -15,7 +14,7 @@ local GamemodeController = {
 }
 
 function GamemodeController:OnStart()
-    self.clonerManager = Root:GetService("MapController").ClonerManager
+    self.clonerManager = self.Root:GetService("MapController").ClonerManager
 end
 
 function GamemodeController:onGamemodeStarted(gamemodeName)
@@ -67,7 +66,7 @@ function GamemodeController:onMapChanged()
 end
 
 function GamemodeController:GetRemoteEvent(name)
-    return Root:getRemoteEvent(name)
+    return self.Root:getRemoteEvent(name)
 end
 
 return GamemodeController

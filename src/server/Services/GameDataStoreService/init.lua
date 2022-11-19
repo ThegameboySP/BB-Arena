@@ -7,7 +7,6 @@ local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
-local Root = require(ReplicatedStorage.Common.Root)
 
 local updaters = require(script.updaters)
 local updateSave = require(script.updateSave)
@@ -22,7 +21,7 @@ local GameDataStoreService = {
 }
 
 function GameDataStoreService:_shouldUpdate(userId)
-    local state = Root.Store:getState()
+    local state = self.Root.Store:getState()
 
     return 
         self._isLoaded[userId]
@@ -36,7 +35,7 @@ end
 function GameDataStoreService:OnStart()
     local PlayerData = DataStoreService:GetDataStore("PlayerData")
 
-    local store = Root.Store
+    local store = self.Root.Store
 
     local function onPlayerAdded(player)
         local userId = player.UserId

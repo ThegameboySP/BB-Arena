@@ -3,7 +3,6 @@ local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 
-local Root = require(ReplicatedStorage.Common.Root)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local SkyboxTweener = require(ReplicatedStorage.ClientModules.Presentation.SkyboxTweener)
@@ -43,7 +42,7 @@ function MapController:RegisterComponent(class)
 end
 
 function MapController:OnStart()
-	self.MapService = Root:GetServerService("MapService")
+	self.MapService = self.Root:GetServerService("MapService")
 	self:_tween(self.MapService.CurrentMap:Get().Name)
 end
 
@@ -126,7 +125,7 @@ function MapController:_tween(mapName)
 		table.insert(tweens, TweenService:Create(Lighting, FADE_INFO, tweenProps))
 		table.insert(tweens, TweenService:Create(Lighting, TIME_FADE_INFO, {ClockTime = lightingEntry.Lighting.ClockTime.Value}))
 
-		local meta = Root.globals.mapInfo:Get()[mapName]
+		local meta = self.Root.globals.mapInfo:Get()[mapName]
 
 		for _, part in CollectionService:GetTagged("IslandTop") do
 			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandTopColor or DEFAULT_TOP_COLOR}))

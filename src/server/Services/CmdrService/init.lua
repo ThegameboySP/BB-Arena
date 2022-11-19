@@ -30,7 +30,6 @@ local CmdrService = {
 	};
 	
 	Cmdr = Cmdr;
-    _lockCommands = LockCommands.new(Root.Store);
 	_logs = {};
 }
 
@@ -44,7 +43,7 @@ local BLACKLISTED_COMMANDS = {
 }
 
 function CmdrService:CanRun(player, group)
-	return canRun.canRun(Root.Store:getState().users, player.UserId, group)
+	return canRun.canRun(self.Root.Store:getState().users, player.UserId, group)
 end
 
 function CmdrService:GetLogs()
@@ -52,14 +51,36 @@ function CmdrService:GetLogs()
 end
 
 function CmdrService:OnInit()
+	self._lockCommands = LockCommands.new(Root.Store)
+
 	local ownerId = game.PrivateServerOwnerId
 	if ownerId then
-        if selectors.getAdmin(Root.Store:getState(), ownerId) < GameEnum.AdminTiers.Admin then
-			Root.Store:dispatch(actions.setAdmin(ownerId, GameEnum.AdminTiers.Admin))
+        if selectors.getAdmin(self.Root.Store:getState(), ownerId) < GameEnum.AdminTiers.Admin then
+			self.Root.Store:dispatch(actions.setAdmin(ownerId, GameEnum.AdminTiers.Admin))
 		end
 	end
 
 	self:_setupCmdr()
+
+	local function playerHandler(player)
+		-- 0 = unknown player, -1 = player1, -2 = player2, etc
+		if player.UserId <= 0 then
+			self.Root.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Owner))
+		end
+	
+		local getRank = Promise.promisify(player.GetRankInGroup)
+	
+		-- TOB Ranktester and beyond gets admin.
+		getRank(player, 3397136):andThen(function(role)
+			if role >= 11 then
+				if selectors.getAdmin(self.Root.Store:getState(), player.UserId) < GameEnum.AdminTiers.Admin then
+					self.Root.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Admin))
+				end
+			end
+		end):finally(function()
+			player:SetAttribute("IsCmdrLoaded", true)
+		end)
+	end
 
 	Players.PlayerAdded:Connect(playerHandler)
 	for _, player in pairs(Players:GetPlayers()) do
@@ -69,8 +90,8 @@ end
 
 function CmdrService:_setupCmdr()
 	local common = Cmdr.Registry:GetStore("Common")
-	common.Root = Root
-	common.Store = Root.Store
+	common.Root = self.Root
+	common.Store = self.Root.Store
 
 	local CmdrReplicated = Instance.new("Folder")
 	CmdrReplicated.Name = "CmdrReplicated"
@@ -81,7 +102,7 @@ function CmdrService:_setupCmdr()
 		return not BLACKLISTED_COMMANDS[name]
 	end)
 	
-	registerArenaTypes(Cmdr.Registry, Root.globals.mapInfo:Get())
+	registerArenaTypes(Cmdr.Registry, self.Root.globals.mapInfo:Get())
 
 	Cmdr.Registry:RegisterCommandsIn(CmdrArena.Commands)
 	Cmdr.Registry:RegisterCommandsIn(CmdrCore.Commands)
@@ -179,26 +200,6 @@ function CmdrService:OnPlayerLoaded(player)
 			end) then con:Disconnect() end
 		end)
 	end
-end
-
-function playerHandler(player)
-	-- 0 = unknown player, -1 = player1, -2 = player2, etc
-	if player.UserId <= 0 then
-		Root.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Owner))
-	end
-
-	local getRank = Promise.promisify(player.GetRankInGroup)
-
-	-- TOB Ranktester and beyond gets admin.
-	getRank(player, 3397136):andThen(function(role)
-		if role >= 11 then
-			if selectors.getAdmin(Root.Store:getState(), player.UserId) < GameEnum.AdminTiers.Admin then
-				Root.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Admin))
-			end
-		end
-	end):finally(function()
-		player:SetAttribute("IsCmdrLoaded", true)
-	end)
 end
 
 return CmdrService
