@@ -32,10 +32,11 @@ local function handleCharacterAppearance(root)
         end
 
         local children = folder:GetChildren()
-        local r6 = folder:FindFirstChild("R6")
-        if r6 then
-            for _, child in r6:GetChildren() do
-                table.insert(children, child)
+        for _, child in children do
+            if child.Name == "R6" then
+                for _, r6Content in child:GetChildren() do
+                    table.insert(children, r6Content)
+                end
             end
         end
 
@@ -85,7 +86,10 @@ local function handleCharacterAppearance(root)
     local playersToUpdate = {}
 
     root:getRemoteEvent("NewPlayerAppearance").OnClientEvent:Connect(function(userId)
-        playersToUpdate[Players:GetPlayerByUserId(userId)] = true
+        local player = Players:GetPlayerByUserId(userId)
+        if player then
+            playersToUpdate[player] = true
+        end
     end)
 
     Effects.call(Players, Effects.pipe({
