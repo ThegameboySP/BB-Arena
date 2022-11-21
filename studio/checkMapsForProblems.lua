@@ -24,12 +24,25 @@ for _, map in maps do
     end
 
     local descendants = map:GetDescendants()
-    
+
     local props = {}
     for _, descendant in descendants do
         for _, tag in PROP_TAGS do
             if CollectionService:HasTag(descendant, tag) then
                 table.insert(props, descendant)
+            end
+        end
+    end
+
+    local forcefieldTime = nil
+    for _, descendant in descendants do
+        if descendant:IsA("SpawnLocation") then
+            if forcefieldTime and descendant.Duration ~= forcefieldTime then
+                warn(("%s has unequal forcefield durations"):format(map:GetFullName()))
+                table.insert(selection, map)
+                break
+            else
+                forcefieldTime = descendant.Duration
             end
         end
     end
