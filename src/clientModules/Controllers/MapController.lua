@@ -56,7 +56,7 @@ function MapController:onMapChanged(map)
 	local oldMap = self.CurrentMap
 	self.CurrentMap = map
 	self.MapScript = nil
-	
+
 	self.ClonerManager:ClientInit(map)
 	self.ClonerManager:Flush()
 	self.ClonerManager.Cloner:RunPrototypes(function()
@@ -99,7 +99,7 @@ function MapController:_tween(mapName)
 			self._skyboxTweener._fakeSkybox._viewport.Visible = true
 			local clone = skybox:Clone()
 			CollectionService:AddTag(clone, "MapBound")
-			
+
 			self._skyboxTweener:TweenSkybox(clone, FADE_INFO, removeSkybox)
 		else
 			self._skyboxTweener._fakeSkybox._viewport.Visible = false
@@ -122,31 +122,54 @@ function MapController:_tween(mapName)
 		end
 
 		local tweens = {}
-		table.insert(tweens, TweenService:Create(Lighting, FADE_INFO, tweenProps))
-		table.insert(tweens, TweenService:Create(Lighting, TIME_FADE_INFO, {ClockTime = lightingEntry.Lighting.ClockTime.Value}))
+		table.insert(tweens, {
+			goal = tweenProps;
+			tween = TweenService:Create(Lighting, FADE_INFO, tweenProps);
+		})
+
+		table.insert(tweens, {
+			goal = { ClockTime = lightingEntry.Lighting.ClockTime.Value };
+			tween = TweenService:Create(Lighting, TIME_FADE_INFO, { ClockTime = lightingEntry.Lighting.ClockTime.Value });
+		})
 
 		local meta = self.Root.globals.mapInfo:Get()[mapName]
 
-		for _, part in CollectionService:GetTagged("IslandTop") do
-			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandTopColor or DEFAULT_TOP_COLOR}))
+		for _, part in CollectionService:GetTagged("IslandBase") do
+			local goal = meta.IslandTopColor or DEFAULT_TOP_COLOR
+			table.insert(tweens, {
+				goal = { Color = goal };
+				tween = TweenService:Create(part, FADE_INFO, { Color = goal });
+			})
 		end
 
 		for _, part in CollectionService:GetTagged("IslandBase") do
-			table.insert(tweens, TweenService:Create(part, FADE_INFO, {Color = meta.IslandBaseColor or DEFAULT_BASE_COLOR}))
+			local goal = meta.IslandBaseColor or DEFAULT_BASE_COLOR
+			table.insert(tweens, {
+				goal = { Color = goal };
+				tween = TweenService:Create(part, FADE_INFO, { Color = goal });
+			})
 		end
 
-		for _, tween in tweens do
-			tween:Play()
+		for _, record in tweens do
+			-- TweenService has a bug going from larger to smaller values where the result is 0.
+			-- This is a patch to fix that.
+			record.tween.Completed:Once(function()
+				for key, value in record.goal do
+					record.tween.Instance[key] = value
+				end
+			end)
+			record.tween:Play()
 		end
 
 		self._lightingCleanupFn = function()
 			for _, tween in tweens do
-				tween:Cancel()
+				tween.tween:Cancel()
 			end
 
 			for key, value in pairs(tweenProps) do
 				Lighting[key] = value
 			end
+
 			Lighting.ClockTime = lightingEntry.Lighting.ClockTime.Value
 		end
 	end
@@ -157,7 +180,7 @@ function MapController:_getLightingEntryOrWarn(name)
 	if entry then
 		return entry
 	end
-	
+
 	warn("No lighting entry for", name)
 end
 
