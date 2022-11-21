@@ -2,7 +2,7 @@
     "name": "BB",
     "tree": {
       "$className": "DataModel",
-  
+
       "Workspace": {
         "$className": "Workspace",
         "MapRoot": {
@@ -45,7 +45,7 @@
           "$className": "Configuration"
         }
       },
-  
+
       "ServerScriptService": {
         "Packages": {
           "$path": "server-packages.project.json"
@@ -71,7 +71,7 @@
           "$className": "Folder"
         }
       },
-  
+
       "StarterPlayer": {
         "$properties": {
           "AutoJumpEnabled": false,
@@ -97,7 +97,7 @@
           "$properties": {
             "AutoAssignable": false,
             "TeamColor": { "BrickColor": 21 },
-            "Tags": ["ToolsEnabled"]
+            "Tags": ["ToolsEnabled", "ParticipatingTeam"]
           }
         }
       },
@@ -139,7 +139,7 @@
 
       "TestService": {
         "$ignoreUnknownInstances": true,
-  
+
         "RunTests": {
           "$path": "runTests.server.lua"
         }
