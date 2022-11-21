@@ -70,12 +70,10 @@ local function updateHUD(root)
     local function equipTool(tool)
         -- I don't know why, but if the character's parent is nil (when spawning),
         -- the tool is taken out of the DataModel, even when the character supposedly enters it.
-        if activeHumanoid and LocalPlayer.Character and LocalPlayer.Character.Parent then
-            for _, child in LocalPlayer.Character:GetChildren() do
-                if child:IsA("Tool") then
-                    child.Parent = LocalPlayer.Backpack
-                end
-            end
+        local character = LocalPlayer.Character
+        local humanoid = character and character:FindFirstChild("Humanoid")
+        if humanoid and character.Parent then
+            humanoid:UnequipTools()
 
             if tool then
                 tool.Parent = LocalPlayer.Character
@@ -85,9 +83,9 @@ local function updateHUD(root)
 
     local cachedTools = {}
     local cachedMappedTools = {}
-    
+
     local displayBattleInfo = false
-    
+
     local function getProps()
         cachedTools = table.freeze(root.Tools:GetEquippedTools())
         cachedMappedTools = table.freeze(mapTools(cachedTools, selectors.getLocalSetting(root.Store:getState(), "weaponOrder")))
@@ -110,7 +108,7 @@ local function updateHUD(root)
             onEquipped = function(itemName)
                 equipTool(getToolInstanceByName(cachedTools, itemName))
             end;
-            
+
             displayBattleInfo = displayBattleInfo;
             secondsTimer = if timestamp then timestamp - Workspace:GetServerTimeNow() else 0;
         }
@@ -138,7 +136,7 @@ local function updateHUD(root)
 
     RunService.Heartbeat:Connect(function()
         local currentTool = root.Tools:GetEquippedTool()
-        
+
         local strs = {}
         if currentTool and selectors.getLocalSetting(root.Store:getState(), "showToolHints") then
             for actionName, fns in Input:GetActions() do
