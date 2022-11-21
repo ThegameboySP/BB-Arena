@@ -5,6 +5,7 @@ local Players = game:GetService("Players")
 
 local IsDebug = RunService:IsStudio() and ReplicatedStorage:FindFirstChild("Configuration"):GetAttribute("IsDebug")
 
+local Signal = require(ReplicatedStorage.Packages.Signal)
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 local t = require(ReplicatedStorage.Packages.t)
 
@@ -31,7 +32,7 @@ end
 
 local function serializeAction(action, state, userIds)
     local serializers = RoduxFeatures.serializers[action.type]
-    
+
     if serializers then
         local serialized
         if serializers.serialize then
@@ -76,7 +77,7 @@ local function makeServerMiddleware(actionDispatchedRemote, root)
             if meta and meta.realm == "client" then
                 return
             end
-    
+
             if not meta or meta.realm ~= "server" then
                 local userIds = meta and meta.interestedUserIds or getUserIds()
                 local actionMap, serializedType = serializeAction(action, root.Store:getState(), userIds)
@@ -93,7 +94,7 @@ local function makeServerMiddleware(actionDispatchedRemote, root)
                     end
                 end
             end
-    
+
             nextDispatch(action)
         end
     end
@@ -121,6 +122,11 @@ local function roduxServer(root)
         nil,
         { Rodux.thunkMiddleware, makeServerMiddleware(actionDispatchedRemote, root), IsDebug and RoduxFeatures.middlewares.loggerMiddleware or nil }
     )
+
+    root.StoreChanged = Signal.new()
+    root.Store.changed:connect(function(...)
+        root.StoreChanged:Fire(...)
+    end)
 
     root.Store:dispatch(actions.merge(initState()))
 
@@ -153,7 +159,7 @@ local function roduxServer(root)
 
         if replicators and replicators.request then
             local toDispatch = replicators.request(client.UserId, action)
-            
+
             if toDispatch then
                 root.Store:dispatch(toDispatch)
             end

@@ -27,7 +27,7 @@ local function crosshair(root)
         end
     end
 
-    root.Store.changed:connect(onChanged)
+    root.StoreChanged:Connect(onChanged)
     onChanged(root.Store:getState(), nil)
 
     Effects.call(LocalPlayer, Effects.pipe({

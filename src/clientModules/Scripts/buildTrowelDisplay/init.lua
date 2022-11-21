@@ -34,7 +34,7 @@ end
 
 local function onBuildingTrowel(player, pos)
     local character = player.Character
-    
+
     if character then
         local trail = Trail:Clone()
         local a0 = Instance.new("Attachment")
@@ -56,7 +56,7 @@ local function onBuildingTrowel(player, pos)
         a0.Parent = part
         a1.Parent = part
         part.Parent = Workspace
-        
+
         local startingTime = os.clock()
         local cn
         cn = RunService.Heartbeat:Connect(function()
@@ -136,7 +136,7 @@ local function buildTrowelDisplay(root)
         end
     end
 
-    root.Store.changed:connect(update)
+    root.StoreChanged:Connect(update)
     update(root.Store:getState(), nil)
 end
 

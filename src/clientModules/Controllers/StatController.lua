@@ -35,11 +35,11 @@ function StatController:OnInit()
 
     self:_updateInit(self.Root.Store:getState().stats)
 
-    self.Root.Store.changed:connect(function(new, old)
+    self.Root.StoreChanged:Connect(function(new, old)
         if new.stats.visualStats ~= old.stats.visualStats then
             for userId, stats in new.stats.visualStats do
                 local oldStats = old.stats.visualStats[userId]
-    
+
                 for name, value in stats do
                     if not oldStats or oldStats[name] ~= value then
                         self:_update(userId, name, value)
@@ -68,9 +68,9 @@ function StatController:_getOrMakeLeaderstats(userId)
     if not self._loggedIn[userId] then
         return
     end
-    
+
     local leaderstats = self._leaderstats[userId]
-    
+
     if not leaderstats then
         leaderstats = Instance.new("NumberValue")
         leaderstats.Name = "leaderstats"
@@ -139,7 +139,7 @@ function StatController:_updateInit(stats)
             table.insert(statsToAdd, stat)
         end
     end
-    
+
     table.sort(statsToAdd, function(a, b)
         return a.priority > b.priority
     end)

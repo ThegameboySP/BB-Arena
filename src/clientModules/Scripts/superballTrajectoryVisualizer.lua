@@ -17,11 +17,11 @@ local function beamProjectile(g, v0, x0, t1)
 	local p3 = 0.5*g*t1*t1 + v0*t1 + x0
 	local p2 = p3 - (g*t1*t1 + v0*t1)/3
 	local p1 = (c*g*t1*t1 + 0.5*v0*t1 + x0 - c*(x0+p3))/(3*c) - p2
-	
+
 	-- the curve sizes
 	local curve0 = (p1 - x0).Magnitude
 	local curve1 = (p2 - p3).Magnitude
-	
+
 	-- build the world CFrames for the attachments
 	local b = (x0 - p3).Unit
 	local r1 = (p1 - x0).Unit
@@ -29,21 +29,21 @@ local function beamProjectile(g, v0, x0, t1)
 	local r2 = (p2 - p3).Unit
 	local u2 = r2:Cross(b).Unit
 	b = u1:Cross(r1).Unit
-	
+
 	local cf1 = CFrame.new(
 		x0.x, x0.y, x0.z,
 		r1.x, u1.x, b.x,
 		r1.y, u1.y, b.y,
 		r1.z, u1.z, b.z
 	)
-	
+
 	local cf2 = CFrame.new(
 		p3.x, p3.y, p3.z,
 		r2.x, u2.x, b.x,
 		r2.y, u2.y, b.y,
 		r2.z, u2.z, b.z
 	)
-	
+
 	return curve0, -curve1, cf1, cf2
 end
 
@@ -57,14 +57,14 @@ local function updatePath(headPos, lookAt, beam)
 	local g = Vector3.new(0, -Workspace.Gravity, 0)
 	local x0 = spawnPos
 	local v0 = lookAt * bbSettings.Superball.Speed
-    
+
     -- Time to project outward
 	local t = 1
 
 	local curve0, curve1, cf1, cf2 = beamProjectile(g, v0, x0, t)
     beam.CurveSize0 = curve0
     beam.CurveSize1 = curve1
-    
+
     -- convert world space CFrames to be relative to the attachment parent
     attachment0.CFrame = (attachment0.Parent.CFrame:inverse() * cf1) - Vector3.new(0, 0.4, 0)
     attachment1.CFrame = (attachment1.Parent.CFrame:inverse() * cf2) - Vector3.new(0, 0.4, 0)
@@ -126,10 +126,10 @@ local pipeline = Effects.pipe({
             local lookAt = (Mouse.Hit.Position - headPos).Unit
             updatePath(headPos, lookAt, beam)
         end
-        
+
         local connection = RunService.Heartbeat:Connect(update)
         update()
-        
+
         return function()
             connection:Disconnect()
             beam.Parent = nil
@@ -168,7 +168,7 @@ local function superballTrajectoryVisualizer(root)
         end
     end
 
-    root.Store.changed:connect(onChanged)
+    root.StoreChanged:Connect(onChanged)
     onChanged(root.Store:getState(), nil)
 end
 

@@ -43,7 +43,7 @@ function Input:onUpdate(new, old)
     if tool and self.lastTool ~= tool.module then
         self.lastTool = tool.module
         table.clear(self.lastActive)
-        
+
         for actionName in self.activeKeybinds do
             ContextActionService:UnbindAction(actionName)
         end
@@ -69,12 +69,12 @@ function Input:onUpdate(new, old)
             or keyName ~= getSavedSetting(old, UserId, actionName .. "Keybind")
         then
             self.lastActive[actionName] = isActive
-            
+
             if not isActive or keyName ~= self.activeKeybinds[actionName] then
                 ContextActionService:UnbindAction(actionName)
                 self.activeKeybinds[actionName] = nil
             end
-            
+
             if isActive and pcall(function() return Enum.KeyCode[keyName] end) then
                 ContextActionService:BindAction(actionName, function(_, state)
                     local success = fns.perform(tool, state, self.root)
@@ -107,7 +107,7 @@ local enumToOrder = {
 }
 
 function Input:Init()
-    self.root.Store.changed:connect(function(...)
+    self.root.StoreChanged:Connect(function(...)
         self:onUpdate(...)
     end)
 

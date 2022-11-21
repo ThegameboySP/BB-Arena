@@ -54,7 +54,7 @@ local function respectSettings(root)
 
     local function onChanged(new, old)
         assert(new, "New Rodux state was somehow nil")
-        
+
         if old == nil or getLocalSetting(new, "musicVolume") ~= getLocalSetting(old, "musicVolume") then
             SoundService.Music.Volume = getLocalSetting(new, "musicVolume")
         end
@@ -103,7 +103,7 @@ local function respectSettings(root)
         if old == nil or new.users.userSettings ~= old.users.userSettings then
             for userId, settings in new.users.userSettings do
                 local player = Players:GetPlayerByUserId(userId)
-                
+
                 if player and player ~= LocalPlayer then
                     Players:GetPlayerByUserId(userId):WaitForChild("Theme").Value = getSavedSetting(new, userId, "weaponTheme")
                 end
@@ -111,7 +111,7 @@ local function respectSettings(root)
         end
     end
 
-    root.Store.changed:connect(onChanged)
+    root.StoreChanged:Connect(onChanged)
     onChanged(root.Store:getState(), nil)
 end
 

@@ -29,7 +29,7 @@ local function lockedServerMessage(adminLevel)
 end
 
 function GatekeepingService:OnStart()
-    self.Root.Store.changed:connect(function(new, old)
+    self.Root.StoreChanged:Connect(function(new, old)
         if new.users == old.users then
             return
         end
@@ -39,7 +39,7 @@ function GatekeepingService:OnStart()
         for _, player in pairs(Players:GetPlayers()) do
             local userId = player.UserId
             local bannedBy = users.banned[userId]
-            
+
             if bannedBy and selectors.canUserBeKickedBy(new, userId, bannedBy) then
                 player:Kick(banMessage(selectors.getAdmin(new, bannedBy)))
             end

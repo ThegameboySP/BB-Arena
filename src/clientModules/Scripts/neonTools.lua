@@ -8,7 +8,7 @@ local getLocalSetting = RoduxFeatures.selectors.getLocalSetting
 
 local function filterProjectile(proj)
     local name = proj.Name:lower()
-                    
+
     return proj:IsA("BasePart") and (
         name:find("rocket")
         or name:find("superball")
@@ -31,11 +31,11 @@ local function neonTools(root)
         end
 
         update()
-        
+
         -- The toolset will try to sync a superball's material, so a brute force method is used.
         local connection = part:GetPropertyChangedSignal("Material"):Connect(update)
         local updateConnection = changed:Connect(update)
-        
+
         return function()
             connection:Disconnect()
             updateConnection:Disconnect()
@@ -51,7 +51,7 @@ local function neonTools(root)
         end
     end
 
-    root.Store.changed:connect(onChanged)
+    root.StoreChanged:Connect(onChanged)
 
     Effects.call(workspace:WaitForChild("Projectiles"):WaitForChild("Active"), Effects.pipe({
         Effects.children,

@@ -72,7 +72,7 @@ local function registerRoot()
         end
     end
 
-    Root.Store.changed:connect(onChanged)
+    Root.StoreChanged:Connect(onChanged)
     onChanged(Root.Store:getState(), nil)
 
     local function updateControllers()
@@ -85,7 +85,7 @@ local function registerRoot()
         elseif queuedGamemodeName == "nil" then
             task.spawn(GamemodeController.onGamemodeEnded, GamemodeController)
         end
-        
+
         if queuedMap then
             task.spawn(GamemodeController.onMapChanged, GamemodeController)
         end
@@ -135,7 +135,7 @@ local function init()
     end
 
     Root.getRemoteEvent = getRemoteEvent
-    
+
     notificationRemote.OnClientEvent:Connect(function(isHint, message, options)
         if isHint then
             Root.hint(message, options)

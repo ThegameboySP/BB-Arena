@@ -135,7 +135,7 @@ local function handleCharacterAppearance(root)
         end
     end
 
-    root.Store.changed:connect(onChanged)
+    root.StoreChanged:Connect(onChanged)
     onChanged(root.Store:getState(), nil)
 
     RunService.Heartbeat:Connect(function()

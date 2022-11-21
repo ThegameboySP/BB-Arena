@@ -96,7 +96,7 @@ local function overrideForcefieldVisuals(root)
                                 break
                             end
                         end
-    
+
                         if newForcefield then
                             data.node.Parent = newForcefield
                             data.forcefield = newForcefield
@@ -118,7 +118,7 @@ local function overrideForcefieldVisuals(root)
                     if item == false then
                         continue
                     end
-                    
+
                     if type(item) == "function" then
                         local lastTransparency = 0
                         data.setTransparency = function(transparency)
@@ -143,7 +143,7 @@ local function overrideForcefieldVisuals(root)
                     if transparency < 0.5 then
                         transparency = 0
                     end
-                    
+
                     data.setTransparency(transparency)
                 end
             end
@@ -189,7 +189,7 @@ local function overrideForcefieldVisuals(root)
     end
 
     onChanged(root.Store:getState(), nil)
-    root.Store.changed:connect(onChanged)
+    root.StoreChanged:Connect(onChanged)
 end
 
 return overrideForcefieldVisuals
