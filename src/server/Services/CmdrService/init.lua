@@ -23,12 +23,12 @@ local LockCommands = require(script.LockCommands)
 local CmdrService = {
 	Name = "CmdrService";
 	Client = {
-		CmdrLoaded = Root.remoteProperty(false);
-		CommandExecuted = Root.remoteEvent();
-		Warning = Root.remoteEvent();
-		Reply = Root.remoteEvent();
+		CmdrLoaded = Root.Services.remoteProperty(false);
+		CommandExecuted = Root.Services.remoteEvent();
+		Warning = Root.Services.remoteEvent();
+		Reply = Root.Services.remoteEvent();
 	};
-	
+
 	Cmdr = Cmdr;
 	_logs = {};
 }
@@ -67,9 +67,9 @@ function CmdrService:OnInit()
 		if player.UserId <= 0 then
 			self.Root.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Owner))
 		end
-	
+
 		local getRank = Promise.promisify(player.GetRankInGroup)
-	
+
 		-- TOB Ranktester and beyond gets admin.
 		getRank(player, 3397136):andThen(function(role)
 			if role >= 11 then
@@ -96,12 +96,12 @@ function CmdrService:_setupCmdr()
 	local CmdrReplicated = Instance.new("Folder")
 	CmdrReplicated.Name = "CmdrReplicated"
 	CmdrReplicated.Parent = ReplicatedStorage
-	
+
 	Cmdr:RegisterDefaultCommands(function(commandDefinition)
 		local name = commandDefinition.Name:lower()
 		return not BLACKLISTED_COMMANDS[name]
 	end)
-	
+
 	registerArenaTypes(Cmdr.Registry, self.Root.globals.mapInfo:Get())
 
 	Cmdr.Registry:RegisterCommandsIn(CmdrArena.Commands)
@@ -114,7 +114,7 @@ function CmdrService:_setupCmdr()
 			Cmdr.Registry:RegisterCommandsIn(customCommands)
 		end
 	end
-	
+
 	Cmdr.Registry:RegisterHook("BeforeRun", function(context)
 		if context.Executor and not self:CanRun(context.Executor, context.Group) then
 			return "You don't have permission to run this command."
@@ -137,12 +137,12 @@ function CmdrService:_setupCmdr()
             self.Cmdr.Registry:GetCommand(context.Name)
         )
 	end)
-	
+
 	Cmdr:RegisterHook("AfterRun", function(context)
 		if #self._logs > 100 then
 			table.remove(self._logs, 1)
 		end
-		
+
 		task.spawn(function()
 			local executorName = "Server"
 			local argumentsText = table.concat(context.RawArguments, " ")
@@ -150,12 +150,12 @@ function CmdrService:_setupCmdr()
 			if context.Executor then
 				pcall(function()
 					executorName = getFullPlayerName(context.Executor)
-					
+
 					local filterResult = TextService:FilterStringAsync(argumentsText, context.Executor.UserId, Enum.TextFilterContext.PublicChat)
 					argumentsText = filterResult:GetNonChatStringForBroadcastAsync()
 				end)
 			end
-	
+
 			table.insert(self._logs, {
 				ExecutorName = executorName;
 				ArgumentsText = argumentsText;
@@ -164,7 +164,7 @@ function CmdrService:_setupCmdr()
 			})
 		end)
 	end)
-	
+
 	require(CmdrArena.processCommands)(Cmdr.Registry)
 
 	-- Replicate to all clients.
@@ -194,7 +194,7 @@ function CmdrService:OnPlayerLoaded(player)
 	else
 		return Promise.new(function(resolve, _, onCancel)
 			local con = player:GetAttributeChangedSignal("IsCmdrLoaded"):Connect(resolve)
-			
+
 			if onCancel(function()
 				con:Disconnect()
 			end) then con:Disconnect() end

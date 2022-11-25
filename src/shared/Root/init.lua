@@ -1,36 +1,140 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 local UserService = game:GetService("UserService")
 local Players = game:GetService("Players")
 
+local Matter = require(ReplicatedStorage.Packages.Matter)
 local Promise = require(ReplicatedStorage.Packages.Promise)
-local Signal = require(ReplicatedStorage.Packages.Signal)
-local RemoteEvent = require(ReplicatedStorage.Common.RemoteEvent)
-local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
+local MatterComponents = require(ReplicatedStorage.Common.MatterComponents)
 local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerName)
+local bindSignals = require(script.bindSignals)
+local getSystems = require(script.getSystems)
+local Services = require(script.Services)
+local Status = require(script.Status)
 
-local Status = {
-    Uninitialized = 0;
-    Initializing = 1;
-    Initialized = 2;
-}
+local SharedServices = ReplicatedStorage.Common.SharedServices
 
 local Root = {}
 Root.__index = Root
 Root.isServer = RunService:IsServer()
+Root.isTesting = false
+Root.Services = Services
 
 function Root.new(replicatedContainer)
-    return setmetatable({
-        services = {};
-        serverServices = nil;
-        _status = Status.Uninitialized;
-        _startedSignal = Signal.new();
-        _root = nil;
-        _replicatedContainer = replicatedContainer or ReplicatedStorage;
+    local world = Matter.World.new()
+    local state = {}
+
+    local self = setmetatable({
+        world = world;
+        state = state;
+        loop = nil;
+        entityKey = nil;
+
+        services = nil;
+        status = Status.Uninitialized;
 
         _infosByUserId = {};
         _userIdsByName = {};
     }, Root)
+
+    self.loop = Matter.Loop.new(self, state)
+    self.services = Services.new(replicatedContainer)
+    self.services:RegisterServicesIn(SharedServices)
+
+    return self
+end
+
+function Root.newTest(systems, isServer)
+    local self = Root.new(nil)
+    self.isServer = isServer
+    self.isTesting = true
+
+    local _bindSignals, run = bindSignals.testBindSignals(self.isServer)
+    self:Start(systems, _bindSignals)
+
+    return self, run
+end
+
+function Root:_registerSystems(systems, signals)
+    -- local systemsToSchedule = {}
+
+    -- for _, system in systems do
+    --     for name, callback in system.callbacks or {} do
+    --         if signals[name] then
+    --             table.insert(systemsToSchedule, {
+    --                 system = callback;
+    --                 event = name;
+    --                 priority = system.priority;
+    --             })
+    --         elseif self.EventBus[name] then
+    --             self.EventBus[name]:Connect(callback)
+    --         else
+    --             warn(("%q is not a valid event"):format(name))
+    --         end
+    --     end
+    -- end
+
+    self.loop:scheduleSystems(systems)
+end
+
+function Root:Start(systems: table | Instance, customBindSignals: callback?)
+    assert(self.status == Status.Uninitialized, "Already started root")
+
+    if not self.isTesting then
+        CollectionService:GetInstanceRemovedSignal("MatterInstance"):Connect(function(instance)
+            local id = instance:GetAttribute(self.entityKey)
+
+            if id and self.world:contains(id) then
+                self.world:despawn(id)
+            end
+        end)
+    end
+
+    self.entityKey = if self.isServer then "ServerEntityId" else "ClientEntityId"
+
+    self:_registerSystems(if type(systems) == "table" then systems else getSystems(systems))
+
+    self.loop:begin((customBindSignals or bindSignals.bindSignals)(function(nextFn, signalName)
+        return function()
+            if
+                (self.isServer and signalName == "PreSimulation")
+                or (not self.isServer and signalName == "PreRender")
+            then
+                local timestamp = workspace:GetServerTimeNow()
+                self.state.currentTime, self.state.previousTime = timestamp, self.state.currentTime or timestamp
+                self.state.deltaTime = if self.state.previousTime then timestamp - self.state.previousTime else 0
+            end
+
+            nextFn()
+        end
+    end))
+
+    self.services.isServer = self.isServer
+
+    return self.services:Start(self)
+end
+
+function Root:Bind(instance, newId)
+	local id = instance:GetAttribute(self.entityKey)
+
+	if id and id ~= newId and self.world:contains(id) then
+		error(string.format(
+			"%s is already bound to a Matter entity. " ..
+			"Did you forget to despawn the old entity first?",
+			instance:GetFullName(),
+			2
+		))
+	end
+
+	instance:SetAttribute(self.entityKey, id)
+	CollectionService:AddTag(instance, "MatterInstance")
+
+    return instance
+end
+
+function Root:QueueDespawn(id)
+    self.world:insert(id, MatterComponents.QueuedForRemoval())
 end
 
 function Root:GetFullNameByUserId(userId)
@@ -44,7 +148,7 @@ end
 
 function Root:GetUserInfoByUserId(userId)
     local cached = self._infosByUserId[userId]
-    
+
     if Promise.is(cached) then
         return cached
     elseif cached then
@@ -85,189 +189,16 @@ function Root:GetUserIdByName(name)
     return self._userIdsByName[name]
 end
 
-function Root:KillCharacter(character, cause)
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not humanoid or humanoid.Health <= 0 then
-        return
-    end
-
-    local player = Players:GetPlayerFromCharacter(character)
-    if player == nil then
-        return
-    end
-
-    -- Override dumb legacy hit info.
-    while humanoid:FindFirstChild("creator") do
-        humanoid:FindFirstChild("creator").Parent = nil
-    end
-
-    humanoid:SetAttribute("DeathCause", cause)
-    humanoid.Health = 0
-end
-
-function Root:RegisterServices(services)
-    for name, service in pairs(services) do
-        self:RegisterService(name, service)
-    end
-end
-
-function Root:RegisterService(name, service)
-    if self.services[name] then
-        error(("Duplicate service %q"):format(name))
-    end
-
-    self.services[name] = service
-end
-
-function Root:RegisterServicesIn(root)
-    for _, child in pairs(root:GetChildren()) do
-        if child:IsA("ModuleScript") then
-            self:RegisterService(child.Name, require(child))
-        elseif child:IsA("Folder") then
-            self:RegisterServicesIn(child)
-        end
-    end
-end
-
 function Root:GetService(name)
-    if self._status == Status.Uninitialized then
-        error("Cannot call GetService until Root is initialized")
-    end
-
-    return self.services[name] or error("No service named " .. name)
+    return self.services:GetService(name)
 end
 
 function Root:GetSingleton(name)
-    if self.isServer then
-        return self:GetService(name .. "Service")
-    else
-        return self:GetService(name .. "Controller")
-    end
+    return self.services:GetSingleton(name)
 end
 
 function Root:GetServerService(name)
-    if self._status == Status.Uninitialized then
-        error("Cannot call GetServerService until Root is initialized")
-    end
-
-    return
-        if self.serverServices
-        then self.serverServices[name] or error("No server service named " .. name)
-        else nil
-end
-
-function Root:Start()
-    assert(self._status == Status.Uninitialized, "Already started root")
-
-    task.spawn(function()
-        self._status = Status.Initializing
-        
-        if self.isServer then
-            self._root = Instance.new("Folder")
-            self._root.Name = "Root_Replication"
-            self._root.Parent = self._replicatedContainer
-        else
-            self._root = self._replicatedContainer:WaitForChild("Root_Replication")
-    
-            if not self._root:GetAttribute("Replicated") then
-                self._root:GetAttributeChangedSignal("Replicated"):Wait()
-            end
-        end
-    
-        if self.isServer then
-            for name, service in pairs(self.services) do
-                local folder = Instance.new("Folder")
-                folder.Name = name
-    
-                for key, value in pairs(service.Client or {}) do
-                    if value.type == "__remoteEvent" then
-                        local remoteEvent = Instance.new("RemoteEvent")
-                        remoteEvent.Name = "RemoteEvent_" .. key
-                        remoteEvent.Parent = folder
-
-                        service.Client[key] = RemoteEvent.new(remoteEvent)
-                    elseif value.type == "__remoteProperty" then
-                        service.Client[key] = RemoteProperty.new(
-                            folder,
-                            "RemoteProperty_" .. key
-                        )
-
-                        service.Client[key]:Set(value.default)
-                    end
-                end
-    
-                folder.Parent = self._root
-            end
-        else
-            self.serverServices = {}
-    
-            for _, folder in ipairs(self._root:GetChildren()) do
-                local serverService = {}
-                self.serverServices[folder.Name] = serverService
-    
-                for _, child in ipairs(folder:GetChildren()) do
-                    if child.Name:find("RemoteEvent") then
-                        serverService[child.Name:match("RemoteEvent_(.+)$")] = RemoteEvent.new(child)
-                    elseif child.Name:find("RemoteProperty") then
-                        serverService[child.Name:match("RemoteProperty_(.+)$")] = RemoteProperty.new(folder, child.Name)
-                    end
-                end
-            end
-        end
-    
-        local servicesOrder = {}
-        for _, service in self.services do
-            table.insert(servicesOrder, service)
-        end
-
-        table.sort(servicesOrder, function(a, b)
-            return (a.Priority or 0) > (b.Priority or 0)
-        end)
-        
-        for _, service in servicesOrder do
-            service.Root = self
-
-            if service.OnInit then
-                xpcall(service.OnInit, function(err)
-                    task.spawn(error, debug.traceback(err, 2))
-                end, service)
-            end
-        end
-    
-        for _, service in servicesOrder do
-            if service.OnStart then
-                task.spawn(service.OnStart, service)
-            end
-        end
-    
-        self._root:SetAttribute("Replicated", true)
-
-        self._status = Status.Initialized
-        self._startedSignal:Fire()
-    end)
-
-    return self:OnStart()
-end
-
-function Root:OnStart()
-    if self._status == Status.Initialized then
-        return Promise.resolve()
-    else
-        return Promise.fromEvent(self._startedSignal)
-    end
-end
-
-function Root.remoteEvent()
-    return {
-        type = "__remoteEvent";
-    }
-end
-
-function Root.remoteProperty(default)
-    return {
-        type = "__remoteProperty";
-        default = default;
-    }
+    return self.services:GetServerService(name)
 end
 
 return Root.new()

@@ -1,10 +1,18 @@
-local Root = require(script.Parent)
+local Services = require(script.Parent.Services)
+
+local function new(folder)
+    folder = folder or Instance.new("Folder")
+    local services = Services.new(folder)
+    services.isServer = true
+
+    return services, folder
+end
 
 return function()
     it("should run OnInit on the same coroutine and OnStart on its own", function()
-        local root = Root.new(Instance.new("Folder"))
-        
-        root:RegisterServices({
+        local services = new()
+
+        services:RegisterServices({
             TestService = {
                 OnInit = function()
                     task.wait()
@@ -16,7 +24,7 @@ return function()
             }
         })
 
-        local promise = root:Start()
+        local promise = services:Start()
 
         expect(promise:getStatus()).to.equal("Started")
 
@@ -26,19 +34,18 @@ return function()
     end)
 
     it("should create remote events and remote properties where marked", function()
-        local folder = Instance.new("Folder")
-        local root = Root.new(folder)
+        local services, folder = new()
 
-        root:RegisterService("TestService", {
+        services:RegisterService("TestService", {
             Client = {
-                RemoteEventTest = Root.remoteEvent();
-                RemotePropertyTest = Root.remoteProperty();
+                RemoteEventTest = Services.remoteEvent();
+                RemotePropertyTest = Services.remoteProperty();
             };
         })
 
-        root:Start():await()
+        services:Start():await()
 
-        local client = Root.new(folder)
+        local client = new(folder)
         client.isServer = false
         client:Start():await()
 
@@ -49,8 +56,7 @@ return function()
     end)
 
     it("should wait on the client until the server is fully replicated", function()
-        local folder = Instance.new("Folder")
-        local serverRoot = Root.new(folder)
+        local serverRoot, folder = new()
         serverRoot.isServer = true
 
         serverRoot:RegisterService("TestService", {
@@ -61,7 +67,7 @@ return function()
 
         serverRoot:Start()
 
-        local clientRoot = Root.new(folder)
+        local clientRoot = new(folder)
         clientRoot.isServer = false
         local promise = clientRoot:Start()
 

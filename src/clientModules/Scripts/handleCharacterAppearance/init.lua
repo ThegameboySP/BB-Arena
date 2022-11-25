@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-local Teams = game:GetService("Teams")
 
 local Effects = require(ReplicatedStorage.Common.Utils.Effects)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
@@ -12,8 +11,12 @@ local noobAppearance = require(script.noobAppearance)
 
 local LocalPlayer = Players.LocalPlayer
 
+local function isGladiator(player)
+    return player.Team and player.Team.Name == "Gladiators"
+end
+
 local function isEnemyFn(player)
-    return player.Team ~= LocalPlayer.Team or LocalPlayer.Team == Teams.Gladiators
+    return player.Team ~= LocalPlayer.Team or isGladiator(player)
 end
 
 local function handleCharacterAppearance(root)
@@ -140,7 +143,7 @@ local function handleCharacterAppearance(root)
 
     RunService.Heartbeat:Connect(function()
         local anonymousFighters = root.Store:getState().game.anonymousFighters
-        local onFightingTeam = CollectionService:HasTag(LocalPlayer.Team, "FightingTeam") or LocalPlayer.Team == Teams.Gladiators
+        local onFightingTeam = CollectionService:HasTag(LocalPlayer.Team, "FightingTeam") or isGladiator(LocalPlayer)
         local enemyDefaultAppearance = selectors.getLocalSetting(root.Store:getState(), "enemyDefaultAppearance")
 
         for player in playersToUpdate do

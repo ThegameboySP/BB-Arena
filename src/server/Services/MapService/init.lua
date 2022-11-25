@@ -13,6 +13,7 @@ local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
 local Definitions = require(ReplicatedStorage.Common.Definitions)
+local MatterComponents = require(ReplicatedStorage.Common.MatterComponents)
 
 local reconcileTeams = require(script.reconcileTeams)
 
@@ -21,24 +22,24 @@ local Components = require(ReplicatedStorage.Common.Components)
 local MapService = {
 	Name = "MapService";
 	Client = {
-		MapChanging = Root.remoteEvent();
-		MapChanged = Root.remoteEvent();
-		PlayerStreamedMap = Root.remoteEvent();
-		CurrentMap = Root.remoteProperty(nil);
+		MapChanging = Root.Services.remoteEvent();
+		MapChanged = Root.Services.remoteEvent();
+		PlayerStreamedMap = Root.Services.remoteEvent();
+		CurrentMap = Root.Services.remoteProperty(nil);
 	};
 	Priority = 1;
-	
+
 	Maps = ServerStorage.Maps;
 	LightingSaves = ServerStorage.Plugin_LightingSaves;
 	mapParent = Workspace.MapRoot;
 
 	MapChanging = Signal.new();
 	MapChanged = Signal.new();
-	
+
 	CurrentMap = nil;
 	ChangingMaps = false;
 	MapScript = nil;
-	
+
 	ClonerManager = ClonerManager.new("MapComponents");
 
 	_lastRegenTimes = {};
@@ -55,7 +56,7 @@ function MapService:OnInit()
 			child.Parent = nil
 		end
 	end
-	
+
     local mapInfo = {}
 	for _, map in pairs(self.Maps:GetChildren()) do
 		local ok, err = Definitions.map(map)
@@ -68,7 +69,7 @@ function MapService:OnInit()
 	end
 
 	self.Root.globals.mapInfo:Set(table.freeze(mapInfo))
-	
+
 	self.LightingSaves.Name = "LightingSaves"
 	self.LightingSaves.Parent = ReplicatedStorage
 
@@ -83,7 +84,7 @@ function MapService:OnInit()
 		local currentTime = os.clock()
 		for _, component in self.ClonerManager.Manager:GetComponents(Components.RegenGroup) do
 			local prototype = self.ClonerManager.Cloner:GetPrototypeByClone(component.Instance)
-			
+
 			local lastTime = self._lastRegenTimes[prototype]
 			if lastTime == nil then
 				self._lastRegenTimes[prototype] = currentTime
@@ -124,7 +125,7 @@ function MapService:_regen(clones, prototypes)
 	end
 
 	self.ClonerManager.Cloner:RunPrototypes(prototypes)
-	
+
 	local components = self.ClonerManager:Flush()
 	self.ClonerManager:ReplicateToClients(components)
 
@@ -200,7 +201,7 @@ function MapService:ChangeMap(mapName)
 
 		return true
 	end)
-	
+
 	local componentsToReplicate = self.ClonerManager:Flush()
 
 	local mapScript = newMap:FindFirstChild("MapScript")
@@ -222,7 +223,7 @@ function MapService:ChangeMap(mapName)
 	if repFirst then
 		repFirst.Parent = newMap
 	end
-	
+
 	for _, player in pairs(CollectionService:GetTagged("ParticipatingPlayer")) do
         task.spawn(player.LoadCharacter, player)
 	end
@@ -230,7 +231,7 @@ function MapService:ChangeMap(mapName)
 	for _, player in Players:GetPlayers() do
 		CollectionService:AddTag(player, "PlayerStreamingMap")
 	end
-	
+
 	self.ClonerManager:ReplicateToClients(componentsToReplicate)
 
 	self.ChangingMaps = false
@@ -250,59 +251,68 @@ function MapService:GetMaps()
 end
 
 function MapService:_reconcileTeams(newNameToColor)
+	local TeamService = self.Root:GetService("TeamService")
+
 	local oldTeamMap = {}
-	for _, team in CollectionService:GetTagged("FightingTeam") do
-		oldTeamMap[team.Name] = {players = team:GetPlayers(), color = team.TeamColor}
-	end
+	local participatingPlayers = {}
 
-    local reconciledTeams, newTeamsMap, untrackedPlayers = reconcileTeams(
-		CollectionService:GetTagged("FightingPlayer"), newNameToColor, oldTeamMap
-	)
+	for teamId, team in self.Root.world:query(MatterComponents.Team) do
+		if team.participating and not team.fromMap then
+			local players = TeamService:getPlayersFromTeam(teamId)
+			for _, playerId in players do
+				table.insert(participatingPlayers, playerId)
+			end
 
-	for _, player in untrackedPlayers do
-		player.Team = Teams.Spectators
-	end
-
-	local toRemove = {}
-	for name in oldTeamMap do
-		table.insert(toRemove, Teams:FindFirstChild(name))
-	end
-
-	local toAdd = {}
-	for name, data in newTeamsMap do
-		local newTeam = Instance.new("Team")
-		newTeam.AutoAssignable = false
-		CollectionService:AddTag(newTeam, "FightingTeam")
-		CollectionService:AddTag(newTeam, "ParticipatingTeam")
-		CollectionService:AddTag(newTeam, "ToolsEnabled")
-		CollectionService:AddTag(newTeam, "Map")
-
-		newTeam.TeamColor = data.color
-		newTeam.Name = name
-
-		toAdd[name] = {
-			players = data.players;
-			team = newTeam;
-		}
-	end
-
-	local reconciledRobloxTeams = {}
-	for oldTeamName, newTeam in reconciledTeams do
-		reconciledRobloxTeams[Teams:FindFirstChild(oldTeamName)] = toAdd[newTeam.name].team
-	end
-
-	for _, data in toAdd do
-		data.team.Parent = Teams
-		for _, player in data.players do
-			player.Team = data.team
+			oldTeamMap[team.name] = {
+				players = players;
+				color = team.color;
+				id = teamId;
+			}
 		end
 	end
 
-	for _, team in toRemove do
-		team.Parent = nil
+    local reconciledTeams, newTeamsMap, untrackedPlayers = reconcileTeams(
+		participatingPlayers, newNameToColor, oldTeamMap
+	)
+
+	-- Team players that are not under any team to Spectators.
+	for _, id in untrackedPlayers do
+		self.Root.world:insert(id, self.Root.world:get(id, Components.Player):patch({
+			teamId = self.Root:getIdFromInstance(Teams.Spectators);
+		}))
 	end
 
-	return reconciledRobloxTeams
+	-- Spawn/replace new teams over top old ones.
+	for name, team in newTeamsMap do
+		local newTeamComponent = MatterComponents.Team({
+			name = name;
+			participating = true;
+			enableTools = true;
+			fromMap = true;
+			color = team.color;
+		})
+
+		if team.replacingTeam then
+			self.Root.world:replace(team.replacingTeam.id, newTeamComponent)
+
+			for _, playerId in team.players do
+				self.Root.world:get(playerId, MatterComponents.Player):patch({
+					teamId = team.id;
+				})
+			end
+		else
+			self.Root.world:spawn(newTeamComponent)
+		end
+	end
+
+	-- Despawn old teams that have no corresponding new teams.
+	for oldTeamName, oldTeam in oldTeamMap do
+		if not reconciledTeams[oldTeamName] then
+			self.Root.world:despawn(oldTeam.id)
+		end
+	end
+
+	return reconciledTeams
 end
 
 return MapService

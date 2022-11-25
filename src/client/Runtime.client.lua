@@ -39,9 +39,9 @@ local function getRemoteEvent(_, name)
 end
 
 local function registerRoot()
-    Root:RegisterServicesIn(Controllers)
+    Root.services:RegisterServicesIn(Controllers)
 
-    Root:Start()
+    Root:Start(Instance.new("Folder"))
         :catch(function(err)
             task.spawn(error, tostring(err))
         end)

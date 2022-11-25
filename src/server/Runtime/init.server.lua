@@ -1,3 +1,4 @@
+local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local TestService = game:GetService("TestService")
@@ -15,6 +16,8 @@ local defaultGlobalValues = require(script.Parent.defaultGlobalValues)
 local loadTools = require(script.loadTools)
 local resetPlayer = require(script.resetPlayer)
 local roduxServer = require(script.roduxServer)
+
+local ServerSystems = ServerScriptService.Server.ServerSystems
 
 local Configuration = ReplicatedStorage.Configuration
 local Services = script.Parent.Services
@@ -44,12 +47,14 @@ local function getRemoteEvent(_, name)
 end
 
 local function registerRoot()
-    Root:RegisterServicesIn(Services)
-    
-    Root:Start()
+    Root.services:RegisterServicesIn(Services)
+    Root.state.mapSupportsGladiators = true
+    Root.state.adminRequestsGladiators = true
+
+    Root:Start(ServerSystems)
         :catch(warn)
         :await()
-    
+
     local startingMapName = Configuration:GetAttribute("StartingMapName")
     if startingMapName then
         Root:GetService("MapService"):ChangeMap(startingMapName)
@@ -172,14 +177,14 @@ local function init()
     local RemoteProperties = Instance.new("Folder")
     RemoteProperties.Name = "RemoteProperties"
     RemoteProperties.Parent = ReplicatedStorage
-    
+
     Root.SoundPlayer = SoundPlayer.new()
     Root.globals = {}
     for key, value in pairs(defaultGlobalValues) do
         Root.globals[key] = RemoteProperty.new(RemoteProperties, key)
         Root.globals[key]:Set(value)
     end
-    
+
     local notificationRemote = Instance.new("RemoteEvent")
     notificationRemote.Name = "NotificationRemote"
     notificationRemote.Parent = ReplicatedStorage
@@ -191,7 +196,7 @@ local function init()
     clientErrorRemote.OnServerEvent:Connect(function(client, message, stackTrace)
         warn("[Game Critical]", getFullPlayerName(client) .. " errored:", message .. "\n" .. stackTrace)
     end)
-    
+
     Root.hint = function(message, options)
         notificationRemote:FireAllClients(true, message, options)
     end

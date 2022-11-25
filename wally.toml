@@ -15,6 +15,7 @@ Roact = "roblox/roact@1.4.2"
 RoactRodux = "roblox/roact-rodux@0.3.0"
 RoactHooks = "kampfkarren/roact-hooks@0.3.0"
 RoactSpring = "chriscerie/roact-spring@1.1.1"
+Matter = "evaera/matter@0.6.2"
 
 # Wally doesn't always properly link dev dependencies, so we have to put it here.
 # https://github.com/UpliftGames/wally/issues/96
