@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
 local LitUtils = require(ReplicatedStorage.Common.Utils.LitUtils)
@@ -14,8 +15,12 @@ local GatekeepingService = {
     serverLockedBy = nil;
 }
 
-local function banMessage(adminLevel)
-    local adminTier = GameEnum.AdminTiersByValue[adminLevel]
+local function banMessage(by)
+    if by == "server" then
+        return "You've been banned from this game permanently."
+    end
+
+    local adminTier = GameEnum.AdminTiersByValue[by]
     return string.format(
         "You've been banned from this server by %s %s.", LitUtils.getIndefiniteArticle(adminTier), adminTier
     )
@@ -46,10 +51,20 @@ function GatekeepingService:OnStart()
         end
     end)
 
+    local defaultBanList = ServerScriptService
+        :FindFirstChild("Place")
+        :FindFirstChild("DefaultBanList")
+
+    defaultBanList = defaultBanList and require(defaultBanList)
+
     local function onPlayerAdded(player)
         local bannedMessage
         local lockedMessage
         local state = self.Root.Store:getState()
+
+        if defaultBanList and defaultBanList[player.UserId] then
+            bannedMessage = banMessage("server")
+        end
 
         if selectors.canUserBeLockKicked(state, player.UserId, state.users.serverLockedBy) then
             lockedMessage = lockedServerMessage(selectors.getAdmin(state, state.users.serverLockedBy))
