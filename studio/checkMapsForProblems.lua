@@ -21,6 +21,15 @@ for _, map in maps do
     if not ok then
         warn(map:GetFullName(), ":", err)
         table.insert(selection, map)
+    else
+        local meta = require(map:FindFirstChild("Meta"):Clone())
+
+        for teamName, color in meta.Teams do
+            if color == BrickColor.Red() then
+                warn(("%s team %q has the same color as Gladiators"):format(map:GetFullName(), teamName))
+                table.insert(selection, map)
+            end
+        end
     end
 
     local descendants = map:GetDescendants()
