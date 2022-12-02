@@ -5,4 +5,5 @@ return makeEnum("DeathCause", {
     Admin = 0;
     Lava = 1;
     Void = 2;
+    Kill = 3;
 })

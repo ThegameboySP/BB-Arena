@@ -16,10 +16,23 @@ local StatService = {
 function StatService:OnInit()
     EventBus.playerDied:Connect(function(victim, info)
         if victim.Team ~= Teams.Spectators then
+            local distance = 0
+
+            if info.victimCharacter and info.killerCharacter then
+                local victimHead = info.victimCharacter:FindFirstChild("Head")
+                local killerHead = info.killerCharacter:FindFirstChild("Head")
+
+                if victimHead and killerHead then
+                    distance = (victimHead.Position - killerHead.Position).Magnitude
+                end
+            end
+
             self.Root.Store:dispatch(actions.playerDied(
                 victim.UserId,
                 info.killer and info.killer.UserId,
-                info.cause
+                info.cause,
+                info.projectileType,
+                distance
             ))
         end
     end)

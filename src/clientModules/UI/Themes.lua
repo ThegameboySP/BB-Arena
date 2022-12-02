@@ -4,7 +4,7 @@ local function darkmode(theme)
     theme.highContrast = Color3.fromRGB(255, 255, 255);
 
     theme.background = Color3.fromRGB(16, 17, 19);
-    theme.foreground = Color3.fromRGB(28, 31, 36);
+    theme.foreground = Color3.fromRGB(29, 31, 35);
     theme.scrollbar = Color3.fromRGB(117, 117, 117);
     theme.inactive = Color3.fromRGB(117, 117, 117);
     theme.border = Color3.fromRGB(55, 59, 66);

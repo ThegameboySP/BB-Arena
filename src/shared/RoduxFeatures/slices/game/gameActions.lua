@@ -36,13 +36,15 @@ function gameActions.setMapInfo(mapInfo)
     }
 end
 
-function gameActions.playerDied(userId, killerId, cause)
+function gameActions.playerDied(userId, killerId, cause, weapon, distance)
     return {
         type = "game_playerDied";
         payload = {
             userId = userId;
             killerId = killerId;
             deathCause = cause;
+            weapon = weapon;
+            distance = distance;
         }
     }
 end

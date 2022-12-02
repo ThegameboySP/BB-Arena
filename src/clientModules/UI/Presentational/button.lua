@@ -10,8 +10,8 @@ local touchRipple = require(script.Parent.touchRipple)
 
 local e = Roact.createElement
 
-local function calculateSize(text, textSize, padding, minSize)
-    local textBounds = TextService:GetTextSize(text, textSize, Enum.Font.Gotham, minSize or Vector2.new(math.huge, math.huge))
+local function calculateSize(text, textSize, padding, font, minSize)
+    local textBounds = TextService:GetTextSize(text, textSize, font or Enum.Font.Gotham, minSize or Vector2.new(math.huge, math.huge))
     textBounds += Vector2.new(padding or 20, padding or 20)
 
     if minSize then
@@ -30,9 +30,18 @@ local function button(props, hooks)
         return { hover = 0 }
     end)
 
+    hooks.useEffect(function()
+        if props.inactive then
+            api.start({
+                hover = 0;
+                config = { tension = 600 };
+            })
+        end
+    end)
+
     return e(props.inactive and "ImageLabel" or "ImageButton", {
-        Size = if type(props.text) == "string" then calculateSize(props.text, props.textSize, props.padding, props.minSize) else props.text:map(function(text)
-            return calculateSize(text, props.textSize, props.padding, props.minSize)
+        Size = if type(props.text) == "string" then calculateSize(props.text, props.textSize, props.padding, props.fontFace, props.minSize) else props.text:map(function(text)
+            return calculateSize(text, props.textSize, props.padding, props.fontFace, props.minSize)
         end);
         Position = props.position;
         AnchorPoint = props.anchor;
@@ -73,7 +82,7 @@ local function button(props, hooks)
             transparency = Roact.createBinding(0.9);
         });
         TextLabel = e("TextLabel", {
-            Font = Enum.Font.Gotham;
+            Font = props.font or Enum.Font.Gotham;
             Size = UDim2.fromScale(1, 1);
             BackgroundTransparency = 1;
 

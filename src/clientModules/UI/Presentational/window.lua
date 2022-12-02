@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
+local RoactSpring = require(ReplicatedStorage.Packages.RoactSpring)
 local e = Roact.createElement
 
 local AutoUIScale = require(script.Parent.Parent.AutoUIScale)
@@ -14,15 +15,19 @@ local function window(props, hooks)
 	local topRef = hooks.useBinding()
     local positionBinding, setPositionBinding = hooks.useBinding(UDim2.new(0.5, 0, 0.5, 0))
 
+    local styles, api = RoactSpring.useSpring(hooks, function()
+        return { hoverAlpha = 0 }
+    end)
+
 	return e("ImageLabel", {
         BackgroundTransparency = 1;
-        
+
         ImageColor3 = theme.background;
         Image = "rbxassetid://9264310289";
         ScaleType = Enum.ScaleType.Slice;
         SliceCenter = Rect.new(Vector2.new(128, 128), Vector2.new(128, 128));
         SliceScale = 0.1;
-        
+
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = positionBinding,
         Size = props.size;
@@ -44,16 +49,33 @@ local function window(props, hooks)
             Title = e("ImageLabel", {
                 [Roact.Ref] = topRef;
 
-                ImageColor3 = theme.foreground;
+                ImageColor3 = styles.hoverAlpha:map(function(value)
+                    return (props.topColor or theme.foreground):Lerp(Color3.new(1, 1, 1), value * 0.05)
+                end);
+
                 Image = "rbxassetid://9264443152";
                 ScaleType = Enum.ScaleType.Slice;
                 SliceCenter = Rect.new(Vector2.new(128, 128), Vector2.new(128, 128));
                 SliceScale = 0.1;
-                
+
                 BorderSizePixel = 0;
                 Position = UDim2.new(0, 0, 0, 0);
                 Size = UDim2.fromScale(1, 1);
                 BackgroundTransparency = 1;
+
+                [Roact.Event.MouseEnter] = function()
+                    api.start({
+                        hoverAlpha = 1;
+                        config = { tension = 600 };
+                    })
+                end;
+
+                [Roact.Event.MouseLeave] = function()
+                    api.start({
+                        hoverAlpha = 0;
+                        config = { tension = 600 };
+                    })
+                end;
             }, {
                 Icon = e("ImageLabel", {
                     Image = props.image;
@@ -82,7 +104,7 @@ local function window(props, hooks)
 
                     AnchorPoint = Vector2.new(1, 0.5);
                     Position = UDim2.new(1, -5, 0.5, 0);
-                    Size = UDim2.new(0, 50, 0, 50);
+                    Size = UDim2.new(0, 20, 0, 20);
                     Image = "http://www.roblox.com/asset/?id=5107150301";
 
                     [Roact.Event.MouseButton1Down] = function()

@@ -31,15 +31,29 @@ return function(EventBus)
         Effects.character,
         function(character)
             local humanoid = character:FindFirstChild("Humanoid")
-            
+
             local con = humanoid.StateChanged:Connect(function(_, new)
                 if new == Enum.HumanoidStateType.Dead then
                     local player = Players:GetPlayerFromCharacter(character) or Players:FindFirstChild(character.Name)
                     if not player then
                         return
                     end
-                    
+
                     local creatorValue = humanoid:FindFirstChild("creator")
+                    local creatorCharacter
+
+                    if creatorValue then
+                        local folderRef = creatorValue:FindFirstChild("FolderRef")
+                        local folder = folderRef and folderRef.Value
+
+                        if folder then
+                            local characterRef = folder:FindFirstChild("Character")
+                            if characterRef then
+                                creatorCharacter = characterRef.Value
+                            end
+                        end
+                    end
+
                     local creator = creatorValue and creatorValue.Value
 
                     if trackingPlayers[player] then
@@ -47,9 +61,12 @@ return function(EventBus)
                     end
 
                     playerDied:Fire(player, {
+                        victimCharacter = character;
                         killer = creator;
                         cause = humanoid:GetAttribute("DeathCause");
                         weaponImageId = creatorValue and creatorValue:GetAttribute("WeaponImageId");
+                        projectileType = creatorValue and creatorValue:GetAttribute("ProjectileType");
+                        killerCharacter = creatorCharacter;
                     })
                 end
             end)

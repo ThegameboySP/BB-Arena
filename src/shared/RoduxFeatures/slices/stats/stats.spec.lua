@@ -57,4 +57,18 @@ return function()
         expect(state.stats.serverStats[1].WOs).to.equal(0)
         expect(state.stats.alltimeStats[1].WOs).to.equal(0)
     end)
+
+    it("should increment short, medium, or long range depending on distance and weapon used", function()
+        local state = reducer(nil, actions.userJoined(1))
+        state = reducer(state, actions.userJoined(2))
+        state = reducer(state, actions.playerDied(1, 2, nil, "Superball", 50))
+        state = reducer(state, actions.playerDied(1, 2, nil, "Superball", 70))
+        expect(state.stats.visualStats[2].CloseRange.Superball).to.equal(2)
+
+        state = reducer(state, actions.playerDied(1, 2, nil, "Superball", 71))
+        expect(state.stats.visualStats[2].MediumRange.Superball).to.equal(1)
+
+        state = reducer(state, actions.playerDied(1, 2, nil, "Superball", 121))
+        expect(state.stats.visualStats[2].LongRange.Superball).to.equal(1)
+    end)
 end

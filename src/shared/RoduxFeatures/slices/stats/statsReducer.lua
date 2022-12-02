@@ -1,12 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local t = require(ReplicatedStorage.Packages.t)
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local RoduxUtils = require(script.Parent.Parent.Parent.RoduxUtils)
+local registerDefaultStats = require(script.Parent.registerDefaultStats)
+local Constants = require(script.Parent.Constants)
 
 local Dictionary = Llama.Dictionary
-local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
 local function addFromTable(source, delta)
     local clone = table.clone(source)
@@ -46,65 +46,20 @@ local function calculateRank(kos)
     return GameEnum.Ranks.F
 end
 
-local checkRegisteredStat = t.interface({
-    default = t.any;
-    name = t.string;
-    friendlyName = t.optional(t.string);
-    priority = t.number;
-    domain = t.optional(t.string);
-    persistent = t.optional(t.boolean);
-    show = t.optional(t.boolean);
-})
-
-local defaultStats = {}
-local registeredStats = {
-    KOs = {name = "KOs", default = 0, priority = 1, show = true};
-    WOs = {name = "WOs", default = 0, priority = 0, show = true};
-}
-
-for _, gamemode in Gamemodes:GetChildren() do
-    local definition = require(gamemode).definition
-
-    for name, stat in definition.stats do
-        if registeredStats[name] then
-            error(string.format("Duplicate stat name: %q", name))
-        end
-
-        local clone = table.clone(stat)
-        clone.gamemodeId = definition.nameId
-        clone.name = name
-
-        registeredStats[name] = clone
-    end
-end
-
-local registeredStatArray = {}
-for _, stat in registeredStats do
-    stat.priority = stat.priority or -1
-    stat.friendlyName = stat.friendlyName or stat.name
-    assert(checkRegisteredStat(stat))
-
-    table.insert(registeredStatArray, stat)
-end
-
-table.sort(registeredStatArray, function(a, b)
-    return a.name > b.name
-end)
-
-for index, stat in registeredStatArray do
-    stat.id = index
-    registeredStats[stat.id] = stat
-    defaultStats[stat.name] = stat.default
-end
-
 local DEFAULT_STAT_KEYS = {"alltimeStats", "serverStats", "visualStats"}
-
-local function increment(state, userId, keys, delta)
+local function increment(state, userId, keys, delta, extraKey)
     local patch = {}
+
     for _, key in keys do
-        patch[key] = {
-            [userId] = addFromTable(state[key][userId], delta);
-        }
+        if extraKey then
+            patch[key] = {
+                [userId] = { [extraKey] = addFromTable(state[key][userId][extraKey], delta) };
+            }
+        else
+            patch[key] = {
+                [userId] = addFromTable(state[key][userId], delta);
+            }
+        end
     end
 
     local final = Dictionary.mergeDeep(state, patch)
@@ -116,6 +71,19 @@ local function increment(state, userId, keys, delta)
 
     return final
 end
+
+local function pushTo3(list, item)
+    local clone = table.clone(list)
+
+    table.insert(clone, item)
+    if #list > 3 then
+        table.remove(clone, 1)
+    end
+
+    return clone
+end
+
+local registeredStats, defaultStats = registerDefaultStats()
 
 return RoduxUtils.createReducer({
     alltimeStats = {};
@@ -130,6 +98,7 @@ return RoduxUtils.createReducer({
         WOs = true;
     };
     usersReceivedGamemodeStats = {};
+    -- XPSources = {};
     registeredStats = registeredStats;
 }, {
     rodux_hotReloaded = function(state)
@@ -199,18 +168,36 @@ return RoduxUtils.createReducer({
         local newState
         if payload.deathCause == GameEnum.DeathCause.Admin then
             newState = increment(state, payload.userId, {"visualStats"}, {
-                WOs = 1
+                WOs = 1;
             })
         else
             newState = increment(state, payload.userId, DEFAULT_STAT_KEYS, {
-                WOs = 1
+                WOs = 1;
             })
         end
 
         if payload.deathCause ~= GameEnum.DeathCause.Admin and payload.killerId and payload.userId ~= payload.killerId then
-            return increment(newState, payload.killerId, DEFAULT_STAT_KEYS, {
+            newState = increment(newState, payload.killerId, DEFAULT_STAT_KEYS, {
+                XP = Constants.XP_ON_KILL;
                 KOs = 1;
             })
+
+            -- newState.XPSources = pushTo3(newState.XPSources, { reason = GameEnum.DeathCause.Kill, XP = Constants.XP_ON_KILL })
+        end
+
+        if payload.weapon and payload.distance then
+            local range
+            if payload.distance <= 70 then
+                range = "CloseRange"
+            elseif payload.distance <= 120 then
+                range = "MediumRange"
+            else
+                range = "LongRange"
+            end
+
+            newState = increment(newState, payload.killerId, DEFAULT_STAT_KEYS, {
+                [payload.weapon] = 1;
+            }, range)
         end
 
         return newState
