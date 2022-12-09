@@ -20,29 +20,29 @@ local reconcileTeams = require(script.reconcileTeams)
 local Components = require(ReplicatedStorage.Common.Components)
 
 local MapService = {
-	Name = "MapService";
+	Name = "MapService",
 	Client = {
-		MapChanging = Root.Services.remoteEvent();
-		MapChanged = Root.Services.remoteEvent();
-		PlayerStreamedMap = Root.Services.remoteEvent();
-		CurrentMap = Root.Services.remoteProperty(nil);
-	};
-	Priority = 1;
+		MapChanging = Root.Services.remoteEvent(),
+		MapChanged = Root.Services.remoteEvent(),
+		PlayerStreamedMap = Root.Services.remoteEvent(),
+		CurrentMap = Root.Services.remoteProperty(nil),
+	},
+	Priority = 1,
 
-	Maps = ServerStorage.Maps;
-	LightingSaves = ServerStorage.Plugin_LightingSaves;
-	mapParent = Workspace.MapRoot;
+	Maps = ServerStorage.Maps,
+	LightingSaves = ServerStorage.Plugin_LightingSaves,
+	mapParent = Workspace.MapRoot,
 
-	MapChanging = Signal.new();
-	MapChanged = Signal.new();
+	MapChanging = Signal.new(),
+	MapChanged = Signal.new(),
 
-	CurrentMap = nil;
-	ChangingMaps = false;
-	MapScript = nil;
+	CurrentMap = nil,
+	ChangingMaps = false,
+	MapScript = nil,
 
-	ClonerManager = ClonerManager.new("MapComponents");
+	ClonerManager = ClonerManager.new("MapComponents"),
 
-	_lastRegenTimes = {};
+	_lastRegenTimes = {},
 }
 
 function MapService:OnInit()
@@ -57,7 +57,7 @@ function MapService:OnInit()
 		end
 	end
 
-    local mapInfo = {}
+	local mapInfo = {}
 	for _, map in pairs(self.Maps:GetChildren()) do
 		local ok, err = Definitions.map(map)
 		if not ok then
@@ -155,8 +155,8 @@ end
 
 function MapService:ChangeMap(mapName)
 	if self.CurrentMap and self.CurrentMap.Name == mapName then
-        return false, ("Already playing on map: %q"):format(mapName)
-    end
+		return false, ("Already playing on map: %q"):format(mapName)
+	end
 
 	local newMap = self.Maps:FindFirstChild(mapName)
 	if newMap == nil then
@@ -225,7 +225,7 @@ function MapService:ChangeMap(mapName)
 	end
 
 	for _, player in pairs(CollectionService:GetTagged("ParticipatingPlayer")) do
-        task.spawn(player.LoadCharacter, player)
+		task.spawn(player.LoadCharacter, player)
 	end
 
 	for _, player in Players:GetPlayers() do
@@ -264,32 +264,34 @@ function MapService:_reconcileTeams(newNameToColor)
 			end
 
 			oldTeamMap[team.name] = {
-				players = players;
-				color = team.color;
-				id = teamId;
+				players = players,
+				color = team.color,
+				id = teamId,
 			}
 		end
 	end
 
-    local reconciledTeams, newTeamsMap, untrackedPlayers = reconcileTeams(
-		participatingPlayers, newNameToColor, oldTeamMap
-	)
+	local reconciledTeams, newTeamsMap, untrackedPlayers =
+		reconcileTeams(participatingPlayers, newNameToColor, oldTeamMap)
 
 	-- Team players that are not under any team to Spectators.
 	for _, id in untrackedPlayers do
-		self.Root.world:insert(id, self.Root.world:get(id, Components.Player):patch({
-			teamId = self.Root:getIdFromInstance(Teams.Spectators);
-		}))
+		self.Root.world:insert(
+			id,
+			self.Root.world:get(id, Components.Player):patch({
+				teamId = self.Root:getIdFromInstance(Teams.Spectators),
+			})
+		)
 	end
 
 	-- Spawn/replace new teams over top old ones.
 	for name, team in newTeamsMap do
 		local newTeamComponent = MatterComponents.Team({
-			name = name;
-			participating = true;
-			enableTools = true;
-			fromMap = true;
-			color = team.color;
+			name = name,
+			participating = true,
+			enableTools = true,
+			fromMap = true,
+			color = team.color,
 		})
 
 		if team.replacingTeam then
@@ -297,7 +299,7 @@ function MapService:_reconcileTeams(newNameToColor)
 
 			for _, playerId in team.players do
 				self.Root.world:get(playerId, MatterComponents.Player):patch({
-					teamId = team.id;
+					teamId = team.id,
 				})
 			end
 		else

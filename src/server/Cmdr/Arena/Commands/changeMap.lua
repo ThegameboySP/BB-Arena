@@ -1,13 +1,13 @@
 return {
-	Name = "changeMap";
-	Aliases = {"map"};
-	Description = "Changes the map.";
-	Group = "Admin";
+	Name = "changeMap",
+	Aliases = { "map" },
+	Description = "Changes the map.",
+	Group = "Admin",
 	Args = {
 		{
 			Type = "map",
 			Name = "map",
-			Description = "The name of the map"
+			Description = "The name of the map",
 		},
-	};
+	},
 }

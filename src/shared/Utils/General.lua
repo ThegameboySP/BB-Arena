@@ -3,16 +3,16 @@ local Players = game:GetService("Players")
 local General = {}
 
 function General.isValidCharacter(char)
-    if typeof(char) ~= "Instance" then
-        return false
-    end
+	if typeof(char) ~= "Instance" then
+		return false
+	end
 
-    local hum = char:FindFirstChild("Humanoid")
-    if hum == nil then
-        return false
-    end
+	local hum = char:FindFirstChild("Humanoid")
+	if hum == nil then
+		return false
+	end
 
-    return hum.Health > 0
+	return hum.Health > 0
 end
 
 function General.getCharacter(instance)
@@ -64,6 +64,5 @@ function General.weld(p0, p1)
 	weld.Parent = p0
 	return weld
 end
-
 
 return General

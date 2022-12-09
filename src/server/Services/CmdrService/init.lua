@@ -21,25 +21,25 @@ local selectors = RoduxFeatures.selectors
 local LockCommands = require(script.LockCommands)
 
 local CmdrService = {
-	Name = "CmdrService";
+	Name = "CmdrService",
 	Client = {
-		CmdrLoaded = Root.Services.remoteProperty(false);
-		CommandExecuted = Root.Services.remoteEvent();
-		Warning = Root.Services.remoteEvent();
-		Reply = Root.Services.remoteEvent();
-	};
+		CmdrLoaded = Root.Services.remoteProperty(false),
+		CommandExecuted = Root.Services.remoteEvent(),
+		Warning = Root.Services.remoteEvent(),
+		Reply = Root.Services.remoteEvent(),
+	},
 
-	Cmdr = Cmdr;
-	_logs = {};
+	Cmdr = Cmdr,
+	_logs = {},
 }
 
 local BLACKLISTED_COMMANDS = {
-	kick = true; -- already have a kick
-	thru = true; -- thru also defines a "t" alias, replacing team's alias
-	respawn = true; -- already have a respawn
-	replace = true; -- replace defines a "map" alias for some reason
-	["goto-place"] = true;
-	["var"] = true; -- this appears to have vulnerabilities in the wrong hands
+	kick = true, -- already have a kick
+	thru = true, -- thru also defines a "t" alias, replacing team's alias
+	respawn = true, -- already have a respawn
+	replace = true, -- replace defines a "map" alias for some reason
+	["goto-place"] = true,
+	["var"] = true, -- this appears to have vulnerabilities in the wrong hands
 }
 
 function CmdrService:CanRun(player, group)
@@ -55,7 +55,7 @@ function CmdrService:OnInit()
 
 	local ownerId = game.PrivateServerOwnerId
 	if ownerId then
-        if selectors.getAdmin(self.Root.Store:getState(), ownerId) < GameEnum.AdminTiers.Admin then
+		if selectors.getAdmin(self.Root.Store:getState(), ownerId) < GameEnum.AdminTiers.Admin then
 			self.Root.Store:dispatch(actions.setAdmin(ownerId, GameEnum.AdminTiers.Admin))
 		end
 	end
@@ -71,15 +71,17 @@ function CmdrService:OnInit()
 		local getRank = Promise.promisify(player.GetRankInGroup)
 
 		-- TOB Ranktester and beyond gets admin.
-		getRank(player, 3397136):andThen(function(role)
-			if role >= 11 then
-				if selectors.getAdmin(self.Root.Store:getState(), player.UserId) < GameEnum.AdminTiers.Admin then
-					self.Root.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Admin))
+		getRank(player, 3397136)
+			:andThen(function(role)
+				if role >= 11 then
+					if selectors.getAdmin(self.Root.Store:getState(), player.UserId) < GameEnum.AdminTiers.Admin then
+						self.Root.Store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.Admin))
+					end
 				end
-			end
-		end):finally(function()
-			player:SetAttribute("IsCmdrLoaded", true)
-		end)
+			end)
+			:finally(function()
+				player:SetAttribute("IsCmdrLoaded", true)
+			end)
 	end
 
 	Players.PlayerAdded:Connect(playerHandler)
@@ -133,9 +135,9 @@ function CmdrService:_setupCmdr()
 
 	Cmdr:RegisterHook("BeforeRun", function(context)
 		return self._lockCommands:beforeRun(
-            context.Executor and context.Executor.UserId,
-            self.Cmdr.Registry:GetCommand(context.Name)
-        )
+			context.Executor and context.Executor.UserId,
+			self.Cmdr.Registry:GetCommand(context.Name)
+		)
 	end)
 
 	Cmdr:RegisterHook("AfterRun", function(context)
@@ -151,16 +153,20 @@ function CmdrService:_setupCmdr()
 				pcall(function()
 					executorName = getFullPlayerName(context.Executor)
 
-					local filterResult = TextService:FilterStringAsync(argumentsText, context.Executor.UserId, Enum.TextFilterContext.PublicChat)
+					local filterResult = TextService:FilterStringAsync(
+						argumentsText,
+						context.Executor.UserId,
+						Enum.TextFilterContext.PublicChat
+					)
 					argumentsText = filterResult:GetNonChatStringForBroadcastAsync()
 				end)
 			end
 
 			table.insert(self._logs, {
-				ExecutorName = executorName;
-				ArgumentsText = argumentsText;
-				Name = context.Name;
-				Response = context.Response;
+				ExecutorName = executorName,
+				ArgumentsText = argumentsText,
+				Name = context.Name,
+				Response = context.Response,
 			})
 		end)
 	end)
@@ -175,17 +181,11 @@ function CmdrService:_setupCmdr()
 end
 
 function CmdrService:LockCommand(commandName, byUserId)
-	return self._lockCommands:lockCommand(
-        byUserId,
-        self.Cmdr.Registry:GetCommand(commandName)
-    )
+	return self._lockCommands:lockCommand(byUserId, self.Cmdr.Registry:GetCommand(commandName))
 end
 
 function CmdrService:UnlockCommand(commandName, byUserId)
-	return self._lockCommands:unlockCommand(
-        byUserId,
-        self.Cmdr.Registry:GetCommand(commandName)
-    )
+	return self._lockCommands:unlockCommand(byUserId, self.Cmdr.Registry:GetCommand(commandName))
 end
 
 function CmdrService:OnPlayerLoaded(player)
@@ -197,7 +197,9 @@ function CmdrService:OnPlayerLoaded(player)
 
 			if onCancel(function()
 				con:Disconnect()
-			end) then con:Disconnect() end
+			end) then
+				con:Disconnect()
+			end
 		end)
 	end
 end

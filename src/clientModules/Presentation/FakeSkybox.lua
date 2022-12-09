@@ -15,11 +15,11 @@ function FakeSkybox.new()
 	skybox:SetPrimaryPartCFrame(CFrame.new())
 	scaleModel(skybox, 500)
 	skybox.Parent = viewportFrame
-	
+
 	local newCamera = Instance.new("Camera")
 	newCamera.CFrame = CFrame.new(Vector3.new(), skybox.PrimaryPart.CFrame.LookVector)
 	newCamera.Parent = viewportFrame
-	
+
 	viewportFrame.CurrentCamera = newCamera
 	viewportFrame.Size = UDim2.fromScale(1, 1)
 	viewportFrame.BackgroundColor3 = Color3.new(0, 0, 0)
@@ -30,10 +30,10 @@ function FakeSkybox.new()
 	viewportFrame.LightColor = Color3.new(0, 0, 0)
 	viewportFrame.ZIndex = 0
 	viewportFrame.Name = "FakeSkybox"
-	
+
 	return setmetatable({
-		_viewport = viewportFrame;
-		_skybox = skybox;
+		_viewport = viewportFrame,
+		_skybox = skybox,
 	}, FakeSkybox)
 end
 
@@ -61,18 +61,20 @@ function FakeSkybox:Adorn(gui, root)
 	local viewport = self._viewport
 	local id = HttpService:GenerateGUID()
 	RunService:BindToRenderStep(id, Enum.RenderPriority.Last.Value, function()
-		if viewport.Visible == false or viewport.ImageTransparency == 1 then return end
+		if viewport.Visible == false or viewport.ImageTransparency == 1 then
+			return
+		end
 		local CF = camera.CFrame
 		local offset = CFrame.fromMatrix(Vector3.new(0, 0, 0), CF.RightVector, CF.UpVector, -CF.LookVector)
 		viewport.CurrentCamera.CFrame = offset
 	end)
-	
+
 	self._cleanupFn = function()
 		RunService:UnbindFromRenderStep(id)
 		viewport.Parent = nil
 		camConnection:Disconnect()
 	end
-	
+
 	viewport.Parent = gui
 end
 
@@ -94,15 +96,15 @@ function FakeSkybox:SetSky(sky)
 		Instance.new("Decal", folder).Texture = sky.SkyboxDn
 		Instance.new("Decal", folder).Texture = sky.SkyboxUp
 		Instance.new("Decal", folder).Texture = sky.SkyboxFt
-		
+
 		ContentProvider:PreloadAsync(folder:GetChildren(), resolve)
 	end):andThen(function()
 		for _, part in pairs(self._skybox:GetChildren()) do
 			if part:IsA("BasePart") then
-                local name = part.Name
-                local texture = sky["Skybox" .. name]
-                part.Decal.Texture = texture
-            end
+				local name = part.Name
+				local texture = sky["Skybox" .. name]
+				part.Decal.Texture = texture
+			end
 		end
 	end)
 end
@@ -111,19 +113,19 @@ function scaleModel(model, scale)
 	if scale ~= 1 then
 		for _, v in next, model:GetDescendants() do
 			if v:IsA("BasePart") then
-				v.Size = v.Size*scale
-				v.Position = v.Position*scale
+				v.Size = v.Size * scale
+				v.Position = v.Position * scale
 			elseif v:IsA("JointInstance") then
 				local C0, C1 = v.C0, v.C1
-				v.C0 = C0 + (C0.p*(scale-1))
-				v.C1 = C1 + (C1.p*(scale-1))
+				v.C0 = C0 + (C0.p * (scale - 1))
+				v.C1 = C1 + (C1.p * (scale - 1))
 			elseif v:IsA("DataModelMesh") then
 				if v:IsA("SpecialMesh") and v.MeshType == Enum.MeshType.FileMesh then
-					v.Scale = v.Scale*scale
+					v.Scale = v.Scale * scale
 				end
-				v.Offset = v.Offset*scale
+				v.Offset = v.Offset * scale
 			elseif v:IsA("Attachment") then
-				v.Position = v.Position*scale
+				v.Position = v.Position * scale
 			end
 		end
 	end

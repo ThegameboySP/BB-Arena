@@ -10,9 +10,9 @@ local hudMainWidget = require(script.hudMainWidget)
 local HUD = Roact.Component:extend("HUD")
 
 function HUD:render()
-    return e(ThemeController, {}, {
-        HUD = e(hudMainWidget, self.props);
-    })
+	return e(ThemeController, {}, {
+		HUD = e(hudMainWidget, self.props),
+	})
 end
 
 return HUD

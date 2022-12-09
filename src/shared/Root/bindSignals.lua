@@ -4,9 +4,9 @@ local RunService = game:GetService("RunService")
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local legacyNameMap = {
-	RenderStepped = "PreRender";
-	Stepped = "PreSimulation";
-	Heartbeat = "PostSimulation";
+	RenderStepped = "PreRender",
+	Stepped = "PreSimulation",
+	Heartbeat = "PostSimulation",
 }
 
 local signalOrder = { "PreRender", "PreSimulation", "PostSimulation" }
@@ -14,9 +14,9 @@ local signalOrder = { "PreRender", "PreSimulation", "PostSimulation" }
 return {
 	bindSignals = function(middleware)
 		local signals = {
-			RenderStepped = Signal.new();
-			Stepped = Signal.new();
-			Heartbeat = Signal.new();
+			RenderStepped = Signal.new(),
+			Stepped = Signal.new(),
+			Heartbeat = Signal.new(),
 		}
 
 		for name, signal in signals do
@@ -30,19 +30,19 @@ return {
 		end
 
 		return {
-			PreRender = signals.RenderStepped;
-			PreSimulation = signals.Stepped;
-			PostSimulation = signals.Heartbeat;
+			PreRender = signals.RenderStepped,
+			PreSimulation = signals.Stepped,
+			PostSimulation = signals.Heartbeat,
 		}
-	end;
+	end,
 	testBindSignals = function(isServer)
 		local middlewareBySignalName = {}
 
 		return function(middleware)
 			local signals = {
-				PreRender = Signal.new();
-				PreSimulation = Signal.new();
-				PostSimulation = Signal.new();
+				PreRender = Signal.new(),
+				PreSimulation = Signal.new(),
+				PostSimulation = Signal.new(),
 			}
 
 			for name, signal in signals do
@@ -59,5 +59,5 @@ return {
 				end
 			end
 		end
-	end;
+	end,
 }

@@ -32,7 +32,7 @@ local function findFirstMatchingAttachment(model, name)
 	end
 end
 
-function addAccoutrement(character, accoutrement)  
+function addAccoutrement(character, accoutrement)
 	accoutrement.Parent = character
 	local handle = accoutrement:FindFirstChild("Handle")
 	if handle then

@@ -1,37 +1,37 @@
 return function(registry)
-    for _, command in registry.Commands do
-        local args = command.Args
-        if args == nil then
-            continue
-        end
+	for _, command in registry.Commands do
+		local args = command.Args
+		if args == nil then
+			continue
+		end
 
-        local lastArg = args[#args]
-        
-        if
-            type(lastArg) == "table"
-            and not lastArg.Optional
-            and (lastArg.Type == "players" or lastArg.Type == "player")
-        then
-            lastArg.Optional = true
+		local lastArg = args[#args]
 
-            local run = command.Run
-            if run then
-                command.Run = function(context, ...)
-                    if select(select("#", ...), ...) == nil then
-                        local newArgs = {...}
+		if
+			type(lastArg) == "table"
+			and not lastArg.Optional
+			and (lastArg.Type == "players" or lastArg.Type == "player")
+		then
+			lastArg.Optional = true
 
-                        if lastArg.Type == "players" then
-                            newArgs[select("#", ...)] = {context.Executor}
-                        else
-                            newArgs[select("#", ...)] = context.Executor
-                        end
+			local run = command.Run
+			if run then
+				command.Run = function(context, ...)
+					if select(select("#", ...), ...) == nil then
+						local newArgs = { ... }
 
-                        return run(context, unpack(newArgs))
-                    end
+						if lastArg.Type == "players" then
+							newArgs[select("#", ...)] = { context.Executor }
+						else
+							newArgs[select("#", ...)] = context.Executor
+						end
 
-                    return run(context, ...)
-                end
-            end
-        end
-    end
+						return run(context, unpack(newArgs))
+					end
+
+					return run(context, ...)
+				end
+			end
+		end
+	end
 end

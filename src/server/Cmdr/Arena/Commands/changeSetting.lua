@@ -45,26 +45,27 @@ for _, entry in Settings do
 end
 
 return {
-	Name = "changeSetting";
-	Aliases = {"setting"};
-	Description = "Changes a local setting.";
-	Group = "Any";
+	Name = "changeSetting",
+	Aliases = { "setting" },
+	Description = "Changes a local setting.",
+	Group = "Any",
 	Args = CmdrUtils.keyValueArgs("setting", 1, function()
 		return settings
 	end, function(setting, _, context)
 		local arg = {
-			Name = setting.name;
-			Type = setting.type;
-			Description = setting.description;
+			Name = setting.name,
+			Type = setting.type,
+			Description = setting.description,
 		}
 
 		local value
 		if LocalPlayer then
-			value = RoduxFeatures.selectors.getSavedSetting(context:GetStore("Common").Store:getState(), nil, setting.key)
+			value =
+				RoduxFeatures.selectors.getSavedSetting(context:GetStore("Common").Store:getState(), nil, setting.key)
 		end
 
 		return arg, value
-	end);
+	end),
 
 	Run = function(context, settingName, value)
 		local store = context:GetStore("Common").Store
@@ -74,7 +75,7 @@ return {
 		if Settings[id].type == "keybind" then
 			value = value.Name
 		end
-		
-		store:dispatch(RoduxFeatures.actions.saveSettings(context.Executor.UserId, {[id] = value}))
-	end;
+
+		store:dispatch(RoduxFeatures.actions.saveSettings(context.Executor.UserId, { [id] = value }))
+	end,
 }

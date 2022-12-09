@@ -10,7 +10,7 @@ local function removeQueued(root)
 end
 
 return {
-	event = "PostSimulation";
-	priority = GameEnum.SystemPriorities.CoreAfter;
-	system = removeQueued;
+	event = "PostSimulation",
+	priority = GameEnum.SystemPriorities.CoreAfter,
+	system = removeQueued,
 }

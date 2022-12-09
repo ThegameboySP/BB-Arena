@@ -4,28 +4,28 @@ local t = require(ReplicatedStorage.Packages.t)
 local Gamemodes = ReplicatedStorage.Common.Gamemodes
 
 local checkRegisteredStat = t.interface({
-	default = t.any;
-	name = t.string;
-	friendlyName = t.string;
-	priority = t.number;
-	domain = t.optional(t.string);
-	persistent = t.optional(t.boolean);
-	show = t.optional(t.boolean);
-	id = t.number;
+	default = t.any,
+	name = t.string,
+	friendlyName = t.string,
+	priority = t.number,
+	domain = t.optional(t.string),
+	persistent = t.optional(t.boolean),
+	show = t.optional(t.boolean),
+	id = t.number,
 })
 
 local function registerDefaultStats()
 	local defaultStats = {}
 	local registeredStats = {
-		KOs = {default = 0, priority = 1, show = true};
-		WOs = {default = 0, priority = 0, show = true};
-		AlltimeWins = {default = 0};
-		AlltimeLosses = {default = 0};
-		BestKillstreak = {default = 0};
+		KOs = { default = 0, priority = 1, show = true },
+		WOs = { default = 0, priority = 0, show = true },
+		AlltimeWins = { default = 0 },
+		AlltimeLosses = { default = 0 },
+		BestKillstreak = { default = 0 },
 		-- XP = {default = 0};
-		LongRange = {default = {}};
-		MediumRange = {default = {}};
-		CloseRange = {default = {}};
+		LongRange = { default = {} },
+		MediumRange = { default = {} },
+		CloseRange = { default = {} },
 	}
 
 	for _, gamemode in Gamemodes:GetChildren() do
@@ -43,8 +43,8 @@ local function registerDefaultStats()
 			registeredStats[name] = clone
 		end
 
-		registeredStats[definition.nameId .. "Wins"] = {default = 0}
-		registeredStats[definition.nameId .. "Losses"] = {default = 0}
+		registeredStats[definition.nameId .. "Wins"] = { default = 0 }
+		registeredStats[definition.nameId .. "Losses"] = { default = 0 }
 	end
 
 	local registeredStatArray = {}

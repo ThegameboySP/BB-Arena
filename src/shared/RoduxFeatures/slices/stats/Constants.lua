@@ -1,5 +1,5 @@
 return {
-	XP_ON_KILL = 200;
+	XP_ON_KILL = 200,
 	-- Objectives = {
 	-- 	[GameEnum.Rank.D] = {
 	-- 		KOs = 20;

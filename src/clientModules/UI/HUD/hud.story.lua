@@ -11,64 +11,64 @@ return function(target)
 	local tree
 	local props
 	props = {
-		equippedItemName = "Sword";
-		health = 50;
-		maxHealth = 100;
-		
-		failedAction = Signal.new();
+		equippedItemName = "Sword",
+		health = 50,
+		maxHealth = 100,
+
+		failedAction = Signal.new(),
 
 		items = {
 			{
-				name = "Sword";
-				thumbnail = "rbxasset://Textures/Sword128.png";
-			};
+				name = "Sword",
+				thumbnail = "rbxasset://Textures/Sword128.png",
+			},
 			{
-				name = "Slingshot";
-				thumbnail = "rbxasset://Textures/Slingshot.png";
-			};
+				name = "Slingshot",
+				thumbnail = "rbxasset://Textures/Slingshot.png",
+			},
 			{
-				name = "Rocket";
-				thumbnail = "rbxasset://Textures/Rocket.png";
-			};
+				name = "Rocket",
+				thumbnail = "rbxasset://Textures/Rocket.png",
+			},
 			{
-				name = "Trowel";
-				thumbnail = "rbxasset://Textures/Wall.png";
-			};
+				name = "Trowel",
+				thumbnail = "rbxasset://Textures/Wall.png",
+			},
 			{
-				name = "Bomb";
-				thumbnail = "rbxasset://Textures/Bomb.png";
-				charge = 0.5;
-			};
+				name = "Bomb",
+				thumbnail = "rbxasset://Textures/Bomb.png",
+				charge = 0.5,
+			},
 			{
-				name = "Superball";
-				thumbnail = "rbxasset://Textures/Superball.png";
-			};
+				name = "Superball",
+				thumbnail = "rbxasset://Textures/Superball.png",
+			},
 			{
-				name = "PaintballGun";
-				thumbnail = "rbxasset://Textures/PaintballIcon.png";
-			};
-		};
+				name = "PaintballGun",
+				thumbnail = "rbxasset://Textures/PaintballIcon.png",
+			},
+		},
 
-		toolTip = "[Z] - Bomb jump (reloading)";
+		toolTip = "[Z] - Bomb jump (reloading)",
 
 		onEquipped = function(itemName)
 			props = Llama.Dictionary.merge(props, {
-				equippedItemName = itemName or Llama.None;
+				equippedItemName = itemName or Llama.None,
 			})
 			Roact.update(tree, e(HUDApp, props))
-		end;
+		end,
 
 		onOrderChanged = function(newOrder)
 			props = Llama.Dictionary.merge(props, {
-				items = newOrder;
+				items = newOrder,
 			})
 			Roact.update(tree, e(HUDApp, props))
-		end;
+		end,
 
-		secondsTimer = 1;
-		displayBattleInfo = true;
+		secondsTimer = 1,
+		displayBattleInfo = true,
 	}
-	
+
 	local roactTree = e(HUDApp, props)
 
 	tree = Roact.mount(roactTree, target)

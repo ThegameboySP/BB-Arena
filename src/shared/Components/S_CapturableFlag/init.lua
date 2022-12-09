@@ -13,28 +13,30 @@ local makeInstances = require(script.makeInstances)
 local getCapTimeMultiplier = require(script.getCapTimeMultiplier)
 
 local S_CapturableFlag = Component:extend("CapturableFlag", {
-	realm = "server";
+	realm = "server",
 
 	checkConfig = t.interface({
-		CaptureTime = t.number;
-		RecoverTime = t.number;
-		PauseSeconds = t.number;
-		Radius = t.number;
-		NoBottomCollision = t.optional(t.boolean);
-		BottomCollisionHeight = t.optional(t.number);
-	});
+		CaptureTime = t.number,
+		RecoverTime = t.number,
+		PauseSeconds = t.number,
+		Radius = t.number,
+		NoBottomCollision = t.optional(t.boolean),
+		BottomCollisionHeight = t.optional(t.number),
+	}),
 
 	checkInstance = t.children({
-		FlagHead = t.instanceIsA("BasePart");
-		Pole = t.instanceIsA("BasePart");
-	});
+		FlagHead = t.instanceIsA("BasePart"),
+		Pole = t.instanceIsA("BasePart"),
+	}),
 })
 
 local function getUniqueGroups(groups)
 	local uniqueGroups = {}
 
 	for _, group in pairs(groups) do
-		if table.find(uniqueGroups, group) then continue end
+		if table.find(uniqueGroups, group) then
+			continue
+		end
 		table.insert(uniqueGroups, group)
 	end
 
@@ -66,14 +68,19 @@ function S_CapturableFlag:OnStart()
 	self.bin = Bin.new()
 	self._recoverSpeed = 1 / self.Config.RecoverTime
 	self._captureSpeed = 1 / self.Config.CaptureTime
-	
+
 	for _, basePart in pairs(self.Instance:GetDescendants()) do
 		if basePart:IsA("BasePart") then
 			basePart.CanCollide = false
 		end
 	end
-	
-	self._radiusPart, self._pos, self._height = makeInstances(self.Instance, self.Config.Radius, self.Config.NoBottomCollision, self.Config.BottomCollisionHeight)
+
+	self._radiusPart, self._pos, self._height = makeInstances(
+		self.Instance,
+		self.Config.Radius,
+		self.Config.NoBottomCollision,
+		self.Config.BottomCollisionHeight
+	)
 	self._radiusPart.Parent = self.Instance
 	self.bin:Add(self._radiusPart)
 
@@ -93,7 +100,7 @@ function S_CapturableFlag:_changeState(state, ...)
 end
 
 function S_CapturableFlag:_incrementOverthrown(inc)
-	self:SetState({PercentOverthrown = math.clamp(self.State.PercentOverthrown + inc, 0, 1)})
+	self:SetState({ PercentOverthrown = math.clamp(self.State.PercentOverthrown + inc, 0, 1) })
 	return self.State.PercentOverthrown
 end
 
@@ -101,18 +108,18 @@ function S_CapturableFlag:_settled(maid, cappedGroup, didCap)
 	self.bin:AddId(maid, "stateMaid")
 	local oldCappedGroup = self.State.CapturedBy
 	self:SetState({
-		State = "Settled";
-		PercentOverthrown = 0;
-		TeammatesCount = 0;
-		CapturingGroup = false;
-		CapturedBy = cappedGroup or false;
+		State = "Settled",
+		PercentOverthrown = 0,
+		TeammatesCount = 0,
+		CapturingGroup = false,
+		CapturedBy = cappedGroup or false,
 	})
 
 	if cappedGroup then
 		if oldCappedGroup and oldCappedGroup ~= cappedGroup then
 			self.Uncaptured:Fire()
 		end
-		
+
 		if didCap then
 			self.Captured:Fire(cappedGroup)
 			self.Instance.Captured:FireAllClients(cappedGroup)
@@ -121,11 +128,10 @@ function S_CapturableFlag:_settled(maid, cappedGroup, didCap)
 
 	maid:Add(RunService.Heartbeat:Connect(function()
 		local uniqueGroups = getUniqueGroups(self:_getGroupsInside(self.Whitelisted))
-		local cappingGroup = (uniqueGroups[1] and uniqueGroups[1] ~= cappedGroup)
-			and uniqueGroups[1] or uniqueGroups[2]
-		
+		local cappingGroup = (uniqueGroups[1] and uniqueGroups[1] ~= cappedGroup) and uniqueGroups[1] or uniqueGroups[2]
+
 		if cappingGroup then
-			self:SetState({CapturingGroup = cappingGroup})
+			self:SetState({ CapturingGroup = cappingGroup })
 			return self:_changeState("paused")
 		end
 	end))
@@ -133,7 +139,7 @@ end
 
 function S_CapturableFlag:_paused(maid)
 	self.bin:AddId(maid, "stateMaid")
-	self:SetState({State = "Paused"})
+	self:SetState({ State = "Paused" })
 	local config = self.Config
 
 	local duration = 0
@@ -156,7 +162,7 @@ function S_CapturableFlag:_paused(maid)
 			end
 		end
 
-		self:SetState({TeammatesCount = getGroupCount(uniqueGroups, uniqueGroups[1])})
+		self:SetState({ TeammatesCount = getGroupCount(uniqueGroups, uniqueGroups[1]) })
 
 		if duration >= config.PauseSeconds then
 			return self:_changeState("uncapping", self._recoverSpeed)
@@ -166,27 +172,21 @@ end
 
 function S_CapturableFlag:_capping(maid, speed)
 	self.bin:AddId(maid, "stateMaid")
-	self:SetState({State = "Capping"})
+	self:SetState({ State = "Capping" })
 
 	maid:Add(RunService.Heartbeat:Connect(function(dt)
 		local groups = self:_getGroupsInside(self.Whitelisted)
 		local uniqueGroups = getUniqueGroups(groups)
 		local cappingGroup = self.State.CapturingGroup
 
-		if
-			uniqueGroups[1] == nil
-			or uniqueGroups[1] ~= cappingGroup
-			or uniqueGroups[2]
-		then
+		if uniqueGroups[1] == nil or uniqueGroups[1] ~= cappingGroup or uniqueGroups[2] then
 			return self:_changeState("paused")
 		end
 
 		local count = getGroupCount(groups, uniqueGroups[1])
-		local percent = self:_incrementOverthrown(
-			speed * dt * getCapTimeMultiplier(count)
-		)
+		local percent = self:_incrementOverthrown(speed * dt * getCapTimeMultiplier(count))
 
-		self:SetState({TeammatesCount = count})
+		self:SetState({ TeammatesCount = count })
 
 		if percent >= 1 then
 			self:_changeState("settled", cappingGroup, true)
@@ -197,27 +197,22 @@ end
 function S_CapturableFlag:_uncapping(maid, speed)
 	self.bin:AddId(maid, "stateMaid")
 	self:SetState({
-		State = "Uncapping";
+		State = "Uncapping",
 	})
-	
+
 	maid:Add(RunService.Heartbeat:Connect(function(dt)
 		local groups = self:_getGroupsInside(self.Whitelisted)
 		local uniqueGroups = getUniqueGroups(groups)
 		local cappingGroup = self.State.CapturingGroup
-		
-		if
-			uniqueGroups[1] == cappingGroup
-			or uniqueGroups[2]
-		then
+
+		if uniqueGroups[1] == cappingGroup or uniqueGroups[2] then
 			return self:_changeState("paused")
 		end
 
 		local count = getGroupCount(groups, uniqueGroups[1])
-		local percent = self:_incrementOverthrown(
-			-speed * dt * getCapTimeMultiplier(count)
-		)
-	
-		self:SetState({TeammatesCount = count})
+		local percent = self:_incrementOverthrown(-speed * dt * getCapTimeMultiplier(count))
+
+		self:SetState({ TeammatesCount = count })
 
 		if percent <= 0 then
 			self:_changeState("settled", self.State.CapturedBy, false)
@@ -230,12 +225,25 @@ function S_CapturableFlag:GetPlayersInside(whitelisted)
 
 	for _, player in pairs(Players:GetPlayers()) do
 		local char = player.Character
-		if not General.isValidCharacter(char) then continue end
-		if not BoundingCylinder.isPointIntersecting(
-			self._pos, self.Config.Radius, self._height, char.PrimaryPart.Position
-		) then continue end
-		if whitelisted and not whitelisted[player] then continue end
-		if table.find(players, player) then continue end
+		if not General.isValidCharacter(char) then
+			continue
+		end
+		if
+			not BoundingCylinder.isPointIntersecting(
+				self._pos,
+				self.Config.Radius,
+				self._height,
+				char.PrimaryPart.Position
+			)
+		then
+			continue
+		end
+		if whitelisted and not whitelisted[player] then
+			continue
+		end
+		if table.find(players, player) then
+			continue
+		end
 
 		table.insert(players, player)
 	end
@@ -248,16 +256,29 @@ function S_CapturableFlag:GetTeamsInside(whitelisted)
 	local playersMap = {}
 
 	for _, player in pairs(Players:GetPlayers()) do
-		if playersMap[player] then continue end
+		if playersMap[player] then
+			continue
+		end
 
 		local char = player.Character
-		if not General.isValidCharacter(char) then continue end
-		if not BoundingCylinder.isPointIntersecting(
-			self._pos, self.Config.Radius, self._height, char.PrimaryPart.Position
-		) then continue end
+		if not General.isValidCharacter(char) then
+			continue
+		end
+		if
+			not BoundingCylinder.isPointIntersecting(
+				self._pos,
+				self.Config.Radius,
+				self._height,
+				char.PrimaryPart.Position
+			)
+		then
+			continue
+		end
 
 		local team = player.Team
-		if whitelisted and not whitelisted[player.Team] then continue end
+		if whitelisted and not whitelisted[player.Team] then
+			continue
+		end
 
 		table.insert(teams, team)
 	end

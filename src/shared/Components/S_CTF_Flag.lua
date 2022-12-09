@@ -9,12 +9,12 @@ local General = require(ReplicatedStorage.Common.Utils.General)
 local Bin = require(ReplicatedStorage.Common.Utils.Bin)
 
 local S_CTF_Flag = Component:extend("CTF_Flag", {
-    realm = "server";
-	UpdateEvent = RunService.Heartbeat;
+	realm = "server",
+	UpdateEvent = RunService.Heartbeat,
 
-    checkConfig = t.interface({
-        DespawnTime = t.number;
-    });
+	checkConfig = t.interface({
+		DespawnTime = t.number,
+	}),
 })
 
 -- Flag is slightly on the back of the player.
@@ -50,30 +50,30 @@ function S_CTF_Flag:OnInit()
 
 	-- For external code.
 	flag.Name = "Flag"
-	
-    self.bin = Bin.new()
-    self.Docked = self:Signal()
-    self.Dropped = self:Signal()
-    self.PickedUp = self:Signal()
-    self.Captured = self:Signal()
-    self.Stolen = self:Signal()
-    self.Recovered = self:Signal()
-    self.TimedOut = self:Signal()
-	
+
+	self.bin = Bin.new()
+	self.Docked = self:Signal()
+	self.Dropped = self:Signal()
+	self.PickedUp = self:Signal()
+	self.Captured = self:Signal()
+	self.Stolen = self:Signal()
+	self.Recovered = self:Signal()
+	self.TimedOut = self:Signal()
+
 	self:RemoteEvent("PickedUp")
 
-    self:RemoteEvent("Drop").OnServerEvent:Connect(function(player)
-        if player == self.State.EquippingPlayer and self.State.State ~= "Dropped" then
-            self:_changeState("Dropped")
+	self:RemoteEvent("Drop").OnServerEvent:Connect(function(player)
+		if player == self.State.EquippingPlayer and self.State.State ~= "Dropped" then
+			self:_changeState("Dropped")
 		end
-    end)
-	
+	end)
+
 	self._droppedTime = 0
 	self._stand = self.Manager:GetComponent(self.Instance.Parent, "CTF_FlagStand")
 	if self._stand == nil then
 		task.spawn(error, "Could not find flag stand under " .. self.Instance:GetFullName())
 	end
-	
+
 	flag.CanCollide = false
 	flag.Anchored = false
 	flag.Massless = true
@@ -95,11 +95,11 @@ end
 
 function S_CTF_Flag:OnStart()
 	local team = self._stand.State.Team
-	self:SetState({Team = team})
-	
+	self:SetState({ Team = team })
+
 	self.Instance.Color = team.TeamColor.Color
 	self.Instance.PointLight.Color = team.TeamColor.Color
-	
+
 	self:_changeState("Docked")
 end
 
@@ -117,20 +117,20 @@ function S_CTF_Flag:_changeState(state, ...)
 end
 
 function S_CTF_Flag:_dropped(bin)
-    self.bin:AddId(bin, "stateBin")
+	self.bin:AddId(bin, "stateBin")
 	self.bin:Remove("weld")
-	
+
 	self.Instance.Parent = Workspace
 	self.Instance.Anchored = true
 	self.Instance.PointLight.Enabled = true
-	
+
 	local oldPlayer = self.State.EquippingPlayer
 	self:SetState({
 		State = "Dropped",
 		EquippingPlayer = false,
-		TimeLeft = self.Config.DespawnTime
+		TimeLeft = self.Config.DespawnTime,
 	})
-	
+
 	local droppedTime = os.clock()
 	bin:Add(self.Instance.Touched:Connect(function(part)
 		if (os.clock() - droppedTime) <= DROPPED_DEBOUNCE then
@@ -141,24 +141,24 @@ function S_CTF_Flag:_dropped(bin)
 		if not player or not General.isValidCharacter(character) then
 			return
 		end
-		
+
 		if player.Team == self.State.Team then
 			local pos = self.Instance.Position
-			
+
 			self:_changeState("Docked")
 			self.Recovered:Fire(player, pos)
-        elseif not self.Manager:GetComponent(character:FindFirstChild("Flag"), S_CTF_Flag) then
+		elseif not self.Manager:GetComponent(character:FindFirstChild("Flag"), S_CTF_Flag) then
 			self:_changeState("Carrying", player)
 		end
 	end))
-	
+
 	bin:Add(self.Instance.AncestryChanged:Connect(function()
 		self:_changeState("Docked")
 	end))
 
 	bin:Add(self.UpdateEvent:Connect(function(dt)
-		self:SetState({TimeLeft = self.State.TimeLeft - dt})
-		
+		self:SetState({ TimeLeft = self.State.TimeLeft - dt })
+
 		if self.State.TimeLeft <= 0 then
 			local oldPos = self.Instance.Position
 			self:_changeState("Docked")
@@ -166,50 +166,50 @@ function S_CTF_Flag:_dropped(bin)
 			self.TimedOut:Fire(oldPos)
 		end
 	end))
-	
+
 	local result = Raycaster.withFilter(self.Instance.Position, Vector3.yAxis * -100, nil, function(instance)
 		return instance ~= self.Instance and not General.getCharacter(instance)
 	end)
-	
+
 	if not result then
 		self:_changeState("Docked")
 		return
 	end
-	
+
 	local pos = result.Position + Vector3.yAxis * 0.5
 	self.Instance.CFrame = CFrame.lookAt(pos, pos + Vector3.yAxis * 1)
-	
+
 	self.Dropped:Fire(oldPlayer)
 end
 
 function S_CTF_Flag:_docked(bin)
 	self.bin:AddId(bin, "stateBin")
-    self.bin:Remove("weld")
-	
+	self.bin:Remove("weld")
+
 	self.Instance.Parent = self._stand.Instance
 	self.Instance.Anchored = true
 	self.Instance.PointLight.Enabled = false
 	self:_dockFlag()
-	
+
 	local oldPlayer = self.State.EquippingPlayer
 	self:SetState({
 		State = "Docked",
-		EquippingPlayer = false
+		EquippingPlayer = false,
 	})
-	
+
 	bin:Add(self.Instance.Touched:Connect(function(part)
 		local player, character = General.getPlayerFromHitbox(part)
 		if not player or not General.isValidCharacter(character) then
 			return
 		end
-		
+
 		if
 			player.Team == self.State.Team
 			or self.Manager:GetComponent(character:FindFirstChild("Flag"), S_CTF_Flag)
 		then
 			return
 		end
-		
+
 		self:_changeState("Carrying", player)
 		self.Stolen:Fire(player)
 	end))
@@ -219,23 +219,23 @@ end
 
 function S_CTF_Flag:_carrying(bin, player)
 	local character = player.Character
-	
+
 	self.bin:AddId(bin, "stateBin")
-    bin:Add(weldToCharacter(self.Instance, character))
-	
+	bin:Add(weldToCharacter(self.Instance, character))
+
 	self.Instance.Parent = character
 	self.Instance.Anchored = false
 	self.Instance.PointLight.Enabled = true
 
 	self:SetState({
 		State = "Carrying",
-		EquippingPlayer = player
+		EquippingPlayer = player,
 	})
-	
+
 	bin:Add(player.AncestryChanged:Connect(function()
 		self:_changeState("Dropped")
 	end))
-	
+
 	bin:Add(character.AncestryChanged:Connect(function()
 		self:_changeState("Dropped")
 	end))
@@ -243,20 +243,20 @@ function S_CTF_Flag:_carrying(bin, player)
 	bin:Add(player:GetPropertyChangedSignal("Team"):Connect(function()
 		self:_changeState("Dropped")
 	end))
-	
+
 	local humanoid = character:FindFirstChild("Humanoid")
 	if humanoid then
 		bin:Add(humanoid.StateChanged:Connect(function(_, newState)
 			if newState == Enum.HumanoidStateType.Dead then
 				-- task.defer(function()
-					self:_changeState("Dropped")
+				self:_changeState("Dropped")
 				-- end)
 			end
 		end))
 	else
 		self:_changeState("Dropped")
 	end
-	
+
 	self:RemoteEvent("PickedUp"):FireAllClients(player)
 	self.PickedUp:Fire(player)
 end

@@ -11,65 +11,65 @@ local MapListApp = require(ReplicatedStorage.ClientModules.UI.MapListApp)
 local setEnabled
 
 if RunService:IsClient() then
-    local tree
-    
-    local gui = Instance.new("ScreenGui")
-    gui.ResetOnSpawn = false
-    gui.Name = "MapList"
-    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    gui.Parent = Players.LocalPlayer.PlayerGui
+	local tree
 
-    local isOn = false
-    setEnabled = function(on)
-        if (not not tree) == on then
-            return
-        end
+	local gui = Instance.new("ScreenGui")
+	gui.ResetOnSpawn = false
+	gui.Name = "MapList"
+	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	gui.Parent = Players.LocalPlayer.PlayerGui
 
-        isOn = on
-        if on then
-            local roactTree = Roact.createElement(MapListApp, {
-                onClosed = function()
-                    setEnabled(false)
-                end;
-                changeToMap = function(mapName)
-                    local cmdr = Root:GetService("CmdrController").Cmdr
-                    return cmdr.Dispatcher:EvaluateAndRun(("changemap %q"):format(mapName))
-                end;
-            })
+	local isOn = false
+	setEnabled = function(on)
+		if (not not tree) == on then
+			return
+		end
 
-            roactTree = Roact.createElement(RoactRodux.StoreProvider, {
-                store = Root.Store;
-            }, {
-                Main = roactTree
-            })
+		isOn = on
+		if on then
+			local roactTree = Roact.createElement(MapListApp, {
+				onClosed = function()
+					setEnabled(false)
+				end,
+				changeToMap = function(mapName)
+					local cmdr = Root:GetService("CmdrController").Cmdr
+					return cmdr.Dispatcher:EvaluateAndRun(("changemap %q"):format(mapName))
+				end,
+			})
 
-            tree = Roact.mount(roactTree, gui)
-        else
-            Roact.unmount(tree)
-            tree = nil
+			roactTree = Roact.createElement(RoactRodux.StoreProvider, {
+				store = Root.Store,
+			}, {
+				Main = roactTree,
+			})
 
-            -- For legacy menu GUI
-            if _G.MapListClosed then
-                _G.MapListClosed()
-            end
-        end
-    end
+			tree = Roact.mount(roactTree, gui)
+		else
+			Roact.unmount(tree)
+			tree = nil
 
-    local function toggleEnabled()
-        setEnabled(not isOn)
-    end
+			-- For legacy menu GUI
+			if _G.MapListClosed then
+				_G.MapListClosed()
+			end
+		end
+	end
 
-    -- For legacy menu GUI
-    _G.ToggleMapList = toggleEnabled
+	local function toggleEnabled()
+		setEnabled(not isOn)
+	end
+
+	-- For legacy menu GUI
+	_G.ToggleMapList = toggleEnabled
 end
 
 return {
-	Name = "maplistGUI";
-	Aliases = {"maplist"};
-	Description = "Open the map list GUI.";
-	Group = "Any";
-	Args = {};
-    Run = function()
-        setEnabled(true)
-    end;
+	Name = "maplistGUI",
+	Aliases = { "maplist" },
+	Description = "Open the map list GUI.",
+	Group = "Any",
+	Args = {},
+	Run = function()
+		setEnabled(true)
+	end,
 }

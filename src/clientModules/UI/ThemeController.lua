@@ -8,21 +8,21 @@ local Themes = require(script.Parent.Themes)
 local ThemeController = Roact.Component:extend("ThemeController")
 
 function ThemeController:init(props)
-    self.props = props
-    self:setState({
-        theme = Themes.default;
-    })
+	self.props = props
+	self:setState({
+		theme = Themes.default,
+	})
 end
 
 function ThemeController:render()
-    return e(ThemeContext.Provider, {
-        value = self.state.theme;
-        setTheme = function(theme)
-            self:setState({
-                value = theme;
-            })
-        end;
-    }, self.props[Roact.Children])
+	return e(ThemeContext.Provider, {
+		value = self.state.theme,
+		setTheme = function(theme)
+			self:setState({
+				value = theme,
+			})
+		end,
+	}, self.props[Roact.Children])
 end
 
 return ThemeController

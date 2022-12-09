@@ -12,45 +12,43 @@ local mapListWidget = require(script.mapListWidget)
 local MapList = Roact.Component:extend("MapList")
 
 function MapList:render()
-    return e(ThemeController, {}, {
-        MapList = e(mapListWidget, self.props);
-    })
+	return e(ThemeController, {}, {
+		MapList = e(mapListWidget, self.props),
+	})
 end
 
 local function transform(value)
-    if value == nil then
-        return "—"
-    elseif typeof(value) == "Vector3" then
-        return string.format("%dx%d", value.X, value.Z)
-    elseif type(value) == "boolean" then
-        return value and "yes" or "no"
-    else
-        return value
-    end
+	if value == nil then
+		return "—"
+	elseif typeof(value) == "Vector3" then
+		return string.format("%dx%d", value.X, value.Z)
+	elseif type(value) == "boolean" then
+		return value and "yes" or "no"
+	else
+		return value
+	end
 end
 
-MapList = RoactRodux.connect(
-    function(state, props)
-        local mapInfo = {}
+MapList = RoactRodux.connect(function(state, props)
+	local mapInfo = {}
 
-        for name, info in state.game.mapInfo do
-            mapInfo[name] = {
-                ["Map name"] = name;
-                ["Teams"] = transform(info.teamSize);
-                ["Size"] = transform(info.size);
-                ["Neutral allowed"] = transform(info.neutralAllowed);
-                ["CTF"] = transform(info.supportsCTF);
-                ["Control Points"] = transform(info.supportsControlPoints);
-                ["Creator"] = transform(info.creator);
-                ["Thumbnail"] = info.thumbnail;
-            }
-        end
+	for name, info in state.game.mapInfo do
+		mapInfo[name] = {
+			["Map name"] = name,
+			["Teams"] = transform(info.teamSize),
+			["Size"] = transform(info.size),
+			["Neutral allowed"] = transform(info.neutralAllowed),
+			["CTF"] = transform(info.supportsCTF),
+			["Control Points"] = transform(info.supportsControlPoints),
+			["Creator"] = transform(info.creator),
+			["Thumbnail"] = info.thumbnail,
+		}
+	end
 
-        return Llama.Dictionary.merge(props, {
-            mapInfo = mapInfo;
-            activeMap = state.game.mapId;
-        })
-    end
-)(MapList)
+	return Llama.Dictionary.merge(props, {
+		mapInfo = mapInfo,
+		activeMap = state.game.mapId,
+	})
+end)(MapList)
 
 return MapList

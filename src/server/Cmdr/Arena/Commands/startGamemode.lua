@@ -1,12 +1,12 @@
 return {
-	Name = "__startGamemode";
-	Description = "Technical command.";
-	Aliases = {};
-	Group = "Admin";
+	Name = "__startGamemode",
+	Description = "Technical command.",
+	Aliases = {},
+	Group = "Admin",
 	Args = {
 		{
-			Type = "string";
-			Name = "";
-		}
-	};
+			Type = "string",
+			Name = "",
+		},
+	},
 }

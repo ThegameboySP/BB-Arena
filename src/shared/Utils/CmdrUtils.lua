@@ -8,20 +8,21 @@ local CmdrUtils = {}
 local inf = math.huge
 
 function CmdrUtils.wrapAutoSuggestions(type, generateAutoSuggestions)
-    local clone = table.clone(type)
-    clone.Autocomplete = function(...)
-        local _, options = type.Autocomplete(...)
-        return generateAutoSuggestions(), options
-    end
+	local clone = table.clone(type)
+	clone.Autocomplete = function(...)
+		local _, options = type.Autocomplete(...)
+		return generateAutoSuggestions(), options
+	end
 
-    return clone
+	return clone
 end
 
 local function getValidateMsg(typeName, min, max)
 	local capitalTypeName = typeName:sub(1, 1):upper() .. typeName:sub(2, -1)
 
 	return
-		if min == -inf and max ~= inf then ("%s must be within %d and below."):format(capitalTypeName, max)
+		if min == -inf and max ~= inf
+		then ("%s must be within %d and below."):format(capitalTypeName, max)
 		elseif min ~= -inf and max == inf then ("%s must be within %d and up."):format(capitalTypeName, min)
 		else ("%s must be between %d and %d."):format(capitalTypeName, min, max)
 end
@@ -32,7 +33,7 @@ function CmdrUtils.keyValueArgs(enumName, argIndex, getKeyValues, mapValue)
 	end
 
 	local entries = {}
-	
+
 	return {
 		function(context)
 			entries = getKeyValues(context)
@@ -42,10 +43,10 @@ function CmdrUtils.keyValueArgs(enumName, argIndex, getKeyValues, mapValue)
 				table.insert(options, key)
 			end
 
-            return {
-                Type = context.Cmdr.Util.MakeEnumType(enumName, options);
-                Name = "option name";
-            }
+			return {
+				Type = context.Cmdr.Util.MakeEnumType(enumName, options),
+				Name = "option name",
+			}
 		end,
 		function(context)
 			local arg1 = context:GetArgument(argIndex)
@@ -53,26 +54,26 @@ function CmdrUtils.keyValueArgs(enumName, argIndex, getKeyValues, mapValue)
 				return
 			end
 
-            local cmdrType, currentValue = mapValue(entries[arg1:GetValue()], arg1:GetValue(), context)
-            local rawType = cmdrType
-            if type(cmdrType) == "function" then
-                rawType = cmdrType(context)
-            end
+			local cmdrType, currentValue = mapValue(entries[arg1:GetValue()], arg1:GetValue(), context)
+			local rawType = cmdrType
+			if type(cmdrType) == "function" then
+				rawType = cmdrType(context)
+			end
 
-            if type(rawType) == "table" then
-                rawType = table.clone(rawType)
-                rawType.Optional = false
-                rawType.Default = nil
+			if type(rawType) == "table" then
+				rawType = table.clone(rawType)
+				rawType.Optional = false
+				rawType.Default = nil
 
 				if currentValue ~= nil then
-					rawType.Description =
-						(rawType.Description and (rawType.Description .. "\n\n") or "")
-						.. "Current value: " .. tostring(currentValue)
+					rawType.Description = (rawType.Description and (rawType.Description .. "\n\n") or "")
+						.. "Current value: "
+						.. tostring(currentValue)
 				end
-            end
+			end
 
 			return rawType
-		end
+		end,
 	}
 end
 
@@ -81,56 +82,49 @@ function CmdrUtils.constrainedInteger(min, max)
 	local validateMsg = getValidateMsg("integer", min, max)
 
 	type.Validate = function(value)
-		local isValid = value ~= nil
-			and math.floor(value) == value
-			and value >= min
-			and value <= max
-		
+		local isValid = value ~= nil and math.floor(value) == value and value >= min and value <= max
+
 		return isValid, validateMsg
 	end
 
 	return type
 end
 
-
 function CmdrUtils.constrainedNumber(min, max)
 	local validateMsg = getValidateMsg("number", min, max)
-	
+
 	return {
 		DisplayName = "Integer " .. ("%s—%s"):format(
 			min == -math.huge and "-inf" or tostring(min),
 			max == math.huge and "inf" or tostring(max)
-		);
-		
+		),
+
 		Transform = function(text)
 			return tonumber(text)
-		end;
+		end,
 
 		Validate = function(value)
-			local isValid = value ~= nil
-				and value >= min
-				and value <= max
-			
+			local isValid = value ~= nil and value >= min and value <= max
+
 			return isValid, validateMsg
-		end;
+		end,
 
 		Parse = function(value)
 			return value
-		end;
+		end,
 	}
 end
 
-
 function CmdrUtils.invalid(msg)
 	msg = msg or "Invalid input. Go back and fix a previous argument."
-	
+
 	return {
 		DisplayName = "Invalid",
-		
+
 		Validate = function()
 			return false, msg
 		end,
-		
+
 		Parse = function()
 			return nil
 		end,
@@ -138,36 +132,36 @@ function CmdrUtils.invalid(msg)
 end
 
 local ISchema = t.array(t.strictInterface({
-	Key = t.string;
-	KeyType = t.table;
-	KeyChecker = t.optional(t.callback);
-	ValueType = t.table;
-	ValueChecker = t.optional(t.callback);
+	Key = t.string,
+	KeyType = t.table,
+	KeyChecker = t.optional(t.callback),
+	ValueType = t.table,
+	ValueChecker = t.optional(t.callback),
 }))
 
 local IDef = t.strictInterface({
-	Validate = t.optional(t.callback);
+	Validate = t.optional(t.callback),
 })
 
 function CmdrUtils.fightingTeamTo(cmdrType, params)
 	return function(commandContext)
 		local schema = {}
-		
+
 		local resolvedCmdrType = cmdrType
 		local Registry = commandContext.Cmdr.Registry
 		if type(cmdrType) == "string" then
 			resolvedCmdrType = Registry.Types[cmdrType]
 		end
-	
+
 		for _, team in pairs(CollectionService:GetTagged("FightingTeam")) do
 			table.insert(schema, {
-				Key = team.Name;
-				KeyType = Registry.Types.team;
-				KeyChecker = t.literal(team);
-				ValueType = resolvedCmdrType;
+				Key = team.Name,
+				KeyType = Registry.Types.team,
+				KeyChecker = t.literal(team),
+				ValueType = resolvedCmdrType,
 				ValueChecker = function()
 					return true
-				end;
+				end,
 			})
 		end
 
@@ -187,30 +181,30 @@ function CmdrUtils.fightingTeamTo(cmdrType, params)
 						return false, err
 					end
 				end
-				
+
 				return true
-			end;
+			end,
 		})
 
 		return wrappedCmdrType
-	end;
+	end
 end
 
 function CmdrUtils.map(schema, def)
 	assert(ISchema(schema))
 	def = def or {}
 	assert(IDef(def))
-	
+
 	local checkers = {}
 	local cmdrTypes = {}
 	local keys = {}
-	
+
 	for _, entry in ipairs(schema) do
 		assert(not entry.KeyType.Listable, "Cannot make a keyword pair with a listable type!")
 		assert(not entry.ValueType.Listable, "Cannot make a keyword pair with a listable type!")
-		
-		checkers[entry.Key] = {Key = entry.KeyChecker, Value = entry.ValueChecker}
-		cmdrTypes[entry.Key] = {Key = entry.KeyType, Value = entry.ValueType}
+
+		checkers[entry.Key] = { Key = entry.KeyChecker, Value = entry.ValueChecker }
+		cmdrTypes[entry.Key] = { Key = entry.KeyType, Value = entry.ValueType }
 		table.insert(keys, entry.Key)
 	end
 
@@ -234,7 +228,7 @@ function CmdrUtils.map(schema, def)
 			if checkersPair == nil then
 				return false, ("No key named %q!"):format(key)
 			end
-			
+
 			do
 				local ok, err = validateValue(types.Key, key)
 				if not ok then
@@ -272,20 +266,15 @@ function CmdrUtils.map(schema, def)
 			if def.Validate then
 				return def.Validate(key, value)
 			end
-			
+
 			return true
 		end,
-		
+
 		-- Define this in case def's .Validate condition becomes cold before pressing enter.
-		ValidateOnce = def.Validate
-			and function(key, value)
-				local types = cmdrTypes[key]
-				return def.Validate(
-					getParsedValue(types.Key, key),
-					getParsedValue(types.Value, value)
-				)
-			end
-			or nil,
+		ValidateOnce = def.Validate and function(key, value)
+			local types = cmdrTypes[key]
+			return def.Validate(getParsedValue(types.Key, key), getParsedValue(types.Value, value))
+		end or nil,
 
 		Autocomplete = function(key, value, hasEquals)
 			if checkers[key] == nil then
@@ -295,30 +284,32 @@ function CmdrUtils.map(schema, def)
 						table.insert(suggestions, suggestedKey)
 					end
 				end
-				
+
 				return suggestions
 			end
-			
+
 			if not hasEquals then
-				return {key .. "="}
+				return { key .. "=" }
 			end
-			
+
 			local suggestions = {}
 			for index, str in ipairs(getAutocompleteValues(cmdrTypes[key].Value, value or "")) do
 				suggestions[index] = key .. "=" .. str
 			end
-			
+
 			return suggestions
 		end,
 
 		Parse = function(key, value)
 			-- Cannot return a map since Cmdr expects an array from a listable type.
 			-- Cannot return a single array since Cmdr removes order as an implementation detail.
-			return {{
-				type = "map";
-				key = getParsedValue(cmdrTypes[key].Key, key),
-				value = getParsedValue(cmdrTypes[key].Value, value)
-			}}
+			return {
+				{
+					type = "map",
+					key = getParsedValue(cmdrTypes[key].Key, key),
+					value = getParsedValue(cmdrTypes[key].Value, value),
+				},
+			}
 		end,
 	}
 end
@@ -352,19 +343,21 @@ function validateValue(cmdrType, value)
 	if not cmdrType.Validate then
 		return true
 	end
-	
+
 	local ret = table.pack(cmdrType.Transform(value))
 	local ok, err = cmdrType.Validate(table.unpack(ret, 1, ret.n))
 	if not ok then
 		return false, err
 	end
-	
+
 	return true
 end
 
 function getParsedValue(cmdrType, value)
 	local ret = table.pack(cmdrType.Transform(value))
-	if cmdrType.Validate and not cmdrType.Validate(table.unpack(ret, 1, ret.n)) then return end
+	if cmdrType.Validate and not cmdrType.Validate(table.unpack(ret, 1, ret.n)) then
+		return
+	end
 	return cmdrType.Parse(table.unpack(ret, 1, ret.n))
 end
 
@@ -377,7 +370,7 @@ function getAutocompleteValues(cmdrType, value)
 	if cmdrType.Validate and not cmdrType.Validate(table.unpack(ret, 1, ret.n)) then
 		return {}
 	end
-	
+
 	return cmdrType.Autocomplete(table.unpack(ret, 1, ret.n))
 end
 
@@ -408,8 +401,9 @@ function makeFuzzyFinder(setOrContainer)
 		names, instances = transformInstanceSet(setOrContainer:GetChildren())
 	elseif typeof(setOrContainer) == "table" then
 		if
-			typeof(setOrContainer[1]) == "Instance" or typeof(setOrContainer[1]) == "EnumItem" or
-				(typeof(setOrContainer[1]) == "table" and typeof(setOrContainer[1].Name) == "string")
+			typeof(setOrContainer[1]) == "Instance"
+			or typeof(setOrContainer[1]) == "EnumItem"
+			or (typeof(setOrContainer[1]) == "table" and typeof(setOrContainer[1].Name) == "string")
 		then
 			names, instances = transformInstanceSet(setOrContainer)
 		elseif type(setOrContainer[1]) == "string" then
@@ -475,7 +469,7 @@ function CmdrUtils.enum(name, values)
 		end,
 		Parse = function(text)
 			return findValue(text, true)
-		end
+		end,
 	}
 end
 

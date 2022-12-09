@@ -6,17 +6,17 @@ local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local IS_STUDIO = RunService:IsStudio()
 
 local anyGroups = table.freeze({
-	Any = true;
-	Help = true;
-	DefaultUtil = true;
-	UserAlias = true;
-	Utility = true;
+	Any = true,
+	Help = true,
+	DefaultUtil = true,
+	UserAlias = true,
+	Utility = true,
 })
 
 local function canRun(permissions, userId, group)
 	if userId == nil then
-        return true
-    end
+		return true
+	end
 
 	if anyGroups[group] then
 		return true
@@ -31,7 +31,7 @@ local function canRun(permissions, userId, group)
 	if group == "Referee" then
 		return
 			(permissions.referees[userId] and playerAdmin >= GameEnum.AdminTiers.Admin)
-			or (not permissions.referees[userId] and playerAdmin >= GameEnum.AdminTiers.Owner)
+				or (not permissions.referees[userId] and playerAdmin >= GameEnum.AdminTiers.Owner)
 	end
 
 	local requiredAdmin = 0
@@ -45,6 +45,6 @@ local function canRun(permissions, userId, group)
 end
 
 return {
-	canRun = canRun;
-	anyGroups = anyGroups;
+	canRun = canRun,
+	anyGroups = anyGroups,
 }

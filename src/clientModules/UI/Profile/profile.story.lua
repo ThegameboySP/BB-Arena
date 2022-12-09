@@ -33,7 +33,7 @@ return function(target)
 				image = "rbxthumb://type=AvatarBust&id=1951387&w=180&h=180",
 				data = { stats = state.stats.alltimeStats[1], place = 53, timePlayed = 60, rank = GameEnum.Ranks.SPlus },
 			},
-		};
+		},
 	})
 
 	local tree = Roact.mount(roactTree, target)

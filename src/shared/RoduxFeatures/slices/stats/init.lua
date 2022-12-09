@@ -1,5 +1,5 @@
 return {
-    reducer = require(script.statsReducer);
-    actions = require(script.statsActions);
-    serializers = require(script.statsSerializers);
+	reducer = require(script.statsReducer),
+	actions = require(script.statsActions),
+	serializers = require(script.statsSerializers),
 }

@@ -7,7 +7,7 @@ local GameEnum = require(ReplicatedStorage.Common.GameEnum)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local selectors = RoduxFeatures.selectors
 
-return function (context, mapName)
+return function(context, mapName)
 	local map = Maps:FindFirstChild(mapName)
 
 	if map and map:GetAttribute("LockedMap") then
@@ -16,18 +16,13 @@ return function (context, mapName)
 
 		if selectors.getAdmin(state, context.Executor.UserId) < GameEnum.AdminTiers.Owner then
 			return
-				"This map is currently not available and you don't have permission to change to it."
-				.. (type(lockedMap) == "string"
-					and ("\nReason: %q"):format(lockedMap)
-					or ""
-				)
+				"This map is currently not available and you don't have permission to change to it." .. (type(
+				lockedMap
+			) == "string" and ("\nReason: %q"):format(lockedMap) or "")
 		end
 	end
 
-	local _, err = context:GetStore("Common")
-		.Root
-		:GetService("MapService")
-		:ChangeMap(mapName)
-	
+	local _, err = context:GetStore("Common").Root:GetService("MapService"):ChangeMap(mapName)
+
 	return err
 end

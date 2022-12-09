@@ -1,11 +1,11 @@
 local function blendAlpha(alphaValues)
-    local alpha = 0
+	local alpha = 0
 
-    for _, value in alphaValues do
-        alpha = alpha + (1 - alpha) * value
-    end
+	for _, value in alphaValues do
+		alpha = alpha + (1 - alpha) * value
+	end
 
-    return alpha
+	return alpha
 end
 
 return blendAlpha

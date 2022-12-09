@@ -6,16 +6,16 @@ local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerNa
 local actions = RoduxFeatures.actions
 
 return function(context, players)
-    local store = context:GetStore("Common").Store
-    
-    for _, player in pairs(players) do
-        local state = store:getState()
-        store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.None, context.Executor.UserId))
+	local store = context:GetStore("Common").Store
 
-        if store:getState() ~= state then
-            context:Reply(string.format("Successfully unadmined %s", getFullPlayerName(player)))
-        end
-    end
+	for _, player in pairs(players) do
+		local state = store:getState()
+		store:dispatch(actions.setAdmin(player.UserId, GameEnum.AdminTiers.None, context.Executor.UserId))
 
-    return ""
+		if store:getState() ~= state then
+			context:Reply(string.format("Successfully unadmined %s", getFullPlayerName(player)))
+		end
+	end
+
+	return ""
 end

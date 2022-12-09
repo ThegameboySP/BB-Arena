@@ -1,10 +1,14 @@
 local RunService = game:GetService("RunService")
 
-return function (_, players)
+return function(_, players)
 	for _, player in next, players do
-		if player.Character == nil then continue end
-		if player.Character.PrimaryPart == nil then continue end
-        
+		if player.Character == nil then
+			continue
+		end
+		if player.Character.PrimaryPart == nil then
+			continue
+		end
+
 		local CF = player.Character.PrimaryPart.CFrame
 		local charCon
 		charCon = player.CharacterAdded:Connect(function(character)

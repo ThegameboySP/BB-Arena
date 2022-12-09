@@ -165,7 +165,7 @@ local function respawnPlayers(root)
 end
 
 return {
-	event = "PreSimulation";
-	priority = GameEnum.SystemPriorities.CoreAfter;
-	system = respawnPlayers;
+	event = "PreSimulation",
+	priority = GameEnum.SystemPriorities.CoreAfter,
+	system = respawnPlayers,
 }

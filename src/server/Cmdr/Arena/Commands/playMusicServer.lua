@@ -1,10 +1,10 @@
 local SoundService = game:GetService("SoundService")
 
-return function (_, soundIdOrSound, volume, looped)
+return function(_, soundIdOrSound, volume, looped)
 	if workspace:FindFirstChild("CmdrMusic") then
 		workspace.CmdrMusic:Destroy()
 	end
-	
+
 	if typeof(soundIdOrSound) == "number" then
 		local music = Instance.new("Sound")
 		music.Name = "CmdrMusic"
@@ -16,7 +16,7 @@ return function (_, soundIdOrSound, volume, looped)
 		music.Parent = workspace
 		music:Play()
 
-        return string.format("Playing #%s", soundIdOrSound)
+		return string.format("Playing #%s", soundIdOrSound)
 	elseif typeof(soundIdOrSound) == "Instance" then
 		local music = soundIdOrSound:Clone()
 		music.Name = "CmdrMusic"
@@ -27,6 +27,6 @@ return function (_, soundIdOrSound, volume, looped)
 		music.Parent = workspace
 		music:Play()
 
-        return string.format("Playing %q", soundIdOrSound.Name)
+		return string.format("Playing %q", soundIdOrSound.Name)
 	end
 end

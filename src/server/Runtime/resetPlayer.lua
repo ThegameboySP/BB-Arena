@@ -15,60 +15,60 @@ local function shuffle(tbl)
 end
 
 local function onDescendantAdded(descendant)
-    if descendant:IsA("SpawnLocation") then
-        table.insert(spawns, descendant)
-    end
+	if descendant:IsA("SpawnLocation") then
+		table.insert(spawns, descendant)
+	end
 end
 
 Workspace.DescendantAdded:Connect(onDescendantAdded)
 Workspace.DescendantRemoving:Connect(function(descendant)
-    if descendant:IsA("SpawnLocation") then
-        table.remove(spawns, table.find(spawns, descendant))
-    end
+	if descendant:IsA("SpawnLocation") then
+		table.remove(spawns, table.find(spawns, descendant))
+	end
 end)
 
 for _, descendant in pairs(Workspace:GetDescendants()) do
-    onDescendantAdded(descendant)
+	onDescendantAdded(descendant)
 end
 
 local function resetPlayer(player)
-    local character = player.Character
-    if character == nil then
-        return
-    end
+	local character = player.Character
+	if character == nil then
+		return
+	end
 
-    if player.Team == nil then
-        character:MoveTo(Vector3.zero)
-        return
-    end
+	if player.Team == nil then
+		character:MoveTo(Vector3.zero)
+		return
+	end
 
-    local teamColor = player.Team.TeamColor
-    local chosenSpawn
+	local teamColor = player.Team.TeamColor
+	local chosenSpawn
 
-    for _, spawn in ipairs(shuffle(spawns)) do
-        if spawn.TeamColor == teamColor then
-            chosenSpawn = spawn
-            break
-        end
-    end
+	for _, spawn in ipairs(shuffle(spawns)) do
+		if spawn.TeamColor == teamColor then
+			chosenSpawn = spawn
+			break
+		end
+	end
 
-    if chosenSpawn == nil or not chosenSpawn.Enabled then
-        character:MoveTo(Vector3.zero)
-        return
-    end
+	if chosenSpawn == nil or not chosenSpawn.Enabled then
+		character:MoveTo(Vector3.zero)
+		return
+	end
 
-    character:MoveTo(chosenSpawn.Position)
+	character:MoveTo(chosenSpawn.Position)
 
-    if chosenSpawn.Duration > 0 then
-        local ff = Instance.new("ForceField")
-		
+	if chosenSpawn.Duration > 0 then
+		local ff = Instance.new("ForceField")
+
 		ff.Parent = character
 		task.delay(chosenSpawn.Duration, function()
 			ff.Parent = nil
 		end)
-    end
+	end
 
-    return chosenSpawn
+	return chosenSpawn
 end
 
 return resetPlayer

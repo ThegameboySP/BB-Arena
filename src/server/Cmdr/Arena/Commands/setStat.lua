@@ -2,11 +2,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CmdrUtils = require(ReplicatedStorage.Common.Utils.CmdrUtils)
 
-local args = {{
-	Type = "players";
-	Name = "players";
-	Description = "Players to set";  
-}}
+local args = { {
+	Type = "players",
+	Name = "players",
+	Description = "Players to set",
+} }
 
 local function mapStats(stats, registered)
 	local strings = {}
@@ -34,8 +34,8 @@ local keyValueArgs = CmdrUtils.keyValueArgs("stat", 2, function(context)
 end, function(_, name, context)
 	local state = context:GetStore("Common").Store:getState()
 	return {
-		Type = type(getStatFromFriendlyName(state.stats, name).default);
-		Name = name;
+		Type = type(getStatFromFriendlyName(state.stats, name).default),
+		Name = name,
 	}
 end)
 
@@ -44,9 +44,9 @@ for _, arg in keyValueArgs do
 end
 
 return {
-	Name = "setStat";
-	Aliases = {"set"};
-	Description = "Sets multiple players' stats.";
-	Group = "Admin";
-	Args = args;
+	Name = "setStat",
+	Aliases = { "set" },
+	Description = "Sets multiple players' stats.",
+	Group = "Admin",
+	Args = args,
 }

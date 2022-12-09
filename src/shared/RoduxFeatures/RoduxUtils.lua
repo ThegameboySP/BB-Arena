@@ -16,23 +16,22 @@ function RoduxUtils.createReducer(initialState, handlers)
 	end
 end
 
-
 function RoduxUtils.numberIndicesToString(map)
-    local strMap = {}
-    for number, value in pairs(map) do
-        strMap[tostring(number)] = value
-    end
+	local strMap = {}
+	for number, value in pairs(map) do
+		strMap[tostring(number)] = value
+	end
 
-    return strMap
+	return strMap
 end
 
 function RoduxUtils.stringIndicesToNumber(map)
-    local numberMap = {}
-    for str, value in pairs(map) do
-        numberMap[tonumber(str)] = value
-    end
+	local numberMap = {}
+	for str, value in pairs(map) do
+		numberMap[tonumber(str)] = value
+	end
 
-    return numberMap
+	return numberMap
 end
 
 return RoduxUtils

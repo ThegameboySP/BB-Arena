@@ -23,10 +23,10 @@ end
 
 function CTFClient.new(binder)
 	return setmetatable({
-		binder = binder;
-		_gui = nil;
-		connections = {};
-		instancesToDestroy = {};
+		binder = binder,
+		_gui = nil,
+		connections = {},
+		instancesToDestroy = {},
 	}, CTFClient)
 end
 
@@ -53,7 +53,7 @@ function CTFClient:OnInit(teams)
 
 	self.service:GetRemoteEvent("CTF_Stolen").OnClientEvent:Connect(function(data)
 		if LocalPlayer.Team == data.team then
-            playSound(Sounds.Splat)
+			playSound(Sounds.Splat)
 		else
 			playSound(Sounds.Button)
 		end
@@ -79,7 +79,7 @@ function CTFClient:_handleGUI(teams)
 
 		guisByTeam[team] = clone
 	end
-	
+
 	local function updateScore()
 		Gui:FindFirstChild("Goal").Text = string.format("To %s", tostring(self.binder.State.maxScore) or "0")
 		for team, gui in pairs(guisByTeam) do

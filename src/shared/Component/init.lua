@@ -1,5 +1,5 @@
 return {
-    Component = require(script.Component);
-    ComponentManager = require(script.ComponentManager);
-    ClonerManager = require(script.ClonerManager);
+	Component = require(script.Component),
+	ComponentManager = require(script.ComponentManager),
+	ClonerManager = require(script.ClonerManager),
 }

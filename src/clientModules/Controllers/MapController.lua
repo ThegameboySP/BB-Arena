@@ -11,16 +11,16 @@ local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
 local Components = require(ReplicatedStorage.Common.Components)
 
 local MapController = {
-	Name = "MapController";
+	Name = "MapController",
 
-	MapChanged = Signal.new();
-	MapChanging = Signal.new();
+	MapChanged = Signal.new(),
+	MapChanging = Signal.new(),
 
-	CurrentMap = nil;
-	MapScript = nil;
+	CurrentMap = nil,
+	MapScript = nil,
 
- 	_skyboxTweener = SkyboxTweener.new(Lighting);
-	ClonerManager = ClonerManager.new("MapComponents");
+	_skyboxTweener = SkyboxTweener.new(Lighting),
+	ClonerManager = ClonerManager.new("MapComponents"),
 }
 
 local FADE_INFO = TweenInfo.new(8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
@@ -123,13 +123,17 @@ function MapController:_tween(mapName)
 
 		local tweens = {}
 		table.insert(tweens, {
-			goal = tweenProps;
-			tween = TweenService:Create(Lighting, FADE_INFO, tweenProps);
+			goal = tweenProps,
+			tween = TweenService:Create(Lighting, FADE_INFO, tweenProps),
 		})
 
 		table.insert(tweens, {
-			goal = { ClockTime = lightingEntry.Lighting.ClockTime.Value };
-			tween = TweenService:Create(Lighting, TIME_FADE_INFO, { ClockTime = lightingEntry.Lighting.ClockTime.Value });
+			goal = { ClockTime = lightingEntry.Lighting.ClockTime.Value },
+			tween = TweenService:Create(
+				Lighting,
+				TIME_FADE_INFO,
+				{ ClockTime = lightingEntry.Lighting.ClockTime.Value }
+			),
 		})
 
 		local meta = self.Root.globals.mapInfo:Get()[mapName]
@@ -137,16 +141,16 @@ function MapController:_tween(mapName)
 		for _, part in CollectionService:GetTagged("IslandBase") do
 			local goal = meta.IslandTopColor or DEFAULT_TOP_COLOR
 			table.insert(tweens, {
-				goal = { Color = goal };
-				tween = TweenService:Create(part, FADE_INFO, { Color = goal });
+				goal = { Color = goal },
+				tween = TweenService:Create(part, FADE_INFO, { Color = goal }),
 			})
 		end
 
 		for _, part in CollectionService:GetTagged("IslandBase") do
 			local goal = meta.IslandBaseColor or DEFAULT_BASE_COLOR
 			table.insert(tweens, {
-				goal = { Color = goal };
-				tween = TweenService:Create(part, FADE_INFO, { Color = goal });
+				goal = { Color = goal },
+				tween = TweenService:Create(part, FADE_INFO, { Color = goal }),
 			})
 		end
 

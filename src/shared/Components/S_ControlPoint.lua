@@ -37,36 +37,36 @@ local function makeOrderGui()
 end
 
 return S_CapturableFlag:extend("ControlPoint", {
-    realm = "server";
+	realm = "server",
 
-    checkConfig = t.intersection(
-        S_CapturableFlag.checkConfig,
-        t.interface({
-            IsCenter = t.boolean;
-            Order = t.intersection(t.numberMin(0), t.integer);
-        })
-    );
-    _getGroupsInside = S_CapturableFlag.GetTeamsInside;
-    
-    OnInit = function(self)
-        local whitelisted = {}
-        self.Whitelisted = whitelisted
-        for _, team in pairs(CollectionService:GetTagged("FightingTeam")) do
-            whitelisted[team] = true
-        end
+	checkConfig = t.intersection(
+		S_CapturableFlag.checkConfig,
+		t.interface({
+			IsCenter = t.boolean,
+			Order = t.intersection(t.numberMin(0), t.integer),
+		})
+	),
+	_getGroupsInside = S_CapturableFlag.GetTeamsInside,
 
-        S_CapturableFlag.OnInit(self)
-    end;
-	
+	OnInit = function(self)
+		local whitelisted = {}
+		self.Whitelisted = whitelisted
+		for _, team in pairs(CollectionService:GetTagged("FightingTeam")) do
+			whitelisted[team] = true
+		end
+
+		S_CapturableFlag.OnInit(self)
+	end,
+
 	OnStart = function(self)
 		S_CapturableFlag.OnStart(self)
 
 		local part, textLabel = makeOrderGui()
-        self.bin:Add(part)
-        
-        textLabel.Text = tostring(self.Config.Order)
-        local CF, size = self.Instance:GetBoundingBox()
-        part.CFrame = CF * CFrame.new(0, size.Y / 2, 0)
-        part.Parent = workspace
-	end;
+		self.bin:Add(part)
+
+		textLabel.Text = tostring(self.Config.Order)
+		local CF, size = self.Instance:GetBoundingBox()
+		part.CFrame = CF * CFrame.new(0, size.Y / 2, 0)
+		part.Parent = workspace
+	end,
 })

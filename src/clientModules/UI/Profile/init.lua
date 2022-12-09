@@ -10,9 +10,9 @@ local profileMainWidget = require(script.profileMainWidget)
 local ProfileApp = Roact.Component:extend("ProfileApp")
 
 function ProfileApp:render()
-    return e(ThemeController, {}, {
-        ProfileApp = e(profileMainWidget, self.props);
-    })
+	return e(ThemeController, {}, {
+		ProfileApp = e(profileMainWidget, self.props),
+	})
 end
 
 return ProfileApp

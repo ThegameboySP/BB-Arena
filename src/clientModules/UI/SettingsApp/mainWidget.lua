@@ -33,96 +33,96 @@ local function mainWidget(props, hooks)
 
 	local styles, api = RoactSpring.useSpring(hooks, function()
 		return {
-			disabledAlpha = 0;
-			disabledTransparency = 1;
+			disabledAlpha = 0,
+			disabledTransparency = 1,
 		}
 	end)
 
 	local theme = hooks.useContext(ThemeContext)
-	
+
 	local selectEvent = Instance.new("BindableEvent")
 
 	return e("Frame", {
-		[Roact.Ref] = outerRef;
+		[Roact.Ref] = outerRef,
 
-		Size = UDim2.fromScale(1, 1);
+		Size = UDim2.fromScale(1, 1),
 		Position = styles.disabledAlpha:map(function(alpha)
 			return UDim2.new(0, 0, alpha, 20)
-		end);
+		end),
 
-		BackgroundTransparency = 1;
+		BackgroundTransparency = 1,
 	}, {
 		Window = e(window, {
-			size = UDim2.new(0, 1100, 0, 500);
-			image = "rbxassetid://9206592117";
-			imageSize = Vector2.new(50, 50);
-			name = "Settings";
-			useExitButton = false;
-			draggable = not isDisabled;
+			size = UDim2.new(0, 1100, 0, 500),
+			image = "rbxassetid://9206592117",
+			imageSize = Vector2.new(50, 50),
+			name = "Settings",
+			useExitButton = false,
+			draggable = not isDisabled,
 
-			outerRef = outerRef;
+			outerRef = outerRef,
 		}, {
 			DisabledOverlay = e("Frame", {
-				Size = UDim2.new(1, 0, 1, 0);
-				BackgroundColor3 = Color3.new(0, 0, 0);
-				BackgroundTransparency = styles.disabledTransparency;
-				ZIndex = 5;
-			});
+				Size = UDim2.new(1, 0, 1, 0),
+				BackgroundColor3 = Color3.new(0, 0, 0),
+				BackgroundTransparency = styles.disabledTransparency,
+				ZIndex = 5,
+			}),
 			PanelContainer = e("Frame", {
-				BackgroundTransparency = 1;
-				Position = UDim2.new(0, 0, 0, 20);
-				Size = UDim2.new(1, 0, 1, -20);
+				BackgroundTransparency = 1,
+				Position = UDim2.new(0, 0, 0, 20),
+				Size = UDim2.new(1, 0, 1, -20),
 			}, {
 				Panel = e(sidePanel, {
-					size = UDim2.new(0, 100, 1, 0);
-					iconSize = UDim2.fromOffset(70, 70);
-					dividerColor = theme.border;
-					activeCategory = categoryBinding;
-					
-					settingCategories = props.settingCategories;
+					size = UDim2.new(0, 100, 1, 0),
+					iconSize = UDim2.fromOffset(70, 70),
+					dividerColor = theme.border,
+					activeCategory = categoryBinding,
+
+					settingCategories = props.settingCategories,
 					onPressed = function(category)
 						setCategory(category)
 						selectEvent:Fire(function()
 							return category
 						end)
-					end;
-				});
-			});
+					end,
+				}),
+			}),
 
 			ContentsContainer = e("ImageLabel", {
-				BackgroundTransparency = 1;
-				Position = UDim2.new(0, 100 + SIDE_BAR_LENGTH, 0, 20);
-				Size = UDim2.new(1, -100 - SIDE_BAR_LENGTH, 1, -88);
+				BackgroundTransparency = 1,
+				Position = UDim2.new(0, 100 + SIDE_BAR_LENGTH, 0, 20),
+				Size = UDim2.new(1, -100 - SIDE_BAR_LENGTH, 1, -88),
 
-				Image = "rbxassetid://rbxassetid://10848356902";
+				Image = "rbxassetid://rbxassetid://10848356902",
 			}, {
 				Contents = e(contents, {
-					settings = props.settingRecords;
-					categories = props.settingCategories;
-					changedSettings = props.changedSettings;
+					settings = props.settingRecords,
+					categories = props.settingCategories,
+					changedSettings = props.changedSettings,
 
-					onSettingChanged = props.onSettingChanged;
-					onSettingCanceled = props.onSettingCanceled;
+					onSettingChanged = props.onSettingChanged,
+					onSettingCanceled = props.onSettingCanceled,
 
-					categoryBinding = categoryBinding;
-					selectEvent = selectEvent.Event;
+					categoryBinding = categoryBinding,
+					selectEvent = selectEvent.Event,
 
-					selectedSettings = selectedSettings;
+					selectedSettings = selectedSettings,
 					onSelectedChanged = function(settingId, isSelected)
 						local clone = table.clone(selectedSettings:getValue())
 						clone[settingId] = if isSelected then true else nil
 						setSelectedSettings(clone)
 						setOutput(nil)
-					end;
+					end,
 
 					onCategoryChanged = function(category)
 						setCategory(category)
-					end;
+					end,
 
 					onPrompt = function(isPrompting)
 						local promise = api.start({
-							disabledAlpha = if isPrompting then 1 else 0;
-							disabledTransparency = if isPrompting then 0 else 1;
+							disabledAlpha = if isPrompting then 1 else 0,
+							disabledTransparency = if isPrompting then 0 else 1,
 						})
 
 						if isPrompting then
@@ -132,21 +132,21 @@ local function mainWidget(props, hooks)
 								setIsDisabled(false)
 							end)
 						end
-					end;
-				});
-			});
+					end,
+				}),
+			}),
 
 			Selected = e(button, {
-				position = UDim2.new(0, 116, 1, -10);
-				anchor = Vector2.new(0, 1);
-				minSize = Vector2.new(310, 48);
-				padding = 10;
+				position = UDim2.new(0, 116, 1, -10),
+				anchor = Vector2.new(0, 1),
+				minSize = Vector2.new(310, 48),
+				padding = 10,
 
-				textSize = 28;
-				textColor = theme.highContrast;
-				color = theme.lessImportantButton;
+				textSize = 28,
+				textColor = theme.highContrast,
+				color = theme.lessImportantButton,
 
-				text = Roact.joinBindings({output, selectedSettings}):map(function(values)
+				text = Roact.joinBindings({ output, selectedSettings }):map(function(values)
 					if values[1] then
 						return values[1]
 					end
@@ -158,36 +158,36 @@ local function mainWidget(props, hooks)
 					end
 
 					return "Click settings to select"
-				end);
+				end),
 
 				onPressed = function()
 					if next(selectedSettings:getValue()) then
 						setSelectedSettings({})
 					end
-				end;
-			});
+				end,
+			}),
 
 			Confirm = e(button, {
-				position = UDim2.new(0.5, 0, 1, -10);
-				anchor = Vector2.new(0.5, 1);
-				text = "Confirm";
-				textSize = 28;
-				minSize = Vector2.new(230, 0);
-				color = theme.button;
-				textColor = theme.highContrast;
+				position = UDim2.new(0.5, 0, 1, -10),
+				anchor = Vector2.new(0.5, 1),
+				text = "Confirm",
+				textSize = 28,
+				minSize = Vector2.new(230, 0),
+				color = theme.button,
+				textColor = theme.highContrast,
 				onPressed = function()
 					props.onSettingsSaved()
 					props.onClosed()
-				end;
-			});
+				end,
+			}),
 
 			Defaults = e(button, {
-				position = UDim2.new(0.5, 240, 1, -10);
-				anchor = Vector2.new(0.5, 1);
-				text = "Restore defaults";
-				textSize = 28;
-				color = theme.lessImportantButton;
-				textColor = theme.highContrast;
+				position = UDim2.new(0.5, 240, 1, -10),
+				anchor = Vector2.new(0.5, 1),
+				text = "Restore defaults",
+				textSize = 28,
+				color = theme.lessImportantButton,
+				textColor = theme.highContrast,
 				onPressed = function()
 					local selected = selectedSettings:getValue()
 
@@ -203,17 +203,19 @@ local function mainWidget(props, hooks)
 					end
 
 					props.onRestoreDefaults(if next(selected) then selected else nil)
-					setOutput(string.format("Restored %d default%s", count, if count > 1 or count == 0 then "s" else ""))
-				end;
-			});
+					setOutput(
+						string.format("Restored %d default%s", count, if count > 1 or count == 0 then "s" else "")
+					)
+				end,
+			}),
 
 			Undo = e(button, {
-				position = UDim2.new(0.5, 408, 1, -10);
-				anchor = Vector2.new(0.5, 1);
-				text = "Undo";
-				textSize = 28;
-				color = theme.lessImportantButton;
-				textColor = theme.highContrast;
+				position = UDim2.new(0.5, 408, 1, -10),
+				anchor = Vector2.new(0.5, 1),
+				text = "Undo",
+				textSize = 28,
+				color = theme.lessImportantButton,
+				textColor = theme.highContrast,
 				onPressed = function()
 					local selected = selectedSettings:getValue()
 
@@ -229,9 +231,9 @@ local function mainWidget(props, hooks)
 
 					props.onSettingsCanceled(if next(selected) then selected else nil)
 					setOutput(string.format("Undid %d setting%s", count, if count > 1 or count == 0 then "s" else ""))
-				end;
-			});
-		});
+				end,
+			}),
+		}),
 	})
 end
 

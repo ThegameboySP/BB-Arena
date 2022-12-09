@@ -6,22 +6,22 @@ type taskId = string | table
 local TYPE_TO_DESTRUCT_METHOD = {
 	["function"] = function(task)
 		return task
-	end;
+	end,
 	["thread"] = function(_task)
 		return coroutine.close
-	end;
+	end,
 	["table"] = function(task)
 		return task.Destroy
-	end;
+	end,
 	["RBXScriptConnection"] = function(task)
 		return task.Disconnect
-	end;
+	end,
 	["Instance"] = function(task)
 		return task.Destroy
-	end;
+	end,
 	["nil"] = function()
 		error("Task cannot be nil")
-	end;
+	end,
 }
 
 function Bin.new()
@@ -50,10 +50,10 @@ Bin.DoCleaning = Bin.Destroy
 function Bin:GiveTask<taskId>(task, destructorName: string?, id)
 	assert(task ~= self, "Cannot add a bin to itself")
 
-	local resolvedDestruct = 
-		if destructorName then task[destructorName]
+	local resolvedDestruct = if destructorName
+		then task[destructorName]
 		else TYPE_TO_DESTRUCT_METHOD[typeof(task)](task)
-	
+
 	if resolvedDestruct == nil then
 		error(("Task type %q does not have a destruct function"):format(typeof(task)), 2)
 	end
@@ -67,7 +67,7 @@ function Bin:GiveTask<taskId>(task, destructorName: string?, id)
 		self:Remove(id)
 	end
 
-	local entry = table.freeze({task = task, destruct = resolvedDestruct})
+	local entry = table.freeze({ task = task, destruct = resolvedDestruct })
 	local resolvedId = id or entry
 	self[resolvedId] = entry
 

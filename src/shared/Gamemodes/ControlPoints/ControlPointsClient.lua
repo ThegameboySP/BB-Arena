@@ -33,7 +33,7 @@ local function playSoundAt(sound, pos)
 	part.CanQuery = false
 	part.Name = "SoundHolder"
 	part.Size = Vector3.zero
-	
+
 	local clone = sound:Clone()
 	clone.SoundGroup = SoundService.Gamemode
 	clone.Parent = part
@@ -47,10 +47,10 @@ end
 
 function ControlPointsClient.new(binder)
 	return setmetatable({
-		_binder = binder;
-		_gui = nil;
-		connections = {};
-		instancesToDestroy = {};
+		_binder = binder,
+		_gui = nil,
+		connections = {},
+		instancesToDestroy = {},
 	}, ControlPointsClient)
 end
 
@@ -67,16 +67,16 @@ end
 function ControlPointsClient:OnInit(teams)
 	self.teams = teams
 
-    local MapController = Root:GetService("MapController")
+	local MapController = Root:GetService("MapController")
 	local controlPoints = {}
 
 	local lastAlerted = 0
 
-    for _, controlPoint in pairs(MapController.ClonerManager.Manager:GetComponents(Components.C_ControlPoint)) do
+	for _, controlPoint in pairs(MapController.ClonerManager.Manager:GetComponents(Components.C_ControlPoint)) do
 		table.insert(controlPoints, controlPoint)
 
 		local isInvisible = controlPoint.Instance.FlagHead.Transparency == 1
-		
+
 		local flash = Assets.FlashParticles:Clone()
 		flash.Parent = controlPoint.Instance.FlagHead
 
@@ -84,8 +84,9 @@ function ControlPointsClient:OnInit(teams)
 		local function onControlPointUpdated()
 			local state = controlPoint.State.State
 
-			if 
-				(state == "Capping" or state == "Paused") and lastState == "Settled"
+			if
+				(state == "Capping" or state == "Paused")
+				and lastState == "Settled"
 				and controlPoint.State.CapturedBy == LocalPlayer.Team
 				and controlPoint.State.CapturingGroup ~= LocalPlayer.Team
 			then
@@ -103,69 +104,75 @@ function ControlPointsClient:OnInit(teams)
 			if not isInvisible then
 				flash.Enabled = state == "Capping"
 			end
-			
+
 			lastState = state
 		end
 
-        table.insert(self.connections, controlPoint.Changed:Connect(onControlPointUpdated))
+		table.insert(self.connections, controlPoint.Changed:Connect(onControlPointUpdated))
 		onControlPointUpdated()
 
 		local confettiHolder = Assets.ConfettiHolder:Clone()
 		local teamConfetti = confettiHolder:FindFirstChild("TeamConfetti")
 		local confetti = confettiHolder:FindFirstChild("Confetti")
 		table.insert(self.instancesToDestroy, confettiHolder)
-		
+
 		local CF, size = controlPoint.Instance:GetBoundingBox()
 		confettiHolder.CFrame = CF * CFrame.new(0, size.Y / 2, 0)
 		confettiHolder.Parent = workspace
 
 		local lastCapturedBy = controlPoint.State.Captured
-		table.insert(self.connections, controlPoint.Instance.Captured.OnClientEvent:Connect(function(capturedBy)
-			teamConfetti.Color = ColorSequence.new({
-				ColorSequenceKeypoint.new(0, capturedBy.TeamColor.Color),
-				ColorSequenceKeypoint.new(1, capturedBy.TeamColor.Color:lerp(Color3.new(0, 0, 0), 0.4))
-			})
+		table.insert(
+			self.connections,
+			controlPoint.Instance.Captured.OnClientEvent:Connect(function(capturedBy)
+				teamConfetti.Color = ColorSequence.new({
+					ColorSequenceKeypoint.new(0, capturedBy.TeamColor.Color),
+					ColorSequenceKeypoint.new(1, capturedBy.TeamColor.Color:lerp(Color3.new(0, 0, 0), 0.4)),
+				})
 
-			for _, confettiEmitter in pairs({confetti, teamConfetti}) do
-				confettiEmitter:Emit(100)
-			end
-
-			if capturedBy == LocalPlayer.Team then
-				playSound(Sounds.CP_GoodCaptured)
-				playSound(Sounds.Tada)
-			else
-				if lastCapturedBy == LocalPlayer.Team then
-					playSound(Sounds.CP_BadCaptured)
+				for _, confettiEmitter in pairs({ confetti, teamConfetti }) do
+					confettiEmitter:Emit(100)
 				end
 
-				playSound(Sounds.Splat)
-			end
+				if capturedBy == LocalPlayer.Team then
+					playSound(Sounds.CP_GoodCaptured)
+					playSound(Sounds.Tada)
+				else
+					if lastCapturedBy == LocalPlayer.Team then
+						playSound(Sounds.CP_BadCaptured)
+					end
 
-			lastCapturedBy = capturedBy
-		end))
+					playSound(Sounds.Splat)
+				end
+
+				lastCapturedBy = capturedBy
+			end)
+		)
 	end
 
-	table.insert(self.connections, ReplicatedStorage.ControlPointsValues.Healed.OnClientEvent:Connect(function(character)
-		local emitter = Assets.HealParticles:Clone()
-		emitter.Parent = character.HumanoidRootPart
-		emitter.Enabled = true
+	table.insert(
+		self.connections,
+		ReplicatedStorage.ControlPointsValues.Healed.OnClientEvent:Connect(function(character)
+			local emitter = Assets.HealParticles:Clone()
+			emitter.Parent = character.HumanoidRootPart
+			emitter.Enabled = true
 
-		task.delay(1, function()
-			emitter.Enabled = false
-			task.delay(2, function()
-				emitter.Parent = nil
+			task.delay(1, function()
+				emitter.Enabled = false
+				task.delay(2, function()
+					emitter.Parent = nil
+				end)
 			end)
-		end)
 
-		playSoundAt(Sounds.Copy, character.Head.Position)
-	end))
-	
+			playSoundAt(Sounds.Copy, character.Head.Position)
+		end)
+	)
+
 	self:_handleGUI(controlPoints)
 end
 
 local function find(instance, ...)
 	local current = instance
-	for _, name in pairs({...}) do
+	for _, name in pairs({ ... }) do
 		current = current:FindFirstChild(name)
 	end
 
@@ -177,7 +184,7 @@ local function setGradient(gradient, capturedBy, capturing, percent)
 	if capturedBy and not capturing and percent == 0 then
 		gradient.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, capturedBy.TeamColor.Color),
-			ColorSequenceKeypoint.new(1, capturedBy.TeamColor.Color)
+			ColorSequenceKeypoint.new(1, capturedBy.TeamColor.Color),
 		})
 		return
 	end
@@ -190,7 +197,7 @@ local function setGradient(gradient, capturedBy, capturing, percent)
 		ColorSequenceKeypoint.new(0, base),
 		ColorSequenceKeypoint.new(inversePercent, base),
 		ColorSequenceKeypoint.new(math.min(0.9999, inversePercent + 0.02), color),
-		ColorSequenceKeypoint.new(1, color)
+		ColorSequenceKeypoint.new(1, color),
 	})
 end
 
@@ -213,11 +220,12 @@ function ControlPointsClient:_handleGUI(controlPoints)
 		end
 
 		local function update()
-			Point:FindFirstChild("Count").Text =
-				((point.State.TeammatesCount or 0) > 0 and point.State.State ~= "Paused")
-				and tostring(point.State.TeammatesCount)
+			Point:FindFirstChild("Count").Text = (
+				(point.State.TeammatesCount or 0) > 0 and point.State.State ~= "Paused"
+			)
+					and tostring(point.State.TeammatesCount)
 				or ""
-			
+
 			local capturedBy = point.State.CapturedBy
 			local color = capturedBy and capturedBy.TeamColor.Color or NEUTRAL
 			Point:FindFirstChild("CapturedIndicator").BackgroundColor3 = color
@@ -226,7 +234,8 @@ function ControlPointsClient:_handleGUI(controlPoints)
 				Point:FindFirstChild("UIGradient"),
 				point.State.CapturedBy,
 				point.State.CapturingGroup,
-				point.State.PercentOverthrown)
+				point.State.PercentOverthrown
+			)
 		end
 
 		table.insert(self.connections, point.Changed:Connect(update))

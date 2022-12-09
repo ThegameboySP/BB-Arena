@@ -10,60 +10,60 @@ local SettingsApp = require(ReplicatedStorage.ClientModules.UI.SettingsApp)
 
 local setEnabled
 if RunService:IsClient() then
-    local tree
-    
-    local gui = Instance.new("ScreenGui")
-    gui.ResetOnSpawn = false
-    gui.Name = "Settings"
-    gui.Parent = Players.LocalPlayer.PlayerGui
+	local tree
 
-    local isOn = false
-    setEnabled = function(on)
-        if (not not tree) == on then
-            return
-        end
+	local gui = Instance.new("ScreenGui")
+	gui.ResetOnSpawn = false
+	gui.Name = "Settings"
+	gui.Parent = Players.LocalPlayer.PlayerGui
 
-        isOn = on
-        if on then
-            local roactTree = Roact.createElement(SettingsApp, {
-                onClosed = function()
-                    setEnabled(false)
-                end;
-            })
+	local isOn = false
+	setEnabled = function(on)
+		if (not not tree) == on then
+			return
+		end
 
-            roactTree = Roact.createElement(RoactRodux.StoreProvider, {
-                store = Root.Store;
-            }, {
-                Main = roactTree
-            })
+		isOn = on
+		if on then
+			local roactTree = Roact.createElement(SettingsApp, {
+				onClosed = function()
+					setEnabled(false)
+				end,
+			})
 
-            tree = Roact.mount(roactTree, gui)
-        else
-            Roact.unmount(tree)
-            tree = nil
+			roactTree = Roact.createElement(RoactRodux.StoreProvider, {
+				store = Root.Store,
+			}, {
+				Main = roactTree,
+			})
 
-            -- For legacy menu GUI
-            if _G.SettingsClosed then
-                _G.SettingsClosed()
-            end
-        end
-    end
+			tree = Roact.mount(roactTree, gui)
+		else
+			Roact.unmount(tree)
+			tree = nil
 
-    local function toggleEnabled()
-        setEnabled(not isOn)
-    end
+			-- For legacy menu GUI
+			if _G.SettingsClosed then
+				_G.SettingsClosed()
+			end
+		end
+	end
 
-    -- For legacy menu GUI
-    _G.ToggleSettings = toggleEnabled
+	local function toggleEnabled()
+		setEnabled(not isOn)
+	end
+
+	-- For legacy menu GUI
+	_G.ToggleSettings = toggleEnabled
 end
 
 return {
-	Name = "settingsGUI";
-	Aliases = {"settings"};
-	Description = "Open the settings GUI.";
-	Group = "Any";
-	Args = {};
-    Run = function()
-        setEnabled(true)
-    end;
+	Name = "settingsGUI",
+	Aliases = { "settings" },
+	Description = "Open the settings GUI.",
+	Group = "Any",
+	Args = {},
+	Run = function()
+		setEnabled(true)
+	end,
 }

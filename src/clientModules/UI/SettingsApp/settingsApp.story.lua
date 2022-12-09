@@ -15,13 +15,13 @@ return function(target)
 	local roactTree = e(app, {
 		onClosed = function()
 			Roact.unmount(tree)
-		end;
+		end,
 	})
 
 	roactTree = Roact.createElement(RoactRodux.StoreProvider, {
-		store = Rodux.Store.new(RoduxFeatures.reducer, nil, { Rodux.thunkMiddleware });
+		store = Rodux.Store.new(RoduxFeatures.reducer, nil, { Rodux.thunkMiddleware }),
 	}, {
-		Main = roactTree
+		Main = roactTree,
 	})
 
 	tree = Roact.mount(roactTree, target)

@@ -20,11 +20,11 @@ function CmdrNotifications:AddMessage(text, playSound, color)
 	if #children > 4 then
 		table.remove(children, 2):Destroy()
 	end
-	
+
 	if playSound == true then
 		NotificationSound:Play()
 	end
-	
+
 	local msg = MessageTemp:Clone()
 	msg.Name = "Entry"
 	msg.BackgroundTransparency = 1
@@ -35,17 +35,19 @@ function CmdrNotifications:AddMessage(text, playSound, color)
 	end
 	msg.Message.TextTransparency = 1
 	msg.Parent = Frame
-	
-	local t1 = TweenService:Create(msg, EASE_IN, {BackgroundTransparency = 0.65, Size = UDim2.fromScale(1, 0.3)})
-	local t2 = TweenService:Create(msg.Message, EASE_IN, {TextTransparency = 0})
+
+	local t1 = TweenService:Create(msg, EASE_IN, { BackgroundTransparency = 0.65, Size = UDim2.fromScale(1, 0.3) })
+	local t2 = TweenService:Create(msg.Message, EASE_IN, { TextTransparency = 0 })
 	t1:Play()
 	t2:Play()
-	
+
 	task.delay(5, function()
-		if msg.Parent == nil then return end
-		
-		local t3 = TweenService:Create(msg, EASE_OUT, {Size = UDim2.fromScale(0, 0)})
-		local t4 = TweenService:Create(msg.Message, EASE_OUT, {TextTransparency = 0})
+		if msg.Parent == nil then
+			return
+		end
+
+		local t3 = TweenService:Create(msg, EASE_OUT, { Size = UDim2.fromScale(0, 0) })
+		local t4 = TweenService:Create(msg.Message, EASE_OUT, { TextTransparency = 0 })
 		t4:Play()
 		t3.Completed:Connect(function()
 			msg:Destroy()

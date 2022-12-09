@@ -53,17 +53,28 @@ function BoundingBox.getAABB(parts)
 	return center, size, minX, minY, minZ, maxX, maxY, maxZ
 end
 
-function BoundingBox.isAABBIntersecting(aMinX, aMinY, aMinZ, aMaxX, aMaxY, aMaxZ, bMinX, bMinY, bMinZ, bMaxX, bMaxY, bMaxZ)
+function BoundingBox.isAABBIntersecting(
+	aMinX,
+	aMinY,
+	aMinZ,
+	aMaxX,
+	aMaxY,
+	aMaxZ,
+	bMinX,
+	bMinY,
+	bMinZ,
+	bMaxX,
+	bMaxY,
+	bMaxZ
+)
 	return
-		(aMinX <= bMaxX and aMaxX >= bMinX) and
-		(aMinY <= bMaxY and aMaxY >= bMinY) and
-		(aMinZ <= bMaxZ and aMaxZ >= bMinZ)
+		(aMinX <= bMaxX and aMaxX >= bMinX)
+			and (aMinY <= bMaxY and aMaxY >= bMinY)
+			and (aMinZ <= bMaxZ and aMaxZ >= bMinZ)
 end
 
 function BoundingBox.isPointIntersecting(x, y, z, minX, minY, minZ, maxX, maxY, maxZ)
-	return (x >= minX and x <= maxX)
-		and (y >= minY and y <= maxY)
-		and (z >= minZ and z <= maxZ)
+	return (x >= minX and x <= maxX) and (y >= minY and y <= maxY) and (z >= minZ and z <= maxZ)
 end
 
 return BoundingBox

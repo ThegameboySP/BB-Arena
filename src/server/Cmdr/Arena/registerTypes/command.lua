@@ -1,36 +1,36 @@
-return function (registry)
-    local Util = registry.Cmdr.Util
+return function(registry)
+	local Util = registry.Cmdr.Util
 
 	local commandType = {
-		Transform = function (text)
-            local commandNames = {}
+		Transform = function(text)
+			local commandNames = {}
 
-            for _, command in registry.Commands do
-                table.insert(commandNames, command.Name)
+			for _, command in registry.Commands do
+				table.insert(commandNames, command.Name)
 
-                if command.Aliases then
-                    for _, alias in command.Aliases do
-                        table.insert(commandNames, alias)
-                    end
-                end
-            end
+				if command.Aliases then
+					for _, alias in command.Aliases do
+						table.insert(commandNames, alias)
+					end
+				end
+			end
 
 			local findCommand = Util.MakeFuzzyFinder(commandNames)
 
 			return findCommand(text)
-		end;
+		end,
 
-		Validate = function (commands)
+		Validate = function(commands)
 			return #commands > 0, "No command with that name could be found."
-		end;
+		end,
 
-		Autocomplete = function (commands)
+		Autocomplete = function(commands)
 			return commands
-		end;
+		end,
 
-		Parse = function (commands)
+		Parse = function(commands)
 			return commands[1]
-		end;
+		end,
 	}
 
 	registry:RegisterType("arenaCommand", commandType)
@@ -57,5 +57,5 @@ return function (registry)
 	registry:RegisterType("arenaCommands", arenaCommandsType)
 
 	registry.Types.command = registry.Types.arenaCommand
-    registry.Types.commands = registry.Types.arenaCommands
+	registry.Types.commands = registry.Types.arenaCommands
 end

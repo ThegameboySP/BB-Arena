@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 
 local function shorthandSingle(text, executor)
 	if text == "me" then
-		return {executor}
+		return { executor }
 	end
 end
 
@@ -24,22 +24,22 @@ local function shorthandMultiple(text, executor)
 end
 
 local function checkShorthands(text, executor, ...)
-	for _, func in ipairs({...}) do
+	for _, func in ipairs({ ... }) do
 		local values = func(text, executor)
 
 		if values then
-            return values
-        end
+			return values
+		end
 	end
 end
 
 local function getPlayerByName(name)
-    local firstName, secondName = name:match("^([^@]+)@?(.*)$")
-	
-    if secondName == "" then
-        return Players:FindFirstChild(firstName)
+	local firstName, secondName = name:match("^([^@]+)@?(.*)$")
+
+	if secondName == "" then
+		return Players:FindFirstChild(firstName)
 	else
-    	return Players:FindFirstChild(secondName)
+		return Players:FindFirstChild(secondName)
 	end
 end
 
@@ -50,8 +50,8 @@ local function getPlayersByNames(names)
 	for _, name in ipairs(names) do
 		local player = getPlayerByName(name)
 		if player == nil or set[player] then
-            continue
-        end
+			continue
+		end
 
 		table.insert(players, player)
 		set[player] = true
@@ -64,10 +64,10 @@ local function mapNames(players)
 	local names = {}
 
 	for _, player in ipairs(players) do
-        if player.Name == player.DisplayName then
-            table.insert(names, player.DisplayName)
-        else
-            table.insert(names, player.DisplayName .. "@" .. player.Name)
+		if player.Name == player.DisplayName then
+			table.insert(names, player.DisplayName)
+		else
+			table.insert(names, player.DisplayName .. "@" .. player.Name)
 		end
 	end
 
@@ -85,7 +85,7 @@ local playerType = {
 		local findName = Util.MakeFuzzyFinder(mapNames(Players:GetPlayers()))
 
 		return findName(text)
-	end;
+	end,
 
 	Validate = function(names)
 		if names[1] == nil or getPlayerByName(names[1]) == nil then
@@ -93,19 +93,19 @@ local playerType = {
 		end
 
 		return true
-	end;
+	end,
 
 	Autocomplete = function(names)
 		return mapNames(getPlayersByNames(names))
-	end;
+	end,
 
 	Parse = function(names)
 		return getPlayerByName(names[1])
-	end;
+	end,
 
 	Default = function(executor)
-		return mapNames({executor})[1]
-	end;
+		return mapNames({ executor })[1]
+	end,
 }
 
 return function(registry)
@@ -126,12 +126,12 @@ return function(registry)
 	end
 
 	playersType.Parse = function(names, returnAll)
-		return returnAll and getPlayersByNames(names) or {getPlayerByName(names[1])}
+		return returnAll and getPlayersByNames(names) or { getPlayerByName(names[1]) }
 	end
 
 	registry:RegisterType("arenaPlayer", playerType)
 	registry:RegisterType("arenaPlayers", playersType, {
-		Prefixes = "% teamPlayers";
+		Prefixes = "% teamPlayers",
 	})
 
 	registry.Types.player = registry.Types.arenaPlayer

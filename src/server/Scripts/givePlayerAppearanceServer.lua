@@ -8,76 +8,79 @@ local Dictionary = Llama.Dictionary
 local MIN_FETCH_TIME = 10
 
 local function givePlayerAppearanceServer(root)
-    local PlayerAppearances = Instance.new("Folder")
-    PlayerAppearances.Name = "PlayerAppearances"
-    PlayerAppearances.Parent = ReplicatedStorage
+	local PlayerAppearances = Instance.new("Folder")
+	PlayerAppearances.Name = "PlayerAppearances"
+	PlayerAppearances.Parent = ReplicatedStorage
 
-    local NewPlayerAppearance = root:getRemoteEvent("NewPlayerAppearance")
+	local NewPlayerAppearance = root:getRemoteEvent("NewPlayerAppearance")
 
-    local userInfos = {}
-    local lastFetchedAppearances = {}
+	local userInfos = {}
+	local lastFetchedAppearances = {}
 
-    local function onSpawning(player)
-        local userId = player.UserId
-        if (os.clock() - (lastFetchedAppearances[userId] or 0)) < MIN_FETCH_TIME then
-            return
-        end
+	local function onSpawning(player)
+		local userId = player.UserId
+		if (os.clock() - (lastFetchedAppearances[userId] or 0)) < MIN_FETCH_TIME then
+			return
+		end
 
-        local info
-        pcall(function()
-            info = Players:GetCharacterAppearanceInfoAsync(userId)
-        end)
+		local info
+		pcall(function()
+			info = Players:GetCharacterAppearanceInfoAsync(userId)
+		end)
 
-        if not info then
-            return
-        end
+		if not info then
+			return
+		end
 
-        lastFetchedAppearances[userId] = os.clock()
+		lastFetchedAppearances[userId] = os.clock()
 
-        if not userInfos[userId] or not Dictionary.equalsDeep(info, userInfos[userId]) then
-            local appearanceModel
-            pcall(function()
-                appearanceModel = Players:GetCharacterAppearanceAsync(userId)
-            end)
+		if not userInfos[userId] or not Dictionary.equalsDeep(info, userInfos[userId]) then
+			local appearanceModel
+			pcall(function()
+				appearanceModel = Players:GetCharacterAppearanceAsync(userId)
+			end)
 
-            if not appearanceModel then
-                return
-            end
+			if not appearanceModel then
+				return
+			end
 
-            userInfos[userId] = info
+			userInfos[userId] = info
 
-            local oldModel = PlayerAppearances:FindFirstChild(tostring(userId))
-            if oldModel then
-                oldModel.Parent = nil
-            end
+			local oldModel = PlayerAppearances:FindFirstChild(tostring(userId))
+			if oldModel then
+				oldModel.Parent = nil
+			end
 
-            appearanceModel.Name = tostring(userId)
-            appearanceModel.Parent = PlayerAppearances
+			appearanceModel.Name = tostring(userId)
+			appearanceModel.Parent = PlayerAppearances
 
-            NewPlayerAppearance:FireAllClients(userId)
-        end
-    end
+			NewPlayerAppearance:FireAllClients(userId)
+		end
+	end
 
-    Effects.call(Players, Effects.pipe({
-        Effects.children,
-        Effects.character,
-        function(character)
-            local player = Players:GetPlayerFromCharacter(character)
-            onSpawning(player)
+	Effects.call(
+		Players,
+		Effects.pipe({
+			Effects.children,
+			Effects.character,
+			function(character)
+				local player = Players:GetPlayerFromCharacter(character)
+				onSpawning(player)
 
-            local humanoid = character:FindFirstChild("Humanoid")
-            local connection = humanoid.StateChanged:Connect(function(_, newState)
-                if newState == Enum.HumanoidStateType.Dead then
-                    onSpawning(player)
-                end
-            end)
+				local humanoid = character:FindFirstChild("Humanoid")
+				local connection = humanoid.StateChanged:Connect(function(_, newState)
+					if newState == Enum.HumanoidStateType.Dead then
+						onSpawning(player)
+					end
+				end)
 
-            return function()
-                connection:Disconnect()
-                onSpawning(player)
-            end
-        end
-    }))
+				return function()
+					connection:Disconnect()
+					onSpawning(player)
+				end
+			end,
+		})
+	)
 end
 
 return givePlayerAppearanceServer

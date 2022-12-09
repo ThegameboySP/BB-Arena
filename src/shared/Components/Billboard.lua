@@ -6,29 +6,29 @@ local Component = require(ReplicatedStorage.Common.Component).Component
 local t = require(ReplicatedStorage.Packages.t)
 
 local Billboard = Component:extend("Billboard", {
-    realm = "client";
+	realm = "client",
 
-    checkConfig = t.interface({
-        LockY = t.optional(t.boolean);
-    });
+	checkConfig = t.interface({
+		LockY = t.optional(t.boolean),
+	}),
 })
 
 function Billboard:OnDestroy()
-    self._connection:Disconnect()
+	self._connection:Disconnect()
 end
 
 function Billboard:OnStart()
 	local parts = {}
-    local descendants = self.Instance:GetDescendants()
-    table.insert(descendants, self.Instance)
+	local descendants = self.Instance:GetDescendants()
+	table.insert(descendants, self.Instance)
 
-    for _, descendant in descendants do
-        if descendant:IsA("BasePart") then
-            table.insert(parts, descendant)
-        end
-    end
-	
-    self._connection = RunService.Heartbeat:Connect(function()
+	for _, descendant in descendants do
+		if descendant:IsA("BasePart") then
+			table.insert(parts, descendant)
+		end
+	end
+
+	self._connection = RunService.Heartbeat:Connect(function()
 		local camPos = Workspace.CurrentCamera.CFrame.Position
 
 		for _, part in parts do
@@ -41,7 +41,7 @@ function Billboard:OnStart()
 				self.Instance.CFrame = CFrame.lookAt(CF.p, camPos)
 			end
 		end
-    end)
+	end)
 end
 
 return Billboard

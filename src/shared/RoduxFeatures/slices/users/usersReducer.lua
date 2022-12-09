@@ -8,180 +8,180 @@ local Settings = require(ReplicatedStorage.Common.StaticData.Settings)
 local RoduxUtils = require(script.Parent.Parent.Parent.RoduxUtils)
 
 return Rodux.createReducer({
-    serverLockedBy = nil;
-    banned = {};
-    whitelisted = {};
-    admins = {};
-    referees = {};
-    activeUsers = {};
+	serverLockedBy = nil,
+	banned = {},
+	whitelisted = {},
+	admins = {},
+	referees = {},
+	activeUsers = {},
 
-    usersFailedDatastore = {};
+	usersFailedDatastore = {},
 
-    userSettings = {};
-    locallyEditedSettings = {};
+	userSettings = {},
+	locallyEditedSettings = {},
 }, {
-    -- Events
-    users_joined = function(state, action)
-        return Dictionary.mergeDeep(state, {
-            activeUsers = {[action.payload.userId] = true};
-            userSettings = {[action.payload.userId] = {}};
-        })
-    end;
-    users_left = function(state, action)
-        return Dictionary.mergeDeep(state, {
-            activeUsers = {[action.payload.userId] = Llama.None};
-            userSettings = {[action.payload.userId] = Llama.None};
-            usersFailedDatastore = {[action.payload.userId] = Llama.None};
-        })
-    end;
-    users_datastoreFetchFailed = function(state, action)
-        return Dictionary.mergeDeep(state, {
-            usersFailedDatastore = {[action.payload.userId] = true};
-        })
-    end;
+	-- Events
+	users_joined = function(state, action)
+		return Dictionary.mergeDeep(state, {
+			activeUsers = { [action.payload.userId] = true },
+			userSettings = { [action.payload.userId] = {} },
+		})
+	end,
+	users_left = function(state, action)
+		return Dictionary.mergeDeep(state, {
+			activeUsers = { [action.payload.userId] = Llama.None },
+			userSettings = { [action.payload.userId] = Llama.None },
+			usersFailedDatastore = { [action.payload.userId] = Llama.None },
+		})
+	end,
+	users_datastoreFetchFailed = function(state, action)
+		return Dictionary.mergeDeep(state, {
+			usersFailedDatastore = { [action.payload.userId] = true },
+		})
+	end,
 
-    rodux_serialize = function(state, action)
-        local serialized = {}
+	rodux_serialize = function(state, action)
+		local serialized = {}
 
-        serialized.banned = RoduxUtils.numberIndicesToString(state.banned)
-        serialized.whitelisted = RoduxUtils.numberIndicesToString(state.whitelisted)
-        serialized.admins = RoduxUtils.numberIndicesToString(state.admins)
-        serialized.referees = RoduxUtils.numberIndicesToString(state.referees)
-        serialized.activeUsers = RoduxUtils.numberIndicesToString(state.activeUsers)
+		serialized.banned = RoduxUtils.numberIndicesToString(state.banned)
+		serialized.whitelisted = RoduxUtils.numberIndicesToString(state.whitelisted)
+		serialized.admins = RoduxUtils.numberIndicesToString(state.admins)
+		serialized.referees = RoduxUtils.numberIndicesToString(state.referees)
+		serialized.activeUsers = RoduxUtils.numberIndicesToString(state.activeUsers)
 
-        serialized.userSettings = {}
-        
-        for userId, userSettings in state.userSettings do
-            if userId == action.payload.userId then
-                serialized.userSettings[tostring(userId)] = userSettings
-            else
-                serialized.userSettings[tostring(userId)] = {
-                    weaponTheme = userSettings.weaponTheme;
-                }
-            end
-        end
+		serialized.userSettings = {}
 
-        return serialized
-    end;
-    rodux_deserialize = function(state, action)
-        local serialized = action.payload.serialized.users
-        local patch = {}
+		for userId, userSettings in state.userSettings do
+			if userId == action.payload.userId then
+				serialized.userSettings[tostring(userId)] = userSettings
+			else
+				serialized.userSettings[tostring(userId)] = {
+					weaponTheme = userSettings.weaponTheme,
+				}
+			end
+		end
 
-        patch.banned = RoduxUtils.stringIndicesToNumber(serialized.banned)
-        patch.whitelisted = RoduxUtils.stringIndicesToNumber(serialized.whitelisted)
-        patch.admins = RoduxUtils.stringIndicesToNumber(serialized.admins)
-        patch.referees = RoduxUtils.stringIndicesToNumber(serialized.referees)
-        patch.activeUsers = RoduxUtils.stringIndicesToNumber(serialized.activeUsers)
-        patch.userSettings = RoduxUtils.stringIndicesToNumber(serialized.userSettings)
+		return serialized
+	end,
+	rodux_deserialize = function(state, action)
+		local serialized = action.payload.serialized.users
+		local patch = {}
 
-        return Dictionary.merge(state, patch)
-    end;
+		patch.banned = RoduxUtils.stringIndicesToNumber(serialized.banned)
+		patch.whitelisted = RoduxUtils.stringIndicesToNumber(serialized.whitelisted)
+		patch.admins = RoduxUtils.stringIndicesToNumber(serialized.admins)
+		patch.referees = RoduxUtils.stringIndicesToNumber(serialized.referees)
+		patch.activeUsers = RoduxUtils.stringIndicesToNumber(serialized.activeUsers)
+		patch.userSettings = RoduxUtils.stringIndicesToNumber(serialized.userSettings)
 
-    -- Settings
-    users_saveSettings = function(state, action)
-        local payload = action.payload
+		return Dictionary.merge(state, patch)
+	end,
 
-        local toSave = {}
-        for id, value in payload.settings do
-            if type(value) == "table" and value.default then
-                toSave[id] = Llama.None
-            else
-                toSave[id] = value
-            end
-        end
+	-- Settings
+	users_saveSettings = function(state, action)
+		local payload = action.payload
 
-        return Dictionary.mergeDeep(state, {
-            userSettings = {[payload.userId] = toSave};
-        })
-    end;
-    users_setLocalSetting = function(state, action)
-        return Dictionary.mergeDeep(state, {
-            locallyEditedSettings = {[action.payload.id] = action.payload.value};
-        })
-    end;
-    users_flushSaveSettings = function(state)
-        return Dictionary.merge(state, {
-            locallyEditedSettings = {};
-        })
-    end;
-    users_cancelLocalSettings = function(state, action)
-        if action.payload.settings then
-            local settingsToUndo = {}
-            for settingName in action.payload.settings do
-                settingsToUndo[settingName] = Llama.None
-            end
+		local toSave = {}
+		for id, value in payload.settings do
+			if type(value) == "table" and value.default then
+				toSave[id] = Llama.None
+			else
+				toSave[id] = value
+			end
+		end
 
-            return Dictionary.mergeDeep(state, {
-                locallyEditedSettings = settingsToUndo;
-            })
-        end
+		return Dictionary.mergeDeep(state, {
+			userSettings = { [payload.userId] = toSave },
+		})
+	end,
+	users_setLocalSetting = function(state, action)
+		return Dictionary.mergeDeep(state, {
+			locallyEditedSettings = { [action.payload.id] = action.payload.value },
+		})
+	end,
+	users_flushSaveSettings = function(state)
+		return Dictionary.merge(state, {
+			locallyEditedSettings = {},
+		})
+	end,
+	users_cancelLocalSettings = function(state, action)
+		if action.payload.settings then
+			local settingsToUndo = {}
+			for settingName in action.payload.settings do
+				settingsToUndo[settingName] = Llama.None
+			end
 
-        return Dictionary.merge(state, {
-            locallyEditedSettings = {};
-        })
-    end;
-    users_cancelLocalSetting = function(state, action)
-        return Dictionary.mergeDeep(state, {
-            locallyEditedSettings = {[action.payload.id] = Llama.None}
-        })
-    end;
-    users_restoreDefaultSettings = function(state, action)
-        local default = {default = true}
+			return Dictionary.mergeDeep(state, {
+				locallyEditedSettings = settingsToUndo,
+			})
+		end
 
-        local defaultsById = {}
-        for id in action.payload.settings or Settings do
-            defaultsById[id] = default
-        end
+		return Dictionary.merge(state, {
+			locallyEditedSettings = {},
+		})
+	end,
+	users_cancelLocalSetting = function(state, action)
+		return Dictionary.mergeDeep(state, {
+			locallyEditedSettings = { [action.payload.id] = Llama.None },
+		})
+	end,
+	users_restoreDefaultSettings = function(state, action)
+		local default = { default = true }
 
-        return Dictionary.mergeDeep(state, {
-            locallyEditedSettings = defaultsById;
-        })
-    end;
+		local defaultsById = {}
+		for id in action.payload.settings or Settings do
+			defaultsById[id] = default
+		end
 
-    -- Permissions/gatekeeping
-    users_setAdmin = function(state, action)
-        return Dictionary.mergeDeep(state, {
-            admins = {[action.payload.userId] = action.payload.admin};
-        })
-    end;
-    users_setReferee = function(state, action)
-        return Dictionary.mergeDeep(state, {
-            referees = {[action.payload.userId] = action.payload.isReferee or Llama.None};
-        })
-    end;
-    users_setServerLocked = function(state, action)
-        return Dictionary.merge(state, {
-            serverLockedBy = if action.payload.isLocked then action.payload.userId else Llama.None;
-        })
-    end;
-    users_setBanned = function(state, action)
-        if action.payload.isBanned then
-            return Dictionary.mergeDeep(state, {
-                banned = {
-                    [action.payload.userId] = action.payload.byUser or true;
-                };
-            })
-        else
-            return Dictionary.mergeDeep(state, {
-                banned = {
-                    [action.payload.userId] = Llama.None;
-                }
-            })
-        end
-    end;
-    users_setWhitelisted = function(state, action)
-        if action.payload.isWhitelisted then
-            return Dictionary.mergeDeep(state, {
-                whitelisted = {
-                    [action.payload.userId] = action.payload.byUser or true;
-                };
-            })
-        else
-            return Dictionary.mergeDeep(state, {
-                whitelisted = {
-                    [action.payload.userId] = Llama.None;
-                }
-            })
-        end
-    end;
+		return Dictionary.mergeDeep(state, {
+			locallyEditedSettings = defaultsById,
+		})
+	end,
+
+	-- Permissions/gatekeeping
+	users_setAdmin = function(state, action)
+		return Dictionary.mergeDeep(state, {
+			admins = { [action.payload.userId] = action.payload.admin },
+		})
+	end,
+	users_setReferee = function(state, action)
+		return Dictionary.mergeDeep(state, {
+			referees = { [action.payload.userId] = action.payload.isReferee or Llama.None },
+		})
+	end,
+	users_setServerLocked = function(state, action)
+		return Dictionary.merge(state, {
+			serverLockedBy = if action.payload.isLocked then action.payload.userId else Llama.None,
+		})
+	end,
+	users_setBanned = function(state, action)
+		if action.payload.isBanned then
+			return Dictionary.mergeDeep(state, {
+				banned = {
+					[action.payload.userId] = action.payload.byUser or true,
+				},
+			})
+		else
+			return Dictionary.mergeDeep(state, {
+				banned = {
+					[action.payload.userId] = Llama.None,
+				},
+			})
+		end
+	end,
+	users_setWhitelisted = function(state, action)
+		if action.payload.isWhitelisted then
+			return Dictionary.mergeDeep(state, {
+				whitelisted = {
+					[action.payload.userId] = action.payload.byUser or true,
+				},
+			})
+		else
+			return Dictionary.mergeDeep(state, {
+				whitelisted = {
+					[action.payload.userId] = Llama.None,
+				},
+			})
+		end
+	end,
 })

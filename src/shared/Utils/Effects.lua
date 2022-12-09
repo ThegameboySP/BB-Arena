@@ -3,25 +3,27 @@ local CollectionService = game:GetService("CollectionService")
 local Effects = {}
 
 local RET_TRUE = function()
-    return true
+	return true
 end
 
 function Effects.pipe(effects)
 	local len = #effects
 	local cached = table.create(len)
-	
+
 	local function pipe(effect, nextPipe)
 		return function(item, rootAdd, rootRemove, context)
 			local subItemToPipeDestructor = {}
 
 			local function add(subItem, subContext)
-				if subItemToPipeDestructor[subItem] then return end
+				if subItemToPipeDestructor[subItem] then
+					return
+				end
 
 				local resolvedContext
 				if context and subContext then
 					if context ~= subContext then
 						resolvedContext = table.clone(context)
-						
+
 						for key, value in pairs(subContext) do
 							resolvedContext[key] = value
 						end
@@ -31,8 +33,7 @@ function Effects.pipe(effects)
 				end
 
 				if nextPipe then
-					subItemToPipeDestructor[subItem] = 
-						nextPipe(subItem, rootAdd, rootRemove, resolvedContext)
+					subItemToPipeDestructor[subItem] = nextPipe(subItem, rootAdd, rootRemove, resolvedContext)
 						or function() end
 				else
 					subItemToPipeDestructor[subItem] = function() end
@@ -42,7 +43,9 @@ function Effects.pipe(effects)
 
 			local function remove(subItem)
 				local destructor = subItemToPipeDestructor[subItem]
-				if destructor == nil then return end
+				if destructor == nil then
+					return
+				end
 
 				destructor()
 				subItemToPipeDestructor[subItem] = nil
@@ -57,11 +60,11 @@ function Effects.pipe(effects)
 				if destructor then
 					destructor()
 				end
-				
+
 				for subItem, subDestructor in pairs(subItemToPipeDestructor) do
 					subDestructor()
 					subItemToPipeDestructor[subItem] = nil
-					
+
 					if nextPipe == nil then
 						rootRemove(subItem)
 					end
@@ -69,11 +72,11 @@ function Effects.pipe(effects)
 			end
 		end
 	end
-	
-	for i=len, 1, -1 do
+
+	for i = len, 1, -1 do
 		cached[i] = pipe(effects[i], cached[i + 1])
 	end
-	
+
 	return function(item, rootAdd, rootRemove, context)
 		return Effects.bufferAll(cached[1])(item, rootAdd, rootRemove, context)
 	end
@@ -82,32 +85,38 @@ end
 -- Transforms all item streams into one stream, adding and removing only when
 -- all streams agree. To be used at very top of effect.
 -- WARNING: The returned function is stateful and cannot be reused.
-	function Effects.bufferAll(func)
-		local itemsCount = {}
-	
-		return function(item, add, remove, context)
-			local added = {}
-	
-			return func(item, function(subItem, ...)
-				if added[subItem] then return end
-				added[subItem] = true
-	
-				itemsCount[subItem] = itemsCount[subItem] or 0
-				itemsCount[subItem] += 1
-				add(subItem, ...)
-			end, function(subItem, ...)
-				if not added[subItem] then return end
-				if itemsCount[subItem] == nil then return end
-				added[subItem] = nil
-	
-				itemsCount[subItem] -= 1
-				if itemsCount[subItem] == 0 then
-					itemsCount[subItem] = nil
-					remove(subItem, ...)
-				end
-			end, context)
-		end
+function Effects.bufferAll(func)
+	local itemsCount = {}
+
+	return function(item, add, remove, context)
+		local added = {}
+
+		return func(item, function(subItem, ...)
+			if added[subItem] then
+				return
+			end
+			added[subItem] = true
+
+			itemsCount[subItem] = itemsCount[subItem] or 0
+			itemsCount[subItem] += 1
+			add(subItem, ...)
+		end, function(subItem, ...)
+			if not added[subItem] then
+				return
+			end
+			if itemsCount[subItem] == nil then
+				return
+			end
+			added[subItem] = nil
+
+			itemsCount[subItem] -= 1
+			if itemsCount[subItem] == 0 then
+				itemsCount[subItem] = nil
+				remove(subItem, ...)
+			end
+		end, context)
 	end
+end
 
 -- Guards against redundant add/remove calls.
 function Effects.buffer(func)
@@ -115,12 +124,16 @@ function Effects.buffer(func)
 		local added = {}
 
 		return func(item, function(subItem, ...)
-			if added[subItem] then return end
+			if added[subItem] then
+				return
+			end
 
 			added[subItem] = true
 			add(subItem, ...)
 		end, function(subItem)
-			if not added[subItem] then return end
+			if not added[subItem] then
+				return
+			end
 
 			added[subItem] = nil
 			remove(subItem)
@@ -137,24 +150,33 @@ function Effects.combine(funcs)
 		for _, func in pairs(funcs) do
 			local added = {}
 
-			table.insert(destructors, func(item, function(subItem, ...)
-				if added[subItem] then return end
-				added[subItem] = true
+			table.insert(
+				destructors,
+				func(item, function(subItem, ...)
+					if added[subItem] then
+						return
+					end
+					added[subItem] = true
 
-				itemsCount[subItem] = itemsCount[subItem] or 0
-				itemsCount[subItem] += 1
+					itemsCount[subItem] = itemsCount[subItem] or 0
+					itemsCount[subItem] += 1
 
-				add(subItem, ...)
-			end, function(subItem, ...)
-				if added[subItem] == nil then return end
-				if itemsCount[subItem] == nil then return end
+					add(subItem, ...)
+				end, function(subItem, ...)
+					if added[subItem] == nil then
+						return
+					end
+					if itemsCount[subItem] == nil then
+						return
+					end
 
-				itemsCount[subItem] -= 1
-				if itemsCount[subItem] == 0 then
-					itemsCount[subItem] = nil
-					remove(subItem, ...)
-				end
-			end, context))
+					itemsCount[subItem] -= 1
+					if itemsCount[subItem] == 0 then
+						itemsCount[subItem] = nil
+						remove(subItem, ...)
+					end
+				end, context)
+			)
 		end
 
 		return function()
@@ -169,15 +191,27 @@ function Effects.conditionOrError(func)
 	return function(item, add, remove, context)
 		return func(item, function(subItem, ...)
 			if subItem ~= item then
-				error(("Added an item other than the input: source = %s (%s); output = %s (%s)")
-					:format(item, tostring(item), subItem, tostring(subItem)))
+				error(
+					("Added an item other than the input: source = %s (%s); output = %s (%s)"):format(
+						item,
+						tostring(item),
+						subItem,
+						tostring(subItem)
+					)
+				)
 			end
 
 			add(subItem, ...)
 		end, function(subItem)
 			if subItem ~= item then
-				error(("Removed an item other than the input: source = %s (%s); output = %s (%s)")
-					:format(item, tostring(item), subItem, tostring(subItem)))
+				error(
+					("Removed an item other than the input: source = %s (%s); output = %s (%s)"):format(
+						item,
+						tostring(item),
+						subItem,
+						tostring(subItem)
+					)
+				)
 			end
 
 			remove(subItem)
@@ -201,7 +235,7 @@ function Effects.filterItems(filter, updateFilter)
 				end
 			end)
 		end
-		
+
 		return con and function()
 			con:Disconnect()
 		end
@@ -240,23 +274,30 @@ local function makeConditions(shouldPass, shouldFail)
 			local passed = 0
 
 			for _, condition in pairs(wrappedConditions) do
-				table.insert(destructors, condition(item, function()
-					if okConditions[condition] then return end
-					okConditions[condition] = true
-					passed += 1
+				table.insert(
+					destructors,
+					condition(item, function()
+						if okConditions[condition] then
+							return
+						end
+						okConditions[condition] = true
+						passed += 1
 
-					if shouldPass(passed, len) then
-						add(item)
-					end
-				end, function()
-					if okConditions[condition] == nil then return end
-					okConditions[condition] = nil
-					passed -= 1
+						if shouldPass(passed, len) then
+							add(item)
+						end
+					end, function()
+						if okConditions[condition] == nil then
+							return
+						end
+						okConditions[condition] = nil
+						passed -= 1
 
-					if shouldFail(passed, len) then
-						remove(item)
-					end
-				end, context))
+						if shouldFail(passed, len) then
+							remove(item)
+						end
+					end, context)
+				)
 			end
 
 			return function()
@@ -301,7 +342,7 @@ function Effects.testChildren(condition)
 		local childrenCount = 0
 		local passedByChildren = {}
 		local destructorByChildren = {}
-		
+
 		local function update()
 			if passed >= childrenCount then
 				add(instance)
@@ -379,7 +420,9 @@ function Effects.testChildrenNamed(children)
 	return Effects.testChildren(function(child, add, remove, context)
 		return onPropertyChanged(child, "Name", function()
 			local condition = children[child.Name]
-			if condition == nil then return end
+			if condition == nil then
+				return
+			end
 
 			local function onRemove()
 				remove(child)
@@ -521,7 +564,9 @@ function Effects.character(player, add, remove)
 			local id = #cons + 1
 
 			cons[id] = character.ChildAdded:Connect(function(child)
-				if not child:IsA("Humanoid") then return end
+				if not child:IsA("Humanoid") then
+					return
+				end
 
 				cons[id]:Disconnect()
 				cons[id] = nil
@@ -538,7 +583,7 @@ function Effects.character(player, add, remove)
 			addCharacterIfValid(character)
 		else
 			local id = #cons + 1
-			
+
 			cons[id] = character.AncestryChanged:Connect(function()
 				cons[id]:Disconnect()
 				cons[id] = nil
@@ -555,7 +600,7 @@ function Effects.character(player, add, remove)
 	if character then
 		onCharacterAdded(character)
 	end
-	
+
 	return function()
 		for id, con in pairs(cons) do
 			con:Disconnect()
@@ -565,21 +610,21 @@ function Effects.character(player, add, remove)
 end
 
 function Effects.instance(getter, added, removed)
-    return function(instance, add, remove, context)
-        for _, item in pairs(instance[getter](instance)) do
-            add(item, context)
-        end
+	return function(instance, add, remove, context)
+		for _, item in pairs(instance[getter](instance)) do
+			add(item, context)
+		end
 
-        local conAdded = instance[added]:Connect(function(item)
-            add(item, context)
-        end)
-        local conRemoved = instance[removed]:Connect(remove)
+		local conAdded = instance[added]:Connect(function(item)
+			add(item, context)
+		end)
+		local conRemoved = instance[removed]:Connect(remove)
 
-        return function()
-            conAdded:Disconnect()
-            conRemoved:Disconnect()
-        end
-    end
+		return function()
+			conAdded:Disconnect()
+			conRemoved:Disconnect()
+		end
+	end
 end
 
 function Effects.getFromTag(tag)
@@ -591,7 +636,7 @@ function Effects.getFromTag(tag)
 		for _, instance in collectionService:GetTagged(tag) do
 			onInstanceAdded(instance)
 		end
-		
+
 		local addedCon = collectionService:GetInstanceAddedSignal(tag):Connect(onInstanceAdded)
 		local removedCon = collectionService:GetInstanceRemovedSignal(tag):Connect(remove)
 
@@ -603,7 +648,7 @@ function Effects.getFromTag(tag)
 end
 
 function Effects.call(item, effect, context)
-    return effect(item, function() end, function() end, context)
+	return effect(item, function() end, function() end, context)
 end
 
 return Effects

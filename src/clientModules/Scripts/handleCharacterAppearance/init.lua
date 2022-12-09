@@ -12,170 +12,173 @@ local noobAppearance = require(script.noobAppearance)
 local LocalPlayer = Players.LocalPlayer
 
 local function isGladiator(player)
-    return player.Team and player.Team.Name == "Gladiators"
+	return player.Team and player.Team.Name == "Gladiators"
 end
 
 local function isEnemyFn(player)
-    return player.Team ~= LocalPlayer.Team or isGladiator(player)
+	return player.Team ~= LocalPlayer.Team or isGladiator(player)
 end
 
 local function handleCharacterAppearance(root)
-    local PlayerAppearances = ReplicatedStorage:FindFirstChild("PlayerAppearances")
+	local PlayerAppearances = ReplicatedStorage:FindFirstChild("PlayerAppearances")
 
-    local function updatePlayer(player, folder)
-        if not folder then
-            return
-        end
+	local function updatePlayer(player, folder)
+		if not folder then
+			return
+		end
 
-        local character = player.Character
-        local tag = "LocalAppearanceInstance_" .. player.Name
+		local character = player.Character
+		local tag = "LocalAppearanceInstance_" .. player.Name
 
-        for _, instance in CollectionService:GetTagged(tag) do
-            instance.Parent = nil
-        end
+		for _, instance in CollectionService:GetTagged(tag) do
+			instance.Parent = nil
+		end
 
-        local children = folder:GetChildren()
-        for _, child in children do
-            if child.Name == "R6" then
-                for _, r6Content in child:GetChildren() do
-                    table.insert(children, r6Content)
-                end
-            end
-        end
+		local children = folder:GetChildren()
+		for _, child in children do
+			if child.Name == "R6" then
+				for _, r6Content in child:GetChildren() do
+					table.insert(children, r6Content)
+				end
+			end
+		end
 
-        local hasFace = false
-        for _, child in children do
-            if child.Name == "face" then
-                hasFace = true
-                break
-            end
-        end
+		local hasFace = false
+		for _, child in children do
+			if child.Name == "face" then
+				hasFace = true
+				break
+			end
+		end
 
-        if not hasFace then
-            table.insert(children, noobAppearance.face)
-        end
+		if not hasFace then
+			table.insert(children, noobAppearance.face)
+		end
 
-        for _, child in children do
-            if child:IsA("Accoutrement") then
-                local clone = child:Clone()
-                CollectionService:AddTag(clone, tag)
-                clone:FindFirstChild("Handle").CanCollide = false
-                addAccoutrement(character, clone)
-            elseif
-                child:IsA("BodyColors") or child:IsA("Shirt")
-                or child:IsA("Pants") or child:IsA("ShirtGraphic")
-                or child:IsA("CharacterMesh")
-            then
-                local clone = child:Clone()
-                CollectionService:AddTag(clone, tag)
-                clone.Parent = character
-            elseif child.Name == "face" then
-                local clone = child:Clone()
-                CollectionService:AddTag(clone, tag)
+		for _, child in children do
+			if child:IsA("Accoutrement") then
+				local clone = child:Clone()
+				CollectionService:AddTag(clone, tag)
+				clone:FindFirstChild("Handle").CanCollide = false
+				addAccoutrement(character, clone)
+			elseif
+				child:IsA("BodyColors")
+				or child:IsA("Shirt")
+				or child:IsA("Pants")
+				or child:IsA("ShirtGraphic")
+				or child:IsA("CharacterMesh")
+			then
+				local clone = child:Clone()
+				CollectionService:AddTag(clone, tag)
+				clone.Parent = character
+			elseif child.Name == "face" then
+				local clone = child:Clone()
+				CollectionService:AddTag(clone, tag)
 
-                local head = character:FindFirstChild("Head")
-                if head then
-                    local oldFace = head:FindFirstChild("face")
-                    if oldFace then
-                        oldFace.Parent = nil
-                    end
+				local head = character:FindFirstChild("Head")
+				if head then
+					local oldFace = head:FindFirstChild("face")
+					if oldFace then
+						oldFace.Parent = nil
+					end
 
-                    clone.Parent = head
-                end
-            end
-        end
-    end
+					clone.Parent = head
+				end
+			end
+		end
+	end
 
-    local playersToUpdate = {}
+	local playersToUpdate = {}
 
-    root:getRemoteEvent("NewPlayerAppearance").OnClientEvent:Connect(function(userId)
-        local player = Players:GetPlayerByUserId(userId)
-        if player then
-            playersToUpdate[player] = true
-        end
-    end)
+	root:getRemoteEvent("NewPlayerAppearance").OnClientEvent:Connect(function(userId)
+		local player = Players:GetPlayerByUserId(userId)
+		if player then
+			playersToUpdate[player] = true
+		end
+	end)
 
-    Effects.call(Players, Effects.pipe({
-        Effects.children,
-        function(player, add)
-            local function update()
-                playersToUpdate[player] = true
-            end
+	Effects.call(
+		Players,
+		Effects.pipe({
+			Effects.children,
+			function(player, add)
+				local function update()
+					playersToUpdate[player] = true
+				end
 
-            add(player, { player = player })
+				add(player, { player = player })
 
-            local connections = {
-                LocalPlayer:GetPropertyChangedSignal("Team"):Connect(update),
-                player:GetPropertyChangedSignal("Team"):Connect(update),
-            }
-            update()
+				local connections = {
+					LocalPlayer:GetPropertyChangedSignal("Team"):Connect(update),
+					player:GetPropertyChangedSignal("Team"):Connect(update),
+				}
+				update()
 
-            return function()
-                for _, connection in connections do
-                    connection:Disconnect()
-                end
-            end
-        end,
-        Effects.character,
-        function(_, _, _, context)
-            playersToUpdate[context.player] = true
+				return function()
+					for _, connection in connections do
+						connection:Disconnect()
+					end
+				end
+			end,
+			Effects.character,
+			function(_, _, _, context)
+				playersToUpdate[context.player] = true
 
-            return function()
-                playersToUpdate[context.player] = true
-            end
-        end
-    }))
+				return function()
+					playersToUpdate[context.player] = true
+				end
+			end,
+		})
+	)
 
-    local function onChanged(new, old)
-        if
-            old == nil
-            or new.game.anonymousFighters ~= old.game.anonymousFighters
-            or selectors.getLocalSetting(new, "enemyDefaultAppearance") ~= selectors.getLocalSetting(old, "enemyDefaultAppearance")
-        then
-            for _, player in Players:GetPlayers() do
-                playersToUpdate[player] = true
-            end
-        end
-    end
+	local function onChanged(new, old)
+		if
+			old == nil
+			or new.game.anonymousFighters ~= old.game.anonymousFighters
+			or selectors.getLocalSetting(new, "enemyDefaultAppearance")
+				~= selectors.getLocalSetting(old, "enemyDefaultAppearance")
+		then
+			for _, player in Players:GetPlayers() do
+				playersToUpdate[player] = true
+			end
+		end
+	end
 
-    root.StoreChanged:Connect(onChanged)
-    onChanged(root.Store:getState(), nil)
+	root.StoreChanged:Connect(onChanged)
+	onChanged(root.Store:getState(), nil)
 
-    RunService.Heartbeat:Connect(function()
-        local anonymousFighters = root.Store:getState().game.anonymousFighters
-        local onFightingTeam = CollectionService:HasTag(LocalPlayer.Team, "FightingTeam") or isGladiator(LocalPlayer)
-        local enemyDefaultAppearance = selectors.getLocalSetting(root.Store:getState(), "enemyDefaultAppearance")
+	RunService.Heartbeat:Connect(function()
+		local anonymousFighters = root.Store:getState().game.anonymousFighters
+		local onFightingTeam = CollectionService:HasTag(LocalPlayer.Team, "FightingTeam") or isGladiator(LocalPlayer)
+		local enemyDefaultAppearance = selectors.getLocalSetting(root.Store:getState(), "enemyDefaultAppearance")
 
-        for player in playersToUpdate do
-            local character = player.Character
-            if character == nil or not character:FindFirstChild("Head") then
-                continue
-            end
+		for player in playersToUpdate do
+			local character = player.Character
+			if character == nil or not character:FindFirstChild("Head") then
+				continue
+			end
 
-            playersToUpdate[player] = nil
+			playersToUpdate[player] = nil
 
-            if
-                onFightingTeam and isEnemyFn(player)
-                and (enemyDefaultAppearance or anonymousFighters)
-            then
-                updatePlayer(player, noobAppearance)
+			if onFightingTeam and isEnemyFn(player) and (enemyDefaultAppearance or anonymousFighters) then
+				updatePlayer(player, noobAppearance)
 
-                if anonymousFighters then
-                    local humanoid = character:FindFirstChild("Humanoid")
-                    if humanoid then
-                        humanoid.DisplayName = " "
-                    end
-                end
-            else
-                updatePlayer(player, PlayerAppearances:FindFirstChild(tostring(player.UserId)))
+				if anonymousFighters then
+					local humanoid = character:FindFirstChild("Humanoid")
+					if humanoid then
+						humanoid.DisplayName = " "
+					end
+				end
+			else
+				updatePlayer(player, PlayerAppearances:FindFirstChild(tostring(player.UserId)))
 
-                local humanoid = character:FindFirstChild("Humanoid")
-                if humanoid then
-                    humanoid.DisplayName = player.DisplayName
-                end
-            end
-        end
-    end)
+				local humanoid = character:FindFirstChild("Humanoid")
+				if humanoid then
+					humanoid.DisplayName = player.DisplayName
+				end
+			end
+		end
+	end)
 end
 
 return handleCharacterAppearance

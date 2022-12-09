@@ -4,89 +4,89 @@ local Players = game:GetService("Players")
 local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerName)
 
 local function getName(text)
-    if text:find("[^%d]") then
-        return text:match("@?([^@]+)$")
-    end
+	if text:find("[^%d]") then
+		return text:match("@?([^@]+)$")
+	end
 end
 
 local function getUserId(text)
-    return tonumber(text:match("^(%d+)"))
+	return tonumber(text:match("^(%d+)"))
 end
 
 return function(registry)
-    local cmdr = registry.Cmdr
-    local cachedInfos = {}
-    local root = registry:GetStore("Common").Root
+	local cmdr = registry.Cmdr
+	local cachedInfos = {}
+	local root = registry:GetStore("Common").Root
 
-    local function onPlayerAdded(player)
-        cachedInfos[player.UserId] = player.UserId .. "@" .. getFullPlayerName(player)
-    end
+	local function onPlayerAdded(player)
+		cachedInfos[player.UserId] = player.UserId .. "@" .. getFullPlayerName(player)
+	end
 
-    Players.PlayerAdded:Connect(onPlayerAdded)
-    for _, player in Players:GetPlayers() do
-        onPlayerAdded(player)
-    end
+	Players.PlayerAdded:Connect(onPlayerAdded)
+	for _, player in Players:GetPlayers() do
+		onPlayerAdded(player)
+	end
 
-    local function getFullNames()
-        local fullNames = {}
+	local function getFullNames()
+		local fullNames = {}
 
-        for _, fullName in cachedInfos do
-            table.insert(fullNames, fullName)
-        end
+		for _, fullName in cachedInfos do
+			table.insert(fullNames, fullName)
+		end
 
-        return fullNames
-    end
+		return fullNames
+	end
 
-    local playerIdType = {
-        DisplayName = "User Id";
-    
-        Transform = function(text)
-            local findPlayer = cmdr.Util.MakeFuzzyFinder(getFullNames())
-    
-            return text, findPlayer(text)
-        end;
-    
-        ValidateOnce = function(text)
-            local name = getName(text)
+	local playerIdType = {
+		DisplayName = "User Id",
 
-            local ok, userId
-            if name then
-                ok, userId = root:GetUserIdByName(name):await()
-                if not ok or not userId then
-                    return false, "Not a valid user name."
-                end
-            else
-                userId = getUserId(text)
+		Transform = function(text)
+			local findPlayer = cmdr.Util.MakeFuzzyFinder(getFullNames())
 
-                if not userId then
-                    return false, "Not a valid user name / userId."
-                end
-            end
+			return text, findPlayer(text)
+		end,
 
-            root:GetUserInfoByUserId(userId):andThen(function(info)
-                cachedInfos[info.Id] = info.Id .. "@" .. getFullPlayerName(info)
-            end)
+		ValidateOnce = function(text)
+			local name = getName(text)
 
-            return true
-        end;
+			local ok, userId
+			if name then
+				ok, userId = root:GetUserIdByName(name):await()
+				if not ok or not userId then
+					return false, "Not a valid user name."
+				end
+			else
+				userId = getUserId(text)
 
-        Autocomplete = function(_, fullNames)
-            return fullNames
-        end;
-    
-        Parse = function(text)
-            local name = getName(text)
-            if name then
-                return root:GetUserIdByName(name):expect()
-            end
+				if not userId then
+					return false, "Not a valid user name / userId."
+				end
+			end
 
-            return getUserId(text)
-        end;
-    }
+			root:GetUserInfoByUserId(userId):andThen(function(info)
+				cachedInfos[info.Id] = info.Id .. "@" .. getFullPlayerName(info)
+			end)
+
+			return true
+		end,
+
+		Autocomplete = function(_, fullNames)
+			return fullNames
+		end,
+
+		Parse = function(text)
+			local name = getName(text)
+			if name then
+				return root:GetUserIdByName(name):expect()
+			end
+
+			return getUserId(text)
+		end,
+	}
 
 	registry:RegisterType("arenaPlayerId", playerIdType)
 	registry:RegisterType("arenaPlayerIds", cmdr.Util.MakeListableType(playerIdType))
 
-    registry.Types.playerId = registry.Types.arenaPlayerId
-    registry.Types.playerIds = registry.Types.arenaPlayerIds
+	registry.Types.playerId = registry.Types.arenaPlayerId
+	registry.Types.playerIds = registry.Types.arenaPlayerIds
 end

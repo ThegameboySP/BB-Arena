@@ -4,15 +4,15 @@ local WeaponThemes = ReplicatedStorage:FindFirstChild("Assets"):FindFirstChild("
 local CustomWeaponThemes = ReplicatedStorage:FindFirstChild("Place"):FindFirstChild("WeaponThemes")
 
 local themes = {
-    Normal = true;
+	Normal = true,
 }
 
 for _, child in WeaponThemes:GetChildren() do
-    themes[child.Name] = true
+	themes[child.Name] = true
 end
 
 for _, child in CustomWeaponThemes:GetChildren() do
-    themes[child.Name] = true
+	themes[child.Name] = true
 end
 
 return themes

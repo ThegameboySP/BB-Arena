@@ -21,15 +21,12 @@ local function raycast(origin, dir, func, params, filter, ...)
 	local result = func(origin, dir, params)
 	local hitPart = result and result.Instance
 
-	if 
-		result
-		and (CollectionService:HasTag(hitPart, "RaycastIgnore") or not filter(hitPart, ...))
-	then
+	if result and (CollectionService:HasTag(hitPart, "RaycastIgnore") or not filter(hitPart, ...)) then
 		local resolvedParams = params or DEFAULT_PARAMS
 		local filterDescendants = resolvedParams.FilterDescendantsInstances
 
 		-- FilterDescendantsInstances change seems to only take effect if you create an entirely new table.
-		resolvedParams.FilterDescendantsInstances = {result.Instance, unpack(filterDescendants or {})}
+		resolvedParams.FilterDescendantsInstances = { result.Instance, unpack(filterDescendants or {}) }
 
 		local hitPoint = result.Position
 		local backward = dir.Unit * 0.001
@@ -41,7 +38,7 @@ local function raycast(origin, dir, func, params, filter, ...)
 		resolvedParams.FilterDescendantsInstances = filterDescendants
 		return nextResult
 	end
-	
+
 	return result
 end
 

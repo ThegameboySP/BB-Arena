@@ -6,8 +6,8 @@ local Players = game:GetService("Players")
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local RichText = require(ReplicatedStorage.Common.Utils.RichText)
 
-local TWEEN_INFO = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
-local TRANSPARENCY_DEFAULT = .2
+local TWEEN_INFO = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0)
+local TRANSPARENCY_DEFAULT = 0.2
 
 local Gui = ReplicatedStorage.UI.Notification:Clone()
 Gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -26,12 +26,12 @@ local TweenableObjects = {
 	Main.Close,
 	Main.TitleBackground,
 	Main.MessageText,
-	Main.TitleBackground.TitleText
+	Main.TitleBackground.TitleText,
 }
 
 local TextOnly = {
 	MessageText = 1,
-	TitleText = 1
+	TitleText = 1,
 }
 
 local function countWords(msg)
@@ -39,7 +39,7 @@ local function countWords(msg)
 	for _ in string.gmatch(msg, "(%w+)") do
 		count += 1
 	end
-	
+
 	return count
 end
 
@@ -53,30 +53,30 @@ local function tweenTransition(visible)
 		if visible then
 			Main.Visible = visible
 		end
-		
+
 		local tweens = {}
-				
+
 		local number = visible and TRANSPARENCY_DEFAULT or 1
-		
+
 		local function registerAndPlay(tween)
 			tween:Play()
 			table.insert(tweens, tween)
 		end
-		
+
 		for _, guiObj in pairs(TweenableObjects) do
 			if not guiObj:IsA("Frame") then
-				registerAndPlay(TweenService:Create(guiObj, TWEEN_INFO, {TextTransparency = number}))
-				registerAndPlay(TweenService:Create(guiObj, TWEEN_INFO, {TextStrokeTransparency = number}))
+				registerAndPlay(TweenService:Create(guiObj, TWEEN_INFO, { TextTransparency = number }))
+				registerAndPlay(TweenService:Create(guiObj, TWEEN_INFO, { TextStrokeTransparency = number }))
 			end
 			if not TextOnly[guiObj.Name] then
-				registerAndPlay(TweenService:Create(guiObj, TWEEN_INFO, {BackgroundTransparency = number}))
+				registerAndPlay(TweenService:Create(guiObj, TWEEN_INFO, { BackgroundTransparency = number }))
 			end
 		end
-		
+
 		local c2
-		
+
 		onCancel(function()
-			for _, tween in pairs (tweens) do
+			for _, tween in pairs(tweens) do
 				tween:Pause()
 				tween = nil
 			end
@@ -84,10 +84,10 @@ local function tweenTransition(visible)
 				c2:Disconnect()
 			end
 		end)
-		
+
 		local t = time()
 		c2 = RunService.RenderStepped:Connect(function()
-			if (time()-t) > 1.5 then
+			if (time() - t) > 1.5 then
 				Main.Visible = shouldBeVisible
 				c2:Disconnect()
 				resolve(visible)
@@ -113,35 +113,38 @@ Main.Close.MouseButton1Click:Connect(close)
 -- Options.sender: player or string
 -- Options.color: Color3
 -- Options.stayOpen: boolean
-return (function(Message, Options)
+return function(Message, Options)
 	Options = Options or {}
 
-	local seconds = (countWords(Message) * .3) + 1
+	local seconds = (countWords(Message) * 0.3) + 1
 	timer += seconds
-    local Color = Options.color or Color3.new(1, 1, 1)
-	
-	if c then 
+	local Color = Options.color or Color3.new(1, 1, 1)
+
+	if c then
 		c:Disconnect()
 	end
 
 	tweenTransition(true)
-	
+
 	if not Options.stayOpen then
 		c = RunService.RenderStepped:Connect(function(step)
 			timer -= step
-			if timer<.2 then
+			if timer < 0.2 then
 				close()
 			end
 		end)
 	end
-	
+
 	local Sender = Options.sender
-	local SenderColor = (typeof(Sender) == "Instance" and Sender:IsA("Player")) and Sender.TeamColor.Color or Color3.new(1, 1, 1)
+	local SenderColor = (typeof(Sender) == "Instance" and Sender:IsA("Player")) and Sender.TeamColor.Color
+		or Color3.new(1, 1, 1)
 	Sender = typeof(Sender) == "string" and Sender or tostring(Sender)
-	
-	Message = RichText.bold("[" .. RichText.color(Sender, SenderColor) .. "]:\n") .. RichText.color(Message, Color) .. "\n"
-	
+
+	Message = RichText.bold("[" .. RichText.color(Sender, SenderColor) .. "]:\n")
+		.. RichText.color(Message, Color)
+		.. "\n"
+
 	CurrentMessage = CurrentMessage .. Message
-	
+
 	MsgText.Text = CurrentMessage
-end)
+end

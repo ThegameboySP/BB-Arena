@@ -5,23 +5,29 @@ local actions = RoduxFeatures.actions
 local actionReplicators = require(script.Parent.actionReplicators)
 
 return function()
-    describe("users_saveSettings", function()
-        it("should replicate properly", function()
-            local map = actionReplicators.users_saveSettings.replicate({1, 2}, actions.saveSettings(1, {
-                lighting = 0.5;
-                weaponTheme = "test";
-            }))
+	describe("users_saveSettings", function()
+		it("should replicate properly", function()
+			local map = actionReplicators.users_saveSettings.replicate(
+				{ 1, 2 },
+				actions.saveSettings(1, {
+					lighting = 0.5,
+					weaponTheme = "test",
+				})
+			)
 
-            expect(map[1].payload.settings.lighting).to.equal(0.5)
-            expect(map[1].payload.settings.weaponTheme).to.equal("test")
-            expect(map[2].payload.settings.lighting).to.equal(nil)
-            expect(map[2].payload.settings.weaponTheme).to.equal("test")
-        end)
+			expect(map[1].payload.settings.lighting).to.equal(0.5)
+			expect(map[1].payload.settings.weaponTheme).to.equal("test")
+			expect(map[2].payload.settings.lighting).to.equal(nil)
+			expect(map[2].payload.settings.weaponTheme).to.equal("test")
+		end)
 
-        it("should handle requests properly", function()
-            expect(actionReplicators.users_saveSettings.request(1, actions.saveSettings(1, {
-                lighting = 0.5;
-            }))).to.never.equal(nil)
-        end)
-    end)
+		it("should handle requests properly", function()
+			expect(actionReplicators.users_saveSettings.request(
+				1,
+				actions.saveSettings(1, {
+					lighting = 0.5,
+				})
+			)).to.never.equal(nil)
+		end)
+	end)
 end

@@ -8,51 +8,51 @@ local spectatorsCanBuildTrowels = Root.globals.spectatorsCanBuildTrowels
 local LocalPlayer = Players.LocalPlayer
 
 local function update()
-    local team = LocalPlayer.Team
-    if team and not CollectionService:HasTag(team, "ToolsEnabled") then
-        if LocalPlayer.Character then
-            local tool = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
-            if tool then
-                tool.Parent = LocalPlayer.Backpack
-            end
+	local team = LocalPlayer.Team
+	if team and not CollectionService:HasTag(team, "ToolsEnabled") then
+		if LocalPlayer.Character then
+			local tool = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
+			if tool then
+				tool.Parent = LocalPlayer.Backpack
+			end
 
-            if spectatorsCanBuildTrowels:Get() then
-                local trowel = LocalPlayer.Backpack:FindFirstChild("Trowel")
-                if trowel then
-                    trowel.Parent = LocalPlayer.Character
-                end
-            end
-        end
-    end
+			if spectatorsCanBuildTrowels:Get() then
+				local trowel = LocalPlayer.Backpack:FindFirstChild("Trowel")
+				if trowel then
+					trowel.Parent = LocalPlayer.Character
+				end
+			end
+		end
+	end
 end
 
 -- Trowels break if immediately equipped?
 local function deferredUpdate()
-    task.delay(0.2, update)
+	task.delay(0.2, update)
 end
 
 local function disableSpecTools()
-    LocalPlayer:GetPropertyChangedSignal("Team"):Connect(update)
-    update()
-    spectatorsCanBuildTrowels.Changed:Connect(deferredUpdate)
+	LocalPlayer:GetPropertyChangedSignal("Team"):Connect(update)
+	update()
+	spectatorsCanBuildTrowels.Changed:Connect(deferredUpdate)
 
-    local connection
-    local function onChildAdded(child)
-        if child:IsA("Backpack") then
-            if connection then
-                connection:Disconnect()
-            end
-            
-            connection = child.ChildAdded:Connect(deferredUpdate)
-            deferredUpdate()
-        end
-    end
-    LocalPlayer.ChildAdded:Connect(onChildAdded)
+	local connection
+	local function onChildAdded(child)
+		if child:IsA("Backpack") then
+			if connection then
+				connection:Disconnect()
+			end
 
-    local backpack = LocalPlayer:FindFirstChild("Backpack")
-    if backpack then
-        onChildAdded(backpack)
-    end
+			connection = child.ChildAdded:Connect(deferredUpdate)
+			deferredUpdate()
+		end
+	end
+	LocalPlayer.ChildAdded:Connect(onChildAdded)
+
+	local backpack = LocalPlayer:FindFirstChild("Backpack")
+	if backpack then
+		onChildAdded(backpack)
+	end
 end
 
 return disableSpecTools

@@ -6,14 +6,14 @@ local Component = require(ReplicatedStorage.Common.Component).Component
 local General = require(ReplicatedStorage.Common.Utils.General)
 
 local Water = Component:extend("Water", {
-    realm = "client";
+	realm = "client",
 
-    checkConfig = t.interface({
-		StudsScale = t.number;
-        Color = t.optional(t.Color3);
-        NoRipples = t.optional(t.boolean);
-        UnderColor = t.optional(t.Color3);
-	});
+	checkConfig = t.interface({
+		StudsScale = t.number,
+		Color = t.optional(t.Color3),
+		NoRipples = t.optional(t.boolean),
+		UnderColor = t.optional(t.Color3),
+	}),
 })
 
 local Ripples = Instance.new("Texture")
@@ -27,19 +27,19 @@ local OFFSET_RATIO_V = 0.375
 local DEFAULT_SPEED = 0.05
 
 function Water:OnDestroy()
-    for _, connection in self._connections do
-        connection:Disconnect()
-    end
+	for _, connection in self._connections do
+		connection:Disconnect()
+	end
 end
 
 function Water:OnInit()
-    self._connections = {}
+	self._connections = {}
 
 	local instance = self.Instance
 	instance.CanCollide = false
 	instance.CastShadow = false
 	instance.Material = Enum.Material.Fabric
-	
+
 	local config = self.Config
 	config.Speed = config.Speed or DEFAULT_SPEED
 	config.NoRipples = not not config.NoRipples
@@ -62,10 +62,13 @@ function Water:Animate(tex, dir)
 	local config = self.Config
 	local size = Vector2.new(tex.StudsPerTileU, tex.StudsPerTileV)
 
-    table.insert(self._connections, RunService.RenderStepped:Connect(function(dt)
-        tex.OffsetStudsU = (size.X * dir.X * (dt * config.Speed) + tex.OffsetStudsU) % size.X
-		tex.OffsetStudsV = (size.Y * dir.Y * (dt * config.Speed) + tex.OffsetStudsV) % size.Y
-    end))
+	table.insert(
+		self._connections,
+		RunService.RenderStepped:Connect(function(dt)
+			tex.OffsetStudsU = (size.X * dir.X * (dt * config.Speed) + tex.OffsetStudsU) % size.X
+			tex.OffsetStudsV = (size.Y * dir.Y * (dt * config.Speed) + tex.OffsetStudsV) % size.Y
+		end)
+	)
 end
 
 function Water:OnStart()
@@ -81,7 +84,12 @@ function setupLayer(instance, index)
 	local CF = instance.CFrame
 	local bottomLayer = instance:Clone()
 	bottomLayer:ClearAllChildren()
-	bottomLayer.CFrame = CFrame.fromMatrix(instance.Position + Vector3.new(0, 0.05 * index, 0), CF.RightVector, CF.UpVector, -CF.LookVector)
+	bottomLayer.CFrame = CFrame.fromMatrix(
+		instance.Position + Vector3.new(0, 0.05 * index, 0),
+		CF.RightVector,
+		CF.UpVector,
+		-CF.LookVector
+	)
 	bottomLayer.Anchored = false
 	bottomLayer.Name = "WaterLayer"
 
@@ -90,7 +98,7 @@ function setupLayer(instance, index)
 	mesh.Scale = Vector3.new(2000, 1, 2000)
 	mesh.Parent = bottomLayer
 
-    General.weld(instance, bottomLayer)
+	General.weld(instance, bottomLayer)
 	return bottomLayer
 end
 
@@ -123,12 +131,12 @@ end
 function setupTopLayer(ripples, instance, scale)
 	local tex = setupTexture(ripples, scale, "Top")
 	local tex2 = setupTexture(ripples, scale, "Bottom")
-	
+
 	local mesh = Instance.new("SpecialMesh")
 	mesh.MeshType = Enum.MeshType.Brick
 	mesh.Scale = Vector3.new(2000, 1, 2000)
 	mesh.Parent = instance
-	
+
 	tex.Parent = instance
 	tex2.Parent = instance
 end

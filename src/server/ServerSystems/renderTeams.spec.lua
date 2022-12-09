@@ -23,14 +23,14 @@ return function()
 		local root, run = Root.newTest({ renderTeams })
 
 		local teamId = root:GetService("TeamService"):spawnTeam(MatterComponents.Team({
-			name = "Test";
-			color = BrickColor.Red();
+			name = "Test",
+			color = BrickColor.Red(),
 		}))
 
 		local playerMock = { Team = nil }
 		root.world:spawn(MatterComponents.Player({
-			player = playerMock;
-			teamId = teamId;
+			player = playerMock,
+			teamId = teamId,
 		}))
 
 		local folder = Instance.new("Folder")
@@ -58,10 +58,13 @@ return function()
 	it("should replace a rendered team", function()
 		local root, run, playerMock, folder = renderTeamCase()
 
-		root.world:insert(1, MatterComponents.Team({
-			name = "Test2";
-			color = BrickColor.Blue();
-		}))
+		root.world:insert(
+			1,
+			MatterComponents.Team({
+				name = "Test2",
+				color = BrickColor.Blue(),
+			})
+		)
 
 		run()
 
