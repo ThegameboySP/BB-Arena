@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ScriptContext = game:GetService("ScriptContext")
+local TestService = game:GetService("TestService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
@@ -23,6 +24,22 @@ local Controllers = ReplicatedStorage.ClientModules.Controllers
 local Scripts = ReplicatedStorage.ClientModules.Scripts
 
 _G.debug = require(ReplicatedStorage.Common.Utils.breakpoint)
+
+TestService:Message((([[
+.
+______ ______  _____  _   __     __
+|.___.\|.___.\|_..._||.|././    / /
+|.|_/./|.|_/./  |.|  |.|/./    / /
+|.___.\|..../   |.|  |....\   / /
+|.|_/./|.|\.\  _|.|_ |.|\..\ / /
+\____/ \_| \_| \___/ \_| \_//_/
+                           ________  _      _____ __   __
+                          / /|.___.\|.|    |.._..|\.\././
+                         / / |.|_/./|.|    |.|.|.| \.V./
+                        / /  |.___.\|.|    |.|.|.| /...\
+                       / /   |.|_/./|.|____\.\_/.//./^\.\
+                      /_/    \____/ \_____/ \___/ \/   \/
+]]):gsub(" ", " ")))
 
 if not Players.LocalPlayer:GetAttribute("Initialized") then
 	Players.LocalPlayer:GetAttributeChangedSignal("Initialized"):Wait()
