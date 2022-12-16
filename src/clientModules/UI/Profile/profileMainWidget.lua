@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local TextService = game:GetService("TextService")
-local RunService = game:GetService("RunService")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local RoactHooks = require(ReplicatedStorage.Packages.RoactHooks)
@@ -12,6 +11,7 @@ local e = Roact.createElement
 local window = require(script.Parent.Parent.Presentational.window)
 local button = require(script.Parent.Parent.Presentational.button)
 local ThemeContext = require(script.Parent.Parent.ThemeContext)
+local declareUtils = require(script.Parent.Parent.Utils.declareUtils)
 
 local STROKE_THICKNESS = 16
 local MARGIN = 12 --10--16
@@ -21,9 +21,9 @@ local STATS = {
 	["Arena stats"] = {
 		{ "Kills", "KOs" },
 		{ "Deaths", "WOs" },
-		{ "Best killstreak", "BestKillstreak" }, --{"XP", "XP"},
-		{ "Wins", "AlltimeWins" },
-		{ "Losses", "AlltimeLosses" },
+		{ "Best killstreak", "bestKillstreak" }, --{"XP", "XP"},
+		{ "Wins", "alltimeWins" },
+		{ "Losses", "alltimeLosses" },
 	},
 	["Ranged stats"] = {},
 	["Gamemode stats"] = {
@@ -40,21 +40,17 @@ local TOOLS = { "Superball", "Bomb", "Rocket", "PaintballGun" }
 local RANGED_STATS = {
 	{
 		header = "Long range kills (120+ studs)",
-		statGroup = "LongRange",
+		statGroup = "longRange",
 	},
 	{
 		header = "Medium range kills (70–120 studs)",
-		statGroup = "MediumRange",
+		statGroup = "mediumRange",
 	},
 	{
 		header = "Close range kills (0–70 studs)",
-		statGroup = "CloseRange",
+		statGroup = "closeRange",
 	},
 }
-
-local function doThis(fn)
-	return fn()
-end
 
 local function makeCircle(props)
 	return Roact.createFragment({
@@ -160,29 +156,6 @@ local function progressBar(props, hooks)
 
 	local activeShineColor = props.activeColor:Lerp(Color3.new(1, 1, 1), 0.4)
 
-	-- hooks.useEffect(function()
-	-- 	local gradient = gradientRef:getValue()
-
-	-- 	local started = os.clock()
-	-- 	local connection = RunService.Heartbeat:Connect(function()
-	-- 		local now = os.clock()
-	-- 		local alpha = 0.3 + math.sin((now - started) * (math.pi*2 / 6)) * 0.1
-	-- 		local activeShineColor = props.activeColor:Lerp(Color3.new(1, 1, 1), alpha)
-	-- 		local activeColor = props.activeColor:Lerp(Color3.new(1, 1, 1), alpha - 0.35)
-
-	-- 		gradient.Color = ColorSequence.new({
-	-- 			ColorSequenceKeypoint.new(0, activeShineColor),
-	-- 			ColorSequenceKeypoint.new(0.1, activeShineColor),
-	-- 			ColorSequenceKeypoint.new(0.2, activeColor),
-	-- 			ColorSequenceKeypoint.new(1, activeColor),
-	-- 		})
-	-- 	end)
-
-	-- 	return function()
-	-- 		connection:Disconnect()
-	-- 	end
-	-- end)
-
 	return e("Frame", {
 		AnchorPoint = props.anchorPoint,
 		Size = props.size,
@@ -223,38 +196,8 @@ end
 
 progressBar = RoactHooks.new(Roact)(progressBar)
 
--- local function truncateRichText(text, textSize, font, size)
--- 	local textBounds = TextService:GetTextSize(text, textSize, font, Vector3.new(100_000, size.Y))
--- 	if textBounds.X > size.X then
-
--- 	end
-
--- 	return size
--- end
-
-local NumberAdvancer = {}
-NumberAdvancer.__index = NumberAdvancer
-
-function NumberAdvancer.new(number)
-	return setmetatable({ number = number or 0 }, NumberAdvancer)
-end
-
-function NumberAdvancer:add(addition)
-	self.number += addition
-	return self.number
-end
-
-function NumberAdvancer:advance(addition)
-	self.number += addition
-	return addition
-end
-
-function NumberAdvancer:set(to)
-	self.number = to
-	return to
-end
-
 local function dropdownBar(props, hooks)
+	local theme = hooks.useContext(ThemeContext)
 	local isCollapsed, setIsCollapsed = hooks.useState(false)
 
 	local styles, api = RoactSpring.useSpring(hooks, function()
@@ -262,19 +205,17 @@ local function dropdownBar(props, hooks)
 	end)
 
 	local selectedPlayerTextBounds =
-		TextService:GetTextSize(props.players[1].displayName, 20, Enum.Font.Gotham, Vector2.new(100, props.ySize))
+		TextService:GetTextSize(props.selectedPlayer.displayName, 20, Enum.Font.Gotham, Vector2.new(100, props.ySize))
 	local maxSize = Vector2.new(200 + 30 * 3, selectedPlayerTextBounds.Y)
 
 	local children = {}
 	children.UICorner = e("UICorner", {
 		CornerRadius = UDim.new(0, 6),
 	})
-	children.UIStroke = if not isCollapsed
-		then nil
-		else e("UIStroke", {
-			Thickness = 2,
-			Color = props.borderColor,
-		})
+	children.UIStroke = e("UIStroke", {
+		Thickness = 2,
+		Color = props.borderColor,
+	})
 
 	hooks.useEffect(function()
 		if isCollapsed then
@@ -285,7 +226,7 @@ local function dropdownBar(props, hooks)
 		else
 			api.start({
 				alpha = 0,
-				config = { tension = 400 },
+				config = { frequency = 0.1 },
 			})
 		end
 
@@ -311,11 +252,16 @@ local function dropdownBar(props, hooks)
 	end)
 
 	local y = 0
-	local players = { props.selectedPlayer, unpack(props.players) }
+	local players = {}
+	table.insert(players, props.selectedPlayer)
+	for _, player in props.players do
+		table.insert(players, player)
+	end
+
 	for i, player in players do
-		local advancer = NumberAdvancer.new(props.iconSize.X.Offset)
+		local advancer = declareUtils.NumberAdvancer.new(props.iconSize.X.Offset)
 		local textBounds =
-			TextService:GetTextSize(player.displayName, 20, Enum.Font.Gotham, Vector2.new(250, props.ySize))
+			TextService:GetTextSize(player.displayName, 20, Enum.Font.Gotham, Vector2.new(maxSize.X - 70, props.ySize))
 		textBounds += Vector2.new(8, 0)
 
 		table.insert(
@@ -338,7 +284,14 @@ local function dropdownBar(props, hooks)
 			}, {
 				Image = e("ImageLabel", {
 					BackgroundTransparency = 1,
-					Image = player.image,
+					Image = declareUtils.doThis(function()
+						local binding, set = Roact.createBinding()
+						player.image:andThen(function(content)
+							set(content)
+						end)
+
+						return binding
+					end),
 
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Size = props.iconSize,
@@ -390,15 +343,21 @@ local function dropdownBar(props, hooks)
 		end
 	end
 
-	return e("Frame", {
+	return e("ScrollingFrame", {
 		ClipsDescendants = true,
 
 		BackgroundTransparency = 0,
 		BorderSizePixel = 0,
 		BackgroundColor3 = props.backgroundColor,
 		Size = styles.alpha:map(function(value)
-			return UDim2.new(0, maxSize.X, 0, props.ySize + (y - props.ySize) * value)
+			return UDim2.new(0, maxSize.X, 0, math.clamp(props.ySize + (y - props.ySize) * value, 0, 300))
 		end),
+		CanvasSize = styles.alpha:map(function(value)
+			return UDim2.new(1, 0, 0, y * value)
+		end),
+		ScrollBarImageColor3 = theme.scrollbar,
+		ScrollBarThickness = 6,
+		ScrollingDirection = Enum.ScrollingDirection.Y,
 		Position = props.position,
 		ZIndex = props.zIndex,
 	}, children)
@@ -411,12 +370,21 @@ local function getPlaceString(place)
 		return "100th+"
 	end
 
+	if type(place) == "string" then
+		return place
+	end
+
 	local str = tostring(place)
 	local last = string.sub(str, -1, -1)
+	local second = string.sub(str, -2, -2)
 
-	if last == "1" then
+	if last == "1" and second == "1" then
+		return str .. "th"
+	elseif last == "1" and second ~= "1" then
 		return str .. "st"
-	elseif last == "2" then
+	elseif last == "2" and second == "2" then
+		return str .. "th"
+	elseif last == "2" and second ~= "2" then
 		return str .. "nd"
 	elseif last == "3" then
 		return str .. "rd"
@@ -436,20 +404,22 @@ local function getKDRString(stats)
 	return string.format("%.1f", kdr)
 end
 
-local MINUTES_IN_DAY = 60 * 24
-local function getTimePlayedString(minutesPlayed)
-	return string.format("%dd %dh", minutesPlayed / MINUTES_IN_DAY, minutesPlayed / 60)
+local SECONDS_IN_DAY = 60 * 60 * 24
+local SECONDS_IN_HOUR = 60 * 60
+local function getTimePlayedString(secondsPlayed)
+	return string.format("%dd %dh", secondsPlayed / SECONDS_IN_DAY, secondsPlayed / SECONDS_IN_HOUR)
 end
 
 local function profileMainWidget(props, hooks)
 	local theme = hooks.useContext(ThemeContext)
 	local outerRef = hooks.useBinding()
 
-	local selectedTab, setSelectedTab = hooks.useState(STAT_TABS[2])
-	local selectedPlayer, setSelectedPlayer = hooks.useState(props.players[1])
+	local selectedTab, setSelectedTab = hooks.useState(STAT_TABS[1])
+	local selectedUserId, setSelectedUserId = hooks.useState(props.localUserId)
+	local selectedPlayer = props.players[selectedUserId]
 
-	local advanceY = NumberAdvancer.new(0)
-	local advanceBarY = NumberAdvancer.new(0)
+	local advanceY = declareUtils.NumberAdvancer.new(0)
+	-- local advanceBarY = declareUtils.NumberAdvancer.new(0)
 
 	return e("Frame", {
 		[Roact.Ref] = outerRef,
@@ -470,16 +440,25 @@ local function profileMainWidget(props, hooks)
 			onClosed = props.onClosed,
 		}, {
 			-- Center = e("Frame", {
-			-- 	AnchorPoint = Vector2.new(0, 0.5);
-			-- 	Size = UDim2.new(1, 0, 0, 2);
-			-- 	Position = UDim2.new(0, 0, 0.5, 0);
-			-- 	ZIndex = 20;
-			-- });
+			-- 	AnchorPoint = Vector2.new(0, 0.5),
+			-- 	Size = UDim2.new(1, 0, 0, 2),
+			-- 	Position = UDim2.new(0, 0, 0.5, 0),
+			-- 	ZIndex = 20,
+			-- }),
 			Background = e("Frame", {
 				Size = UDim2.new(1, 0, 1, 0),
 				BorderSizePixel = 0,
-				BackgroundColor3 = theme.background,
+				BackgroundColor3 = Color3.new(1, 1, 1),
 				ZIndex = -1,
+			}, {
+				UIGradient = e("UIGradient", {
+					Rotation = 90,
+					Color = ColorSequence.new({
+						ColorSequenceKeypoint.new(0, theme.background),
+						ColorSequenceKeypoint.new(0.3, theme.background),
+						ColorSequenceKeypoint.new(1, theme.background:Lerp(Color3.new(0, 0, 0), 0.4)),
+					}),
+				}),
 			}),
 			Border = e("Frame", {
 				AnchorPoint = Vector2.new(0.5, 0.5),
@@ -512,7 +491,7 @@ local function profileMainWidget(props, hooks)
 				zIndex = 8,
 
 				onChosenPlayer = function(player)
-					setSelectedPlayer(player)
+					setSelectedUserId(player.userId)
 				end,
 			}),
 
@@ -532,50 +511,48 @@ local function profileMainWidget(props, hooks)
 				}),
 
 				-- Objective1 = e("TextLabel", {
-				-- 	BackgroundTransparency = 1;
-				-- 	RichText = true;
-				-- 	Position = UDim2.new(0, 126, 0, advanceBarY:add(20));
-				-- 	Font = Enum.Font.GothamBold;
-				-- 	TextColor3 = theme.highContrast;
-				-- 	TextXAlignment = Enum.TextXAlignment.Left;
+				-- 	BackgroundTransparency = 1,
+				-- 	RichText = true,
+				-- 	Position = UDim2.new(0, 126, 0, advanceBarY:add(20)),
+				-- 	Font = Enum.Font.GothamBold,
+				-- 	TextColor3 = theme.highContrast,
+				-- 	TextXAlignment = Enum.TextXAlignment.Left,
 				-- 	Text = string.format(
-				-- 		[[<font size="22">Get 30 KOs</font>]]
-				-- 		.. [[<font size="14" color="#%s"> (44%%)</font>]],
+				-- 		[[<font size="22">Get 30 KOs</font>]] .. [[<font size="14" color="#%s"> (44%%)</font>]],
 				-- 		theme.text:ToHex()
-				-- 	);
-				-- });
+				-- 	),
+				-- }),
 
 				-- Progress1 = e(progressBar, {
-				-- 	position = UDim2.new(0, 126, 0, advanceBarY:add(20));
-				-- 	size = UDim2.new(0, 420, 0, advanceBarY:advance(22));
-				-- 	activeColor = Color3.fromRGB(62, 149, 38);
-				-- 	backgroundColor = Color3.fromRGB(29, 31, 35);
-				-- 	strokeColor = theme.border;
-				-- 	percent = 0.25;
-				-- });
+				-- 	position = UDim2.new(0, 126, 0, advanceBarY:add(20)),
+				-- 	size = UDim2.new(0, 420, 0, advanceBarY:advance(22)),
+				-- 	activeColor = Color3.fromRGB(58, 140, 39),
+				-- 	backgroundColor = Color3.fromRGB(29, 31, 35),
+				-- 	strokeColor = theme.border,
+				-- 	percent = 0.25,
+				-- }),
 
 				-- Objective2 = e("TextLabel", {
-				-- 	BackgroundTransparency = 1;
-				-- 	RichText = true;
-				-- 	Position = UDim2.new(0, 126, 0, advanceBarY:add(26));
-				-- 	Font = Enum.Font.GothamBold;
-				-- 	TextColor3 = theme.highContrast;
-				-- 	TextXAlignment = Enum.TextXAlignment.Left;
+				-- 	BackgroundTransparency = 1,
+				-- 	RichText = true,
+				-- 	Position = UDim2.new(0, 126, 0, advanceBarY:add(26)),
+				-- 	Font = Enum.Font.GothamBold,
+				-- 	TextColor3 = theme.highContrast,
+				-- 	TextXAlignment = Enum.TextXAlignment.Left,
 				-- 	Text = string.format(
-				-- 		[[<font size="22">Get 300 XP</font>]]
-				-- 		.. [[<font size="14" color="#%s"> (44%%)</font>]],
+				-- 		[[<font size="22">Get 300 XP</font>]] .. [[<font size="14" color="#%s"> (44%%)</font>]],
 				-- 		theme.text:ToHex()
-				-- 	);
-				-- });
+				-- 	),
+				-- }),
 
 				-- Progress2 = e(progressBar, {
-				-- 	position = UDim2.new(0, 126, 0, advanceBarY:add(20));
-				-- 	size = UDim2.new(0, 420, 0, advanceBarY:advance(22));
-				-- 	activeColor = Color3.fromRGB(62, 149, 38);
-				-- 	backgroundColor = Color3.fromRGB(29, 31, 35);
-				-- 	strokeColor = theme.border;
-				-- 	percent = 0.44;
-				-- });
+				-- 	position = UDim2.new(0, 126, 0, advanceBarY:add(20)),
+				-- 	size = UDim2.new(0, 420, 0, advanceBarY:advance(22)),
+				-- 	activeColor = Color3.fromRGB(58, 140, 39),
+				-- 	backgroundColor = Color3.fromRGB(29, 31, 35),
+				-- 	strokeColor = theme.border,
+				-- 	percent = 0.44,
+				-- }),
 			}),
 
 			CharacterIcon = e(circle, {
@@ -585,16 +562,23 @@ local function profileMainWidget(props, hooks)
 				zIndex = 2,
 			}, {
 				-- Rank = e("ImageLabel", {
-				-- 	Image = "rbxassetid://11695217168";
-				-- 	BackgroundTransparency = 1;
-				-- 	AnchorPoint = Vector2.new(0.5, 0);
-				-- 	Size = UDim2.new(0, 142 * 0.5, 0, 92 * 0.5);
-				-- 	Position = UDim2.new(0.5, 0, 1, -34);
-				-- });
+				-- 	Image = "rbxassetid://11695217168",
+				-- 	BackgroundTransparency = 1,
+				-- 	AnchorPoint = Vector2.new(0.5, 0),
+				-- 	Size = UDim2.new(0, 142 * 0.5, 0, 92 * 0.5),
+				-- 	Position = UDim2.new(0.5, 0, 1, -34),
+				-- }),
 				Icon = e("ImageLabel", {
 					BorderSizePixel = 0,
 					BackgroundTransparency = 1,
-					Image = selectedPlayer.image,
+					Image = declareUtils.doThis(function()
+						local binding, set = Roact.createBinding()
+						selectedPlayer.image:andThen(function(content)
+							set(content)
+						end)
+
+						return binding
+					end),
 
 					AnchorPoint = Vector2.new(0.5, 0.5),
 					Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -631,7 +615,6 @@ local function profileMainWidget(props, hooks)
 					Rotation = 90,
 					Color = ColorSequence.new({
 						ColorSequenceKeypoint.new(0, Color3.fromRGB(37, 41, 48)),
-						-- ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 29, 33)),
 						ColorSequenceKeypoint.new(1, Color3.fromRGB(25, 28, 31)),
 					}),
 				}),
@@ -697,7 +680,7 @@ local function profileMainWidget(props, hooks)
 						BackgroundTransparency = 1,
 						Size = UDim2.new(1, 0, 1, 0),
 					},
-					doThis(function()
+					declareUtils.doThis(function()
 						local elements = {}
 						elements.UIListLayout = e("UIListLayout", {
 							Padding = UDim.new(0, MARGIN),
@@ -725,7 +708,7 @@ local function profileMainWidget(props, hooks)
 					end)
 				),
 
-				Table = doThis(function()
+				Table = declareUtils.doThis(function()
 					local function layout(layoutProps)
 						return e("Frame", {
 							BackgroundTransparency = 1,
@@ -834,8 +817,8 @@ local function profileMainWidget(props, hooks)
 						return e("ScrollingFrame", {
 							[Roact.Ref] = scrollingFrameRef,
 
-							-- ClipsDescendants = false;
 							ScrollBarImageColor3 = theme.scrollbar,
+							AutomaticCanvasSize = Enum.AutomaticSize.Y,
 							ScrollingDirection = Enum.ScrollingDirection.Y,
 							BorderSizePixel = 0,
 							BackgroundTransparency = 1,

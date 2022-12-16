@@ -2,7 +2,7 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="ModuleScript" referent="RBXEE166C7C14D048E69F65F7290FE11C97">
+	<Item class="ModuleScript" referent="RBXC2B01AB02691409293A75975C1159BF8">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<Content name="LinkedSource"><null></null></Content>
@@ -390,28 +390,28 @@ return Load
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBX773E2FD119E54856A94809F989AC3854">
+		<Item class="Folder" referent="RBXE1BBF7B1068A4226B253C0F02D67D5B4">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Directories</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="Folder" referent="RBX221B089A2AF04FA0BACB6D7A7B6EFE1A">
+			<Item class="Folder" referent="RBX60DD7A214E5049B997A017F8C68BFB50">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">ReplicatedStorage</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="Folder" referent="RBXE06C252043574D50B47E1EAC55B79752">
+				<Item class="Folder" referent="RBX6145BDB073A54F2B811D94E5DE1E4FF3">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">ToolNetworking</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="RemoteEvent" referent="RBX705112CE984647B4AC1A0D4F25DE0224">
+					<Item class="RemoteEvent" referent="RBXADE09261BCC94894A09527CA342BC456">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Explosion</string>
@@ -419,7 +419,7 @@ return Load
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="RemoteEvent" referent="RBX8BB7BD6B569444D5A0DE1829622ECAB1">
+					<Item class="RemoteEvent" referent="RBXB88BA3CB93324A02926B53BC3BD08460">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Hit</string>
@@ -427,7 +427,7 @@ return Load
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="RemoteEvent" referent="RBX9F60B89BE5F242448F04C2683688DF1E">
+					<Item class="RemoteEvent" referent="RBX9CFB5613983F4D5B9A9C75907050AFA0">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">UpdatePhysics</string>
@@ -435,7 +435,7 @@ return Load
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="RemoteEvent" referent="RBXE3735E260397487CB239A28CD7E365E8">
+					<Item class="RemoteEvent" referent="RBXEE46AE7D6E894B809D5ABB521F7453B1">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Ping</string>
@@ -443,7 +443,7 @@ return Load
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="RemoteFunction" referent="RBXA945681EB8B64CC68242A9384673CE45">
+					<Item class="RemoteFunction" referent="RBX1E200076CCCF465C8F92D5FF03B485CA">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">AcquireSettings</string>
@@ -451,7 +451,7 @@ return Load
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="BindableEvent" referent="RBX41836551D84C49819814B1D57AD51961">
+					<Item class="BindableEvent" referent="RBX29D65624C99D402C846789DDE06E27CE">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">ThemeActivation</string>
@@ -459,7 +459,7 @@ return Load
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="RemoteEvent" referent="RBX9F7D112E5C6B4B25B542D23F3B8CD05A">
+					<Item class="RemoteEvent" referent="RBX39CCE5E384E84E65AEBE621FE1E86AB9">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Delete</string>
@@ -468,14 +468,14 @@ return Load
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Folder" referent="RBXDB984FAD50C04ACB86F4D2E80CCB742B">
+				<Item class="Folder" referent="RBX7B019B283FB7405F9B086D2502E579E6">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">ToolModules</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="ModuleScript" referent="RBXB6DE322A59854E0AB924B414E96D1898">
+					<Item class="ModuleScript" referent="RBXC84589A9781142319BFC864F97C029C6">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -1331,14 +1331,14 @@ return Aesthetics]]></ProtectedString>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="Folder" referent="RBX350A0C37B93049F4850BAAF443DDF6A1">
+						<Item class="Folder" referent="RBXD27DF325E37A44D1A7442B8EE6852E21">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">PaintballGUIs</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="SurfaceGui" referent="RBX3F763EDB743D4DBAA949AB908D25650B">
+							<Item class="SurfaceGui" referent="RBX751CE54B90D94B519FF497260B6A34DA">
 								<Properties>
 									<bool name="Active">true</bool>
 									<Ref name="Adornee">null</Ref>
@@ -1370,7 +1370,7 @@ return Aesthetics]]></ProtectedString>
 									<token name="ZIndexBehavior">1</token>
 									<float name="ZOffset">0</float>
 								</Properties>
-								<Item class="Frame" referent="RBX140F183B9AD14EF2AF02FA9B89B1E02E">
+								<Item class="Frame" referent="RBXF032F3477F674140B07F0AD1B6A1C49B">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -1432,7 +1432,7 @@ return Aesthetics]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="SurfaceGui" referent="RBX5848D276B73144568498D343FB6602CB">
+							<Item class="SurfaceGui" referent="RBXA68B3A7A91D44E3994B1B6FEC1F1381B">
 								<Properties>
 									<bool name="Active">true</bool>
 									<Ref name="Adornee">null</Ref>
@@ -1464,7 +1464,7 @@ return Aesthetics]]></ProtectedString>
 									<token name="ZIndexBehavior">1</token>
 									<float name="ZOffset">0</float>
 								</Properties>
-								<Item class="Frame" referent="RBXBCEE1A6FE25A42B68377EFC8742E5331">
+								<Item class="Frame" referent="RBXA445F2C3AA22491A8D8217E4773ECDD0">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -1526,7 +1526,7 @@ return Aesthetics]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="SurfaceGui" referent="RBX189BA460FFCF43B3921206295521BCE4">
+							<Item class="SurfaceGui" referent="RBX21133566FDD74026B3189CB57F4F11AF">
 								<Properties>
 									<bool name="Active">true</bool>
 									<Ref name="Adornee">null</Ref>
@@ -1558,7 +1558,7 @@ return Aesthetics]]></ProtectedString>
 									<token name="ZIndexBehavior">1</token>
 									<float name="ZOffset">0</float>
 								</Properties>
-								<Item class="Frame" referent="RBX09317DE051B3475E85DE65C42821C357">
+								<Item class="Frame" referent="RBX230AC913DC294308B6AB2F34B1CDF430">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -1620,7 +1620,7 @@ return Aesthetics]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="SurfaceGui" referent="RBX10AC10DC7D8E42CEB6105F7AA1BBBB61">
+							<Item class="SurfaceGui" referent="RBX7181D11B9F9A4E9CADD7DC77969AA746">
 								<Properties>
 									<bool name="Active">true</bool>
 									<Ref name="Adornee">null</Ref>
@@ -1652,7 +1652,7 @@ return Aesthetics]]></ProtectedString>
 									<token name="ZIndexBehavior">1</token>
 									<float name="ZOffset">0</float>
 								</Properties>
-								<Item class="Frame" referent="RBX0D23D5E1B0FB44E1B0DEA2DD901C5CCE">
+								<Item class="Frame" referent="RBXEA1284AB72E449D784B2626EEE1CA6F0">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -1714,7 +1714,7 @@ return Aesthetics]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="SurfaceGui" referent="RBX9B0788150E734C439BC131BCF37D079A">
+							<Item class="SurfaceGui" referent="RBX8860CA2403E6470EBC6F1703022A14E3">
 								<Properties>
 									<bool name="Active">true</bool>
 									<Ref name="Adornee">null</Ref>
@@ -1746,7 +1746,7 @@ return Aesthetics]]></ProtectedString>
 									<token name="ZIndexBehavior">1</token>
 									<float name="ZOffset">0</float>
 								</Properties>
-								<Item class="Frame" referent="RBX61B2E8F5DD6542E68A28F3047BA1CFDA">
+								<Item class="Frame" referent="RBXC78A5BCDC4E844419BCB6AA50190E40C">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -1808,7 +1808,7 @@ return Aesthetics]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="SurfaceGui" referent="RBX495D851500974C57B6A9BF8121F67044">
+							<Item class="SurfaceGui" referent="RBX4FA4F82F4E554BD79D95DA9137EDB5D8">
 								<Properties>
 									<bool name="Active">true</bool>
 									<Ref name="Adornee">null</Ref>
@@ -1840,7 +1840,7 @@ return Aesthetics]]></ProtectedString>
 									<token name="ZIndexBehavior">1</token>
 									<float name="ZOffset">0</float>
 								</Properties>
-								<Item class="Frame" referent="RBX78A25E42A1574725B8AB6D1418E57A20">
+								<Item class="Frame" referent="RBX5252BDC9194347CA9A9D99F8B08EB2AF">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -1904,7 +1904,7 @@ return Aesthetics]]></ProtectedString>
 							</Item>
 						</Item>
 					</Item>
-					<Item class="ModuleScript" referent="RBX0998252F7D624B3CA72D39EDE3AA6DCF">
+					<Item class="ModuleScript" referent="RBXBC169A359BE04C678F49967E859BB7DE">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -2052,6 +2052,12 @@ function Kill:TagHumanoid(player, humanoid, obj, projectileType)
 	NewTag.Name = "creator"
 	NewTag.Value = player
 	NewTag:SetAttribute("WeaponImageId", Tags[projectileType])
+	NewTag:SetAttribute("ProjectileType", projectileType)
+	
+	local FolderRef = Instance.new("ObjectValue")
+	FolderRef.Name = "FolderRef"
+	FolderRef.Value = obj
+	FolderRef.Parent = NewTag
 	--NewTag:SetAttribute("WeaponType", projectileType)
 	
 	local weapon = player:WaitForChild("Backpack"):FindFirstChild(projectileType) or player.Character:FindFirstChild(projectileType)
@@ -2108,7 +2114,7 @@ return Kill]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBX0D9E74C645184B6096B20CB9C7B93A01">
+					<Item class="ModuleScript" referent="RBXB042E7E96D7D404584EE02B3E4020F03">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -2604,7 +2610,7 @@ return Explosion]]></ProtectedString>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXFF44A5BD707E47B5A045BE2D174C5477">
+						<Item class="ModuleScript" referent="RBX4FEE8E55F93C4BD4ACE69B3249671026">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -2783,7 +2789,7 @@ return Force
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="ModuleScript" referent="RBX0A03E855EBF04247A4AC135457896E57">
+						<Item class="ModuleScript" referent="RBX8252A31AC2EC410BA16E272452A02499">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -2908,7 +2914,7 @@ return singleton]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="ModuleScript" referent="RBX1854973A6A194F8A84EC678A18233887">
+					<Item class="ModuleScript" referent="RBX0D591D9EE09E4299A7F11185C923EC56">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -3668,7 +3674,7 @@ return Security
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXE1FBB6DFF92E4F4285838A93DB30CD08">
+						<Item class="ModuleScript" referent="RBX9894436C09E84A23A7F2C4C01A38EE73">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -3902,7 +3908,7 @@ return ParabolaModule]]></ProtectedString>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="ModuleScript" referent="RBX0DA4F9C604914B89AB7D3A0B6178B5BB">
+						<Item class="ModuleScript" referent="RBX4221D68F317D4D369145A39F5D488B59">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -4268,7 +4274,7 @@ return PSPV
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="ModuleScript" referent="RBXCB302E18C30A4799B6C691FDCFCB5EBF">
+						<Item class="ModuleScript" referent="RBXCC4BF062E66F42829DFA6DC690E4D038">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -4303,7 +4309,7 @@ return module]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="ModuleScript" referent="RBX139EDC2B4FDB43C68A78D49B731B336E">
+					<Item class="ModuleScript" referent="RBX895A0F46AEED4C3A8BA509D299A79315">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -4661,7 +4667,7 @@ return HitModule
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="BillboardGui" referent="RBX68FE904154E643AABB17BF55FEE0E1DC">
+						<Item class="BillboardGui" referent="RBX8E23E73F525D4DFAAF70727D5AAEF430">
 							<Properties>
 								<bool name="Active">true</bool>
 								<Ref name="Adornee">null</Ref>
@@ -4719,7 +4725,7 @@ return HitModule
 								<BinaryString name="Tags"></BinaryString>
 								<token name="ZIndexBehavior">1</token>
 							</Properties>
-							<Item class="Frame" referent="RBX265DD9CFC8C24D009793FBB9A7D7D00D">
+							<Item class="Frame" referent="RBXDFF4AA7234E9474889D027404336CB00">
 								<Properties>
 									<bool name="Active">false</bool>
 									<Vector2 name="AnchorPoint">
@@ -4779,7 +4785,7 @@ return HitModule
 									<bool name="Visible">true</bool>
 									<int name="ZIndex">1</int>
 								</Properties>
-								<Item class="TextLabel" referent="RBXFF3328C9AFB34BD7B5644508871A2D04">
+								<Item class="TextLabel" referent="RBX005C3780F734409FACAF834113DCED00">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -4872,7 +4878,7 @@ return HitModule
 						</Item>
 					</Item>
 				</Item>
-				<Item class="NumberValue" referent="RBX2F2A5A70840A471CA2346A55B7CF05F9">
+				<Item class="NumberValue" referent="RBX21DBD85B8EF146D0B0906A5A3BB3BF1B">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">SERVER_TIME</string>
@@ -4881,21 +4887,21 @@ return HitModule
 						<double name="Value">0</double>
 					</Properties>
 				</Item>
-				<Item class="Folder" referent="RBX6035DADB68C84801A51E410003DCCC31">
+				<Item class="Folder" referent="RBXF483126A826646EBAAE9576AB9E0B50C">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Themes</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="Folder" referent="RBX6176CD89098C47DBBC33DF47B859F00B">
+					<Item class="Folder" referent="RBXAC372177ED6842FC985462F2309CB05D">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Normal</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="Color3Value" referent="RBX593654DEF1A440ACAFED4E20B51BF773">
+						<Item class="Color3Value" referent="RBX5A25D73F853749C1ACA397E7AC735A94">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">HitColor</string>
@@ -4908,14 +4914,14 @@ return HitModule
 								</Color3>
 							</Properties>
 						</Item>
-						<Item class="Folder" referent="RBX1B8C0B3F76D945CE98050B53FF9118BB">
+						<Item class="Folder" referent="RBX6D4237577B0A4234883C6A24B60575AD">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">PaintballGun</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Part" referent="RBX5BC1A0F80FBE4F6A812DD90AE7C800A6">
+							<Item class="Part" referent="RBX062188839F974DEA81BDAB207E7E2D42">
 								<Properties>
 									<bool name="Anchored">false</bool>
 									<BinaryString name="AttributesSerialize"></BinaryString>
@@ -5009,7 +5015,7 @@ return HitModule
 										<Z>1</Z>
 									</Vector3>
 								</Properties>
-								<Item class="Trail" referent="RBXFD5F367EA70E4F69941ADA7EDA131954">
+								<Item class="Trail" referent="RBXD07229155FA247FEBACEEDDC359F6244">
 									<Properties>
 										<Ref name="Attachment0">null</Ref>
 										<Ref name="Attachment1">null</Ref>
@@ -5035,14 +5041,14 @@ return HitModule
 								</Item>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX05424612D5B84C2890541A1681DBAA83">
+						<Item class="Folder" referent="RBX0654A079FF6946D49EEDB860F4A7F536">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Rocket</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Part" referent="RBXB783779ACAE44CD4A15B2750504064D3">
+							<Item class="Part" referent="RBX13A299AB0C064147A77313E1927D4425">
 								<Properties>
 									<bool name="Anchored">false</bool>
 									<BinaryString name="AttributesSerialize"></BinaryString>
@@ -5136,7 +5142,7 @@ return HitModule
 										<Z>4</Z>
 									</Vector3>
 								</Properties>
-								<Item class="Trail" referent="RBXB98F06E0B8A44BA682FC9E771C4EEFD5">
+								<Item class="Trail" referent="RBXFA74FC910374411C94B93885C372B2DA">
 									<Properties>
 										<Ref name="Attachment0">null</Ref>
 										<Ref name="Attachment1">null</Ref>
@@ -5162,14 +5168,14 @@ return HitModule
 								</Item>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX02B48EFC8E734A598C78FB0B6EC098DA">
+						<Item class="Folder" referent="RBX48D09D675AE54AAEBBCDD82FB04DAAFC">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Slingshot</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Part" referent="RBX8B41DED368AF4B949184E387239157C9">
+							<Item class="Part" referent="RBX1FCB85A58624435C8CB0367F4BE419C1">
 								<Properties>
 									<bool name="Anchored">false</bool>
 									<BinaryString name="AttributesSerialize"></BinaryString>
@@ -5265,14 +5271,14 @@ return HitModule
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBXF3F595A9040347C08318B1B836BAC102">
+						<Item class="Folder" referent="RBX8DD282AAF6E1496590ABCC6771C14296">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Superball</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Part" referent="RBX3BE5AAC68D9C408C9992E690E8C0F611">
+							<Item class="Part" referent="RBX93940987672E4DCCB127D16E7AACAB8F">
 								<Properties>
 									<bool name="Anchored">false</bool>
 									<BinaryString name="AttributesSerialize"></BinaryString>
@@ -5366,7 +5372,7 @@ return HitModule
 										<Z>2</Z>
 									</Vector3>
 								</Properties>
-								<Item class="Trail" referent="RBX7239FD5489254F0D9EA69A955D5C267C">
+								<Item class="Trail" referent="RBX48A3CBBABC2A4A829030F588A764CE2A">
 									<Properties>
 										<Ref name="Attachment0">null</Ref>
 										<Ref name="Attachment1">null</Ref>
@@ -5392,14 +5398,14 @@ return HitModule
 								</Item>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX326F226B161A411FAF367B9664592F9B">
+						<Item class="Folder" referent="RBX50605241ADB640099585C99499839F7A">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Sword</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Part" referent="RBXBAE9CBBB08C84A609A8A785CA44D0E9A">
+							<Item class="Part" referent="RBX5E307334E3494F4380EDD8ACA77A3FFA">
 								<Properties>
 									<bool name="Anchored">false</bool>
 									<BinaryString name="AttributesSerialize"></BinaryString>
@@ -5493,7 +5499,7 @@ return HitModule
 										<Z>4</Z>
 									</Vector3>
 								</Properties>
-								<Item class="SpecialMesh" referent="RBX85DFEDEC1C604BDFBDEE08B55331B844">
+								<Item class="SpecialMesh" referent="RBX6553497D06274617842933EECE200F04">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<token name="LODX">2</token>
@@ -5523,14 +5529,14 @@ return HitModule
 								</Item>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBXA22F0AFBAF614575B63227387BB95C5E">
+						<Item class="Folder" referent="RBX311152AD32214CC6B0E9C132883DF798">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Trowel</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Part" referent="RBX1197F71858EC437AA60F5186E8B8E81D">
+							<Item class="Part" referent="RBXC76DFCCE527448B1848AD7BD0E16B397">
 								<Properties>
 									<bool name="Anchored">false</bool>
 									<BinaryString name="AttributesSerialize"></BinaryString>
@@ -5625,7 +5631,7 @@ return HitModule
 									</Vector3>
 								</Properties>
 							</Item>
-							<Item class="UIGradient" referent="RBX509C8BF43FD94F65AA769C8FE7F3559B">
+							<Item class="UIGradient" referent="RBX30F68253D3F74C0FB5B14948138C90A0">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<ColorSequence name="Color">0 0.498039 0.498039 0.498039 0 1 0.498039 0.498039 0.498039 0 </ColorSequence>
@@ -5642,14 +5648,14 @@ return HitModule
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX089F16FDF47F48D88B8357452C9F4FE1">
+						<Item class="Folder" referent="RBX65C6F7419A04459D99F44E91BD0F241B">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Bomb</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Part" referent="RBX7E695E9CC2BE42D7B190D5AE5052B7E5">
+							<Item class="Part" referent="RBXB0E3A84CE6F74760BDAC45CFEBDFF3F9">
 								<Properties>
 									<bool name="Anchored">false</bool>
 									<BinaryString name="AttributesSerialize"></BinaryString>
@@ -5744,7 +5750,7 @@ return HitModule
 									</Vector3>
 								</Properties>
 							</Item>
-							<Item class="Color3Value" referent="RBX105828C628794C319DB07B5709923717">
+							<Item class="Color3Value" referent="RBX439A42C297244749B0074EC9726DA493">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<string name="Name">TickColor</string>
@@ -5758,14 +5764,14 @@ return HitModule
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX0246626118814140B95317B2256C2608">
+						<Item class="Folder" referent="RBX660E430D4AB64CC4ABC96768090C328D">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">ExplosionParticles</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="ParticleEmitter" referent="RBX6E303424F6364FF8B96D9340037151A0">
+							<Item class="ParticleEmitter" referent="RBXE052CD2197F745388B25AF2385B2C9ED">
 								<Properties>
 									<Vector3 name="Acceleration">
 										<X>0</X>
@@ -5812,7 +5818,7 @@ return HitModule
 									<float name="ZOffset">0</float>
 								</Properties>
 							</Item>
-							<Item class="ParticleEmitter" referent="RBX3CF0608B0C9A4E2A82C5642CAAC4B83F">
+							<Item class="ParticleEmitter" referent="RBX9E169CF5D5BF40A89341FFEBB4ACBABF">
 								<Properties>
 									<Vector3 name="Acceleration">
 										<X>0</X>
@@ -5859,7 +5865,7 @@ return HitModule
 									<float name="ZOffset">0</float>
 								</Properties>
 							</Item>
-							<Item class="ParticleEmitter" referent="RBXCF13F6B46A6C4E0480F190EFCAF94DE8">
+							<Item class="ParticleEmitter" referent="RBXA72B2065AA4949FDB38AD8824649C560">
 								<Properties>
 									<Vector3 name="Acceleration">
 										<X>0</X>
@@ -5906,7 +5912,7 @@ return HitModule
 									<float name="ZOffset">0</float>
 								</Properties>
 							</Item>
-							<Item class="ParticleEmitter" referent="RBX28D8F2880C314FE89310087DDF3112E0">
+							<Item class="ParticleEmitter" referent="RBXC6508F83AD064284BED5045A8A607865">
 								<Properties>
 									<Vector3 name="Acceleration">
 										<X>0</X>
@@ -5954,14 +5960,14 @@ return HitModule
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX0EC04A40170640B5B90F90FB68A816DD">
+						<Item class="Folder" referent="RBX0697C900452C4F7691148F15C79DBF58">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Explosion</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="NumberValue" referent="RBX7E652037484845C893F0054B4A594CD1">
+							<Item class="NumberValue" referent="RBX5CDBDB8A04C345278965927748FC54B6">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<string name="Name">BaseTime</string>
@@ -5970,7 +5976,7 @@ return HitModule
 									<double name="Value">0.2999999999999999889</double>
 								</Properties>
 							</Item>
-							<Item class="NumberValue" referent="RBXA8E6E589D88145F1AEE21BB10853EC28">
+							<Item class="NumberValue" referent="RBX0D5E5EC8F84E46C8940F94BC3DEE266A">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<string name="Name">ThemeTime</string>
@@ -5979,7 +5985,7 @@ return HitModule
 									<double name="Value">0.5999999999999999778</double>
 								</Properties>
 							</Item>
-							<Item class="Part" referent="RBX992514AD340746E19F6D646A0829C1AF">
+							<Item class="Part" referent="RBX26DCB6C311364735874EDB756A7F1EB9">
 								<Properties>
 									<bool name="Anchored">false</bool>
 									<BinaryString name="AttributesSerialize"></BinaryString>
@@ -6074,7 +6080,7 @@ return HitModule
 									</Vector3>
 								</Properties>
 							</Item>
-							<Item class="Part" referent="RBXC83A529E420D4DDCA0B9CCC77E619099">
+							<Item class="Part" referent="RBX8FCE67A42F6A41F3B438EEAFAD0BE429">
 								<Properties>
 									<bool name="Anchored">false</bool>
 									<BinaryString name="AttributesSerialize"></BinaryString>
@@ -6173,14 +6179,14 @@ return HitModule
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Folder" referent="RBXA879DBF2C86247589AA809313FE54169">
+			<Item class="Folder" referent="RBX39138969F02045379DC2B4EC2FEAF21C">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">StarterPack</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="Tool" referent="RBX161B49F8933A447C83D21654128F66AC">
+				<Item class="Tool" referent="RBX2413381F2814420AA7E42E4F475A16FE">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<bool name="CanBeDropped">false</bool>
@@ -6207,7 +6213,7 @@ return HitModule
 						<Content name="TextureId"><url>rbxasset://Textures/Sword128.png</url></Content>
 						<string name="ToolTip">Sword</string>
 					</Properties>
-					<Item class="RemoteEvent" referent="RBXF4F50A1717BE4CE4A40EA67E3DF3490C">
+					<Item class="RemoteEvent" referent="RBXFEB4FA87310947CDB0A248760B11566D">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Grip</string>
@@ -6215,7 +6221,7 @@ return HitModule
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBX5042944B9D934108AC1C421A511FB1B7">
+					<Item class="ModuleScript" referent="RBX2A8D94DC827B4B9598A4D28870D78E24">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -6273,14 +6279,14 @@ return Sword
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Folder" referent="RBXE9DA5AD075DC4E3DA113F173AB610C2F">
+					<Item class="Folder" referent="RBX527869933E024DB985FD8E04FD90B4C9">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Client</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBX42517E79C1654322B26F860D38041720">
+						<Item class="ModuleScript" referent="RBXEBB3A5B882A94A6CB7DB92103FC31A2D">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -6512,14 +6518,14 @@ return Sword]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBX9D2039E050994BDF8DC32483C5B0A93D">
+					<Item class="Folder" referent="RBXD4C50AB50C944607AA79DAB16EE13EF2">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Server</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBX65CBC135727043EFB97FFB63B3D1BB8B">
+						<Item class="ModuleScript" referent="RBX13E7F4E5D76742DCB91EE75C1759472D">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -6713,7 +6719,7 @@ return Sword]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="BindableEvent" referent="RBXD631BE3C10F748779B9A996F96D3B141">
+					<Item class="BindableEvent" referent="RBX6D42D90AD64A4E6187EC3CC8DF263BB4">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Activation</string>
@@ -6721,7 +6727,7 @@ return Sword]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="RemoteEvent" referent="RBXC3D6449E3E59465398FEAE88A4DE647B">
+					<Item class="RemoteEvent" referent="RBX91A8BD64D7EA41639E5AD4B802AA7DC8">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Damage</string>
@@ -6729,7 +6735,7 @@ return Sword]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Part" referent="RBXFD342C19B92B4E5A8C082C426CA6036C">
+					<Item class="Part" referent="RBX003AD554C88040C6A49B920F95087156">
 						<Properties>
 							<bool name="Anchored">false</bool>
 							<BinaryString name="AttributesSerialize"></BinaryString>
@@ -6823,7 +6829,7 @@ return Sword]]></ProtectedString>
 								<Z>4</Z>
 							</Vector3>
 						</Properties>
-						<Item class="SpecialMesh" referent="RBX6A44B0C0075F41C791AF6F8471D1588F">
+						<Item class="SpecialMesh" referent="RBX4DDF7CA786094474B6B774C670A978CB">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<token name="LODX">2</token>
@@ -6851,7 +6857,7 @@ return Sword]]></ProtectedString>
 								</Vector3>
 							</Properties>
 						</Item>
-						<Item class="ObjectValue" referent="RBX95F43FCAB40347878DC715BA6AF17FE6">
+						<Item class="ObjectValue" referent="RBXED1948881DD1453584FFC9B77C7F02E2">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">creator</string>
@@ -6860,7 +6866,7 @@ return Sword]]></ProtectedString>
 								<Ref name="Value">null</Ref>
 							</Properties>
 						</Item>
-						<Item class="Sound" referent="RBX838278E9A995488C9B1F6C446D5ED2E7">
+						<Item class="Sound" referent="RBX1F44051926CF43449E80664E0160C383">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<float name="EmitterSize">10</float>
@@ -6882,7 +6888,7 @@ return Sword]]></ProtectedString>
 								<float name="xmlRead_MaxDistance_3">10000</float>
 							</Properties>
 						</Item>
-						<Item class="Attachment" referent="RBX0276CE6FF0C44604BEBEF69154BDF27F">
+						<Item class="Attachment" referent="RBX398A248D2AAA424E87A4C7DAF0428838">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<CoordinateFrame name="CFrame">
@@ -6905,7 +6911,7 @@ return Sword]]></ProtectedString>
 								<bool name="Visible">false</bool>
 							</Properties>
 						</Item>
-						<Item class="Attachment" referent="RBXB4C9DE8135084A75B06D2AC346A0BA97">
+						<Item class="Attachment" referent="RBXD11F941049954D0BB1335E02EF1DFDF4">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<CoordinateFrame name="CFrame">
@@ -6928,7 +6934,7 @@ return Sword]]></ProtectedString>
 								<bool name="Visible">false</bool>
 							</Properties>
 						</Item>
-						<Item class="Attachment" referent="RBX311DC81F4F4945129C3ED8B4FD3D3EE1">
+						<Item class="Attachment" referent="RBXD18A3A28C7CC48C5A6751BA200A9C1C9">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<CoordinateFrame name="CFrame">
@@ -6951,7 +6957,7 @@ return Sword]]></ProtectedString>
 								<bool name="Visible">false</bool>
 							</Properties>
 						</Item>
-						<Item class="Sound" referent="RBX44805E2934B84C489A8B6A6A2E0B06E5">
+						<Item class="Sound" referent="RBX071FCBAD0E1B441E91145BEC53842528">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<float name="EmitterSize">10</float>
@@ -6972,7 +6978,7 @@ return Sword]]></ProtectedString>
 								<float name="Volume">0.600000024</float>
 								<float name="xmlRead_MaxDistance_3">10000</float>
 							</Properties>
-							<Item class="EqualizerSoundEffect" referent="RBXCC362DEB233C478CB1DA751F5F631F1D">
+							<Item class="EqualizerSoundEffect" referent="RBXE02E63F75B6146C488630A4D66ABC29F">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<bool name="Enabled">true</bool>
@@ -6986,7 +6992,7 @@ return Sword]]></ProtectedString>
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Sound" referent="RBXD5840C5124534920B4A349AE9640EA7A">
+						<Item class="Sound" referent="RBX92AA83CB5C844FF398FC78EC8F1465F8">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<float name="EmitterSize">10</float>
@@ -7007,7 +7013,7 @@ return Sword]]></ProtectedString>
 								<float name="Volume">0.5</float>
 								<float name="xmlRead_MaxDistance_3">10000</float>
 							</Properties>
-							<Item class="EqualizerSoundEffect" referent="RBX135767CCF19F41748FA4E15A87EF1C36">
+							<Item class="EqualizerSoundEffect" referent="RBX2F19F1B809384992AB931D9489CF82A4">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<bool name="Enabled">true</bool>
@@ -7023,7 +7029,7 @@ return Sword]]></ProtectedString>
 						</Item>
 					</Item>
 				</Item>
-				<Item class="Tool" referent="RBX60AE1297D70E421D908C330EA093535A">
+				<Item class="Tool" referent="RBXA69D08DABF42413F933A071D67EA3DA3">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<bool name="CanBeDropped">false</bool>
@@ -7050,7 +7056,7 @@ return Sword]]></ProtectedString>
 						<Content name="TextureId"><url>rbxasset://Textures/Slingshot.png</url></Content>
 						<string name="ToolTip">Sling</string>
 					</Properties>
-					<Item class="Part" referent="RBX471FEED586284AADA90DB7AB6878BC10">
+					<Item class="Part" referent="RBX1687517FB3B444DCADC847CD4C1F1BA6">
 						<Properties>
 							<bool name="Anchored">false</bool>
 							<BinaryString name="AttributesSerialize"></BinaryString>
@@ -7144,7 +7150,7 @@ return Sword]]></ProtectedString>
 								<Z>1</Z>
 							</Vector3>
 						</Properties>
-						<Item class="SpecialMesh" referent="RBX9405BDF0AC0F4C1B8F66A096855D4D7A">
+						<Item class="SpecialMesh" referent="RBXBF9D7F35DC294CEA8B680F84F6ED71CD">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<token name="LODX">2</token>
@@ -7172,14 +7178,14 @@ return Sword]]></ProtectedString>
 								</Vector3>
 							</Properties>
 						</Item>
-						<Item class="Folder" referent="RBX37D5EBE49BEE44E1A07F010636A73B74">
+						<Item class="Folder" referent="RBX41C73F3F19D549C19FE40DFDD7F1137D">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">SlingshotSounds</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Sound" referent="RBX754AB2396BB94665993DE92B98C922A1">
+							<Item class="Sound" referent="RBX816B353C88F04FD890165D91399F34BF">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -7201,7 +7207,7 @@ return Sword]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBX1B842CB6A3B94B9298F4A9D0843E2819">
+							<Item class="Sound" referent="RBXC4A19CE14F7F45A18A9460DE9A72C768">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -7225,7 +7231,7 @@ return Sword]]></ProtectedString>
 							</Item>
 						</Item>
 					</Item>
-					<Item class="RemoteEvent" referent="RBX17DAB16843C04AEAB34804040354624B">
+					<Item class="RemoteEvent" referent="RBXCB89EB8E01E9488B860E13FEDCFF4234">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Update</string>
@@ -7233,14 +7239,14 @@ return Sword]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Folder" referent="RBX61C0FC0347E54CF78BA9A74284348DF9">
+					<Item class="Folder" referent="RBXEC8EEB2C7EBD4B01983DA44A3B0399D9">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Client</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXB64F34B673AE4759A00311C5D675FF9E">
+						<Item class="ModuleScript" referent="RBX3F4946F4AD884B55BDC069C15934A8F8">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -7523,14 +7529,14 @@ return Slingshot]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBX6595EFC9A5124044960A7B0CBC6F37B2">
+					<Item class="Folder" referent="RBXB7D67D436ECD4340B3247DC364D25163">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Server</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXC80AE83AE44A42E48C51A12F089F3702">
+						<Item class="ModuleScript" referent="RBX8532AFBB2CBE4F29B7E6E0F66B770992">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -7562,6 +7568,11 @@ function Slingshot:CreatePhysicsFolder(count)
 	Active.Name = "Active"
 	Active.Value = true
 	Active.Parent = PhysicsFolder
+	
+	local character = Instance.new("ObjectValue")
+	character.Name = "Character"
+	character.Value = self.Character
+	character.Parent = PhysicsFolder
 	
 	local ProjectileType = Instance.new("StringValue")
 	ProjectileType.Name = "ProjectileType"
@@ -7619,6 +7630,7 @@ function Slingshot:Init(Settings, Modules, Buffers, Player, Character, Folder)
 	self.Aesthetics = require(Modules:WaitForChild("Aesthetics"))
 	self.Settings = Settings
 	self.Player = Player
+	self.Character = Character
 	
 	local ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
 	
@@ -7664,7 +7676,7 @@ return Slingshot]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="BindableEvent" referent="RBXB4E42BD78D414C89BA1EE3DDB2E0F501">
+					<Item class="BindableEvent" referent="RBX540FB10183DA4B02B8AEB9F44321EA85">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Activation</string>
@@ -7673,7 +7685,7 @@ return Slingshot]]></ProtectedString>
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Tool" referent="RBX65839DEBE8144B8689F7DB4FFFB8D4A6">
+				<Item class="Tool" referent="RBX0D77CE857C824BAB97E958CF5B999D55">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<bool name="CanBeDropped">false</bool>
@@ -7700,7 +7712,7 @@ return Slingshot]]></ProtectedString>
 						<Content name="TextureId"><url>rbxasset://Textures/Rocket.png</url></Content>
 						<string name="ToolTip">Rocket</string>
 					</Properties>
-					<Item class="MeshPart" referent="RBX9DEF2ECA241C429CBB36796E67C64102">
+					<Item class="MeshPart" referent="RBXCABD96926CB04454BDBDDB4A3D57978F">
 						<Properties>
 							<bool name="Anchored">false</bool>
 							<BinaryString name="AttributesSerialize"></BinaryString>
@@ -7812,7 +7824,7 @@ return Slingshot]]></ProtectedString>
 								<Z>0.820400238</Z>
 							</Vector3>
 						</Properties>
-						<Item class="Sound" referent="RBX53C75E69BC74447AAD614E707219F5DF">
+						<Item class="Sound" referent="RBX74820574BF9841E5B047FF8B79F2EAD1">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<float name="EmitterSize">10</float>
@@ -7834,14 +7846,14 @@ return Slingshot]]></ProtectedString>
 								<float name="xmlRead_MaxDistance_3">300</float>
 							</Properties>
 						</Item>
-						<Item class="Folder" referent="RBX4D1A9DD9E22F414C99031604A12E87FE">
+						<Item class="Folder" referent="RBX679B149783AA46E7A4E860199D122F74">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Boom</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Sound" referent="RBX8FAB1988CA0444178117C54D752C350A">
+							<Item class="Sound" referent="RBX59E5190DEDC74BFEBE67F8C38B3595FF">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -7863,7 +7875,7 @@ return Slingshot]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBXC91496F817D4420390AEF33801CD3205">
+							<Item class="Sound" referent="RBXD4104EE62E864BD6A19C2DA7E24B87C6">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -7887,7 +7899,7 @@ return Slingshot]]></ProtectedString>
 							</Item>
 						</Item>
 					</Item>
-					<Item class="RemoteEvent" referent="RBX374FF16EE83E4ACA9B89FF2C575E7EE0">
+					<Item class="RemoteEvent" referent="RBX604942C5A9B242818140FC7C06AE8823">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Update</string>
@@ -7895,14 +7907,14 @@ return Slingshot]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Folder" referent="RBXD40AE7B0EED247C8BB66B703E043D21E">
+					<Item class="Folder" referent="RBX922F50A57E6A4068A55FEF07AE58B3DC">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Client</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBX8A365AAD2AC74F7C84B243B4D2D9F753">
+						<Item class="ModuleScript" referent="RBX1DDDE973EAB64A4B9B04791335545FB8">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -8080,14 +8092,14 @@ return Rocket]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBX4FE70C8B8FA546A29614049CD1E36DA7">
+					<Item class="Folder" referent="RBX000C80C9997740BBBAA89AEB7E978F74">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Server</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBX120A6211A5674A2793995EC4DE20CB75">
+						<Item class="ModuleScript" referent="RBX48F337665F444582ADA9BD73D27AD1BE">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -8121,6 +8133,11 @@ function Rocket:CreatePhysicsFolder(count)
 	newTag.Name = "creator"
 	newTag.Value = self.Player
 	newTag.Parent = PhysicsFolder
+	
+	local character = Instance.new("ObjectValue")
+	character.Name = "Character"
+	character.Value = self.Character
+	character.Parent = PhysicsFolder
 	
 	local Active = Instance.new("BoolValue");
 	Active.Name = "Active"
@@ -8217,7 +8234,7 @@ return Rocket]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="BindableEvent" referent="RBXD2EFAF0A71184B599BB0FA3583254438">
+					<Item class="BindableEvent" referent="RBX7F126A916C514E3BA98C07C5A7648EA8">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Activation</string>
@@ -8226,7 +8243,7 @@ return Rocket]]></ProtectedString>
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Tool" referent="RBXA79DA27BF94E413BB2EB59C275A9D133">
+				<Item class="Tool" referent="RBXDAA3635E2E124389BCBB38B6BCA47DE1">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<bool name="CanBeDropped">false</bool>
@@ -8253,7 +8270,7 @@ return Rocket]]></ProtectedString>
 						<Content name="TextureId"><url>rbxasset://Textures/Wall.png</url></Content>
 						<string name="ToolTip">Wall</string>
 					</Properties>
-					<Item class="RemoteEvent" referent="RBXD6BE725E158F448992FA55A6663F051C">
+					<Item class="RemoteEvent" referent="RBX062715D8B20B4062B61F13CCBB27B937">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Update</string>
@@ -8261,7 +8278,7 @@ return Rocket]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Part" referent="RBXB0E83A1524E44AB7BA46C95519D216E4">
+					<Item class="Part" referent="RBX256919B126904B87AB7997505A3F9AC9">
 						<Properties>
 							<bool name="Anchored">false</bool>
 							<BinaryString name="AttributesSerialize"></BinaryString>
@@ -8355,7 +8372,7 @@ return Rocket]]></ProtectedString>
 								<Z>1</Z>
 							</Vector3>
 						</Properties>
-						<Item class="Sound" referent="RBX82B78FD2CE83402DAA4F06E4B036A315">
+						<Item class="Sound" referent="RBXDF5F374087B14634803F6E885A4CE7A1">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<float name="EmitterSize">10</float>
@@ -8377,7 +8394,7 @@ return Rocket]]></ProtectedString>
 								<float name="xmlRead_MaxDistance_3">10000</float>
 							</Properties>
 						</Item>
-						<Item class="SpecialMesh" referent="RBXC6863E77E2854E48A79D31EA06A882B4">
+						<Item class="SpecialMesh" referent="RBX997F082AD6DE4EF28243A408E09FEF49">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<token name="LODX">2</token>
@@ -8406,14 +8423,14 @@ return Rocket]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBX650FEB56C0254DFB89C78C5F0064E3C8">
+					<Item class="Folder" referent="RBX9E7CD61E39DF40718B61A1013C93BE59">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Client</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBX775934E10C5748C9AAF3A63640783558">
+						<Item class="ModuleScript" referent="RBXF5FB9ABA22564FD88DC4E87B5D11794F">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -8518,14 +8535,14 @@ return Trowel]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBXF4E08910592243E5A1C9DFFC0FC90079">
+					<Item class="Folder" referent="RBX983DF7B713BB4E94B95BC0AE4F920B65">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Server</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXB9870CD256314864B08DD4E6521248D9">
+						<Item class="ModuleScript" referent="RBX5B384BF392034CD59D2FE189AADC360E">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -8720,7 +8737,7 @@ return Trowel]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="BindableEvent" referent="RBXCFC3FB22AF114FDF99DCC82F1F755971">
+					<Item class="BindableEvent" referent="RBXC4DFFF158F764EE195003306277A0C60">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Activation</string>
@@ -8728,7 +8745,7 @@ return Trowel]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBX488E277F6B084B5B9EADD3B5B05F1F6D">
+					<Item class="ModuleScript" referent="RBXDEBF0358737B45CB90EAA2D3888B9A4E">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -8834,7 +8851,7 @@ return Trowel]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBXCB58578D34004BE28846D49ECB2729F3">
+					<Item class="ModuleScript" referent="RBX0431098DF46641998CB594149246F9D3">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -8873,7 +8890,7 @@ end]]></ProtectedString>
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Tool" referent="RBXE7527DF06AF44440A6E6EB1AFD6E5616">
+				<Item class="Tool" referent="RBXBE1BE9FBEE8A4874BC94EF505B702327">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<bool name="CanBeDropped">false</bool>
@@ -8900,7 +8917,7 @@ end]]></ProtectedString>
 						<Content name="TextureId"><url>rbxasset://Textures/Bomb.png</url></Content>
 						<string name="ToolTip">Bomb</string>
 					</Properties>
-					<Item class="RemoteEvent" referent="RBXC63C7162F4164796BCC15303EF7FA8C2">
+					<Item class="RemoteEvent" referent="RBX8DFC632CF5224F35A4B1211DB89B5C71">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Update</string>
@@ -8908,14 +8925,14 @@ end]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Folder" referent="RBX351FA2212B5A496AA08E5BEED450FA50">
+					<Item class="Folder" referent="RBX500C9E814CDF47B4B94476C7A87D2EAC">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Client</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBX1A21917D965D46A3B111CBC111257E37">
+						<Item class="ModuleScript" referent="RBX1A3311A6CE7E4C19B306DFB1C699477D">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -9245,14 +9262,14 @@ return Bomb]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBXDFED440906EE4EC693897CC36D2C98A4">
+					<Item class="Folder" referent="RBX2AFD25F68DF040F7979CCB12EB040C38">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Server</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXA652248782524909BBEE75277C4D57E3">
+						<Item class="ModuleScript" referent="RBX71D6BACF40E842338479BEEEA14009B3">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -9283,6 +9300,11 @@ function Bomb:CreatePhysicsFolder(count)
 	new_tag.Name = ("creator")
 	new_tag.Value = self.Player
 	new_tag.Parent = PhysicsFolder
+	
+	local character = Instance.new("ObjectValue")
+	character.Name = "Character"
+	character.Value = self.Character
+	character.Parent = PhysicsFolder
 	
 	
 	local projType = Instance.new("StringValue")
@@ -9360,6 +9382,7 @@ function Bomb:Init(Settings,Modules,Buffers,Player,Character,Folder)
 	local ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
 	
 	self.Player = Player
+	self.Character = Character
 	
 	-- First activation must always work even if time() returns 0.
 	local lastActivation = -5;	
@@ -9411,7 +9434,7 @@ return Bomb]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="BindableEvent" referent="RBXC325078375B247169601F56BE2B1FF84">
+					<Item class="BindableEvent" referent="RBX5F42998420C5419EAF59F8FE14EB6565">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Activation</string>
@@ -9419,7 +9442,7 @@ return Bomb]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Part" referent="RBX430AED33E53F4CC9862EC475F42DD744">
+					<Item class="Part" referent="RBXF8A76CA6EFD2469D88EFCCCA688A7A8F">
 						<Properties>
 							<bool name="Anchored">false</bool>
 							<BinaryString name="AttributesSerialize"></BinaryString>
@@ -9518,7 +9541,7 @@ return Bomb]]></ProtectedString>
 								<Z>2</Z>
 							</Vector3>
 						</Properties>
-						<Item class="SpecialMesh" referent="RBXCF21DB5A275D42778AEA02ABA56B4491">
+						<Item class="SpecialMesh" referent="RBX2D0C99D7057141E8909EF0BD9219A11E">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<token name="LODX">2</token>
@@ -9546,7 +9569,7 @@ return Bomb]]></ProtectedString>
 								</Vector3>
 							</Properties>
 						</Item>
-						<Item class="Sound" referent="RBX5D48A4AE303943C28DB50E51DAC698EE">
+						<Item class="Sound" referent="RBX8A5D039DD8CD432AA19C7844A5E17077">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<float name="EmitterSize">10</float>
@@ -9568,14 +9591,14 @@ return Bomb]]></ProtectedString>
 								<float name="xmlRead_MaxDistance_3">10000</float>
 							</Properties>
 						</Item>
-						<Item class="Folder" referent="RBXAB686530A69B4FB7A341B0500820EB0B">
+						<Item class="Folder" referent="RBX91CA9D11FBFC489C869356B88E39EE73">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Boom</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Sound" referent="RBXB1B3FFD49808484E905C3584E9C27CA2">
+							<Item class="Sound" referent="RBXF49531318AC949A782568B59FCCD25EC">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -9597,7 +9620,7 @@ return Bomb]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBX980B3252F4BB49CFAE2F98FDB3A1AE99">
+							<Item class="Sound" referent="RBX3D64B6552CE140BE917891C9FDE10BB7">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -9622,7 +9645,7 @@ return Bomb]]></ProtectedString>
 						</Item>
 					</Item>
 				</Item>
-				<Item class="Tool" referent="RBXEC7208EF9F1246F5919F6662012FFFBC">
+				<Item class="Tool" referent="RBX79D132EF3B7B4AD3B79C9B4D521BBD8F">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<bool name="CanBeDropped">false</bool>
@@ -9649,7 +9672,7 @@ return Bomb]]></ProtectedString>
 						<Content name="TextureId"><url>rbxasset://Textures/Superball.png</url></Content>
 						<string name="ToolTip">Super Ball</string>
 					</Properties>
-					<Item class="RemoteEvent" referent="RBX18B2D37CF0D04792B42A030D8ED9EFFA">
+					<Item class="RemoteEvent" referent="RBX55F47C2EB60142EB8B415B58E2F0418D">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Update</string>
@@ -9657,14 +9680,14 @@ return Bomb]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Folder" referent="RBX519C4250E0F74483803D6C4B0522E1D1">
+					<Item class="Folder" referent="RBXF20D0EB395B9408D8F8EDEF12B27C308">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Client</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBX347A339F993C4B699A12D82A0E9AFD8B">
+						<Item class="ModuleScript" referent="RBXAEF55689017B47A4BD5ACA99065C16DD">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -9779,14 +9802,14 @@ return Superball]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBXF2A30DC3AA59410C98E18BE2CE7A85F0">
+					<Item class="Folder" referent="RBXDC0752EF7C804C9A9DAB104101C72833">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Server</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXBB650A722C0644478CEBFAB651429491">
+						<Item class="ModuleScript" referent="RBXB1D56EF74DB24851BEB8A1C525B3A890">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -9836,6 +9859,11 @@ function Superball:CreatePhysicsFolder(color, count)
 	local lastUpdateCFrame = Instance.new("Vector3Value")
 	lastUpdateCFrame.Name = "LastSentPosition"
 	lastUpdateCFrame.Parent = PhysicsFolder
+	
+	local character = Instance.new("ObjectValue")
+	character.Name = "Character"
+	character.Value = self.Character
+	character.Parent = PhysicsFolder
 	
 	local lastSentTime = Instance.new("NumberValue")
 	lastSentTime.Name = "LastSentTime"
@@ -9897,6 +9925,7 @@ function Superball:Init(Settings, Modules, Buffers, Player, Character, Folder)
 
 	self.ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
 	self.Player = Player
+	self.Character = Character
 	
 	self.handle = tool:WaitForChild("Handle")
 	self.Boing = self.handle:WaitForChild("Boing")
@@ -9953,7 +9982,7 @@ return Superball]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="BindableEvent" referent="RBX841F69044F4947B6B43B915338B46EF8">
+					<Item class="BindableEvent" referent="RBXF019BB9831BD45FAA4EEADCEF8369D0E">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Activation</string>
@@ -9961,7 +9990,7 @@ return Superball]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Part" referent="RBX6A4F453CA9BF4DF28646DFE22297A424">
+					<Item class="Part" referent="RBX276B466E85EE4C7E95EACCFC7446DE65">
 						<Properties>
 							<bool name="Anchored">false</bool>
 							<BinaryString name="AttributesSerialize"></BinaryString>
@@ -10055,7 +10084,7 @@ return Superball]]></ProtectedString>
 								<Z>2</Z>
 							</Vector3>
 						</Properties>
-						<Item class="Sound" referent="RBXA1B4028CD6374055A27DBE53A661B07D">
+						<Item class="Sound" referent="RBX11E55389A53D4E4D93F810DCFC34419A">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<float name="EmitterSize">10</float>
@@ -10078,7 +10107,7 @@ return Superball]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="RemoteEvent" referent="RBXA01C920D8622471B9788B9660E072B1D">
+					<Item class="RemoteEvent" referent="RBXC1EF6D2A7D9B4D3BBAF238E305EC3027">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Color</string>
@@ -10087,7 +10116,7 @@ return Superball]]></ProtectedString>
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="Tool" referent="RBXE241A5BB46F149948A4829439BA7A60C">
+				<Item class="Tool" referent="RBX2F24835EFB2248B3B0F0D54907206E66">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<bool name="CanBeDropped">false</bool>
@@ -10114,7 +10143,7 @@ return Superball]]></ProtectedString>
 						<Content name="TextureId"><url>rbxasset://Textures/PaintballIcon.png</url></Content>
 						<string name="ToolTip"></string>
 					</Properties>
-					<Item class="Part" referent="RBXB8B0EABEF1C5413298509A8E261CABE4">
+					<Item class="Part" referent="RBX90979C64506B4F56B8A7529B325DC5BD">
 						<Properties>
 							<bool name="Anchored">false</bool>
 							<BinaryString name="AttributesSerialize"></BinaryString>
@@ -10213,7 +10242,7 @@ return Superball]]></ProtectedString>
 								<Z>1</Z>
 							</Vector3>
 						</Properties>
-						<Item class="SpecialMesh" referent="RBX5041719410FF4414A84279BC1EDC3A95">
+						<Item class="SpecialMesh" referent="RBX5CABFE03DF5449648AF25F3A3D8FA321">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<token name="LODX">2</token>
@@ -10241,7 +10270,7 @@ return Superball]]></ProtectedString>
 								</Vector3>
 							</Properties>
 						</Item>
-						<Item class="Sound" referent="RBXBEF70CF6CF7D4AB5934752CBF58AB44B">
+						<Item class="Sound" referent="RBX9049FD66C198444C965CA35EB1B5CDFF">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<float name="EmitterSize">10</float>
@@ -10264,14 +10293,14 @@ return Superball]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBX9613F9067981402589FE6EA546C7C426">
+					<Item class="Folder" referent="RBX843FCE35E6E34A13A928D6A165F999B4">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Client</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXB60F709FA30647FA8B775A6572246FE1">
+						<Item class="ModuleScript" referent="RBX78C81C71B40D43738E05C0C4423CA66F">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -10353,14 +10382,14 @@ return Paintball]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="Folder" referent="RBX6DAC582E89D34E44800E682BE4E3FFAB">
+					<Item class="Folder" referent="RBX806D7EE2C912420C9B486AD2885DF7BE">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Server</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXA3E148E1D1AB485CB124262883CAEA2D">
+						<Item class="ModuleScript" referent="RBX0224E06C34B647DA8F0766FB44424615">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -10391,6 +10420,11 @@ function Paintball:CreatePhysicsFolder(color, count)
 	CT.Name = "RandomColor"
 	CT.Value = color
 	CT.Parent = PhysicsFolder	
+	
+	local character = Instance.new("ObjectValue")
+	character.Name = "Character"
+	character.Value = self.Character
+	character.Parent = PhysicsFolder
 	
 	-- Add the creator tag
 	local new_tag = Instance.new("ObjectValue")
@@ -10462,6 +10496,7 @@ function Paintball:Init(Settings, Modules, Buffers ,Player, Character, Folder)
 	self.ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
 	
 	self.Player = Player
+	self.Character = Character
 	
 	self.Settings = Settings
 	
@@ -10511,7 +10546,7 @@ return Paintball]]></ProtectedString>
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="BindableEvent" referent="RBX031AB3AA27CA4B1F89F2E989B6F94CE5">
+					<Item class="BindableEvent" referent="RBX993C392D8A5342E1A4973B3CC9F91D17">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Activation</string>
@@ -10519,7 +10554,7 @@ return Paintball]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="RemoteEvent" referent="RBX01629DED09184E25BD6DD54CF8090830">
+					<Item class="RemoteEvent" referent="RBXFB2150AB38E745E494DF24790C0E2DBA">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Update</string>
@@ -10527,7 +10562,7 @@ return Paintball]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBXFD632F76CA034D07A700FC8840E36AFF">
+					<Item class="ModuleScript" referent="RBXE4A70D768BA049DFA6E0489EF13BB10A">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -10564,35 +10599,35 @@ end]]></ProtectedString>
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Folder" referent="RBXB1298E0DFC1942EC8A01D801B0B51BFF">
+			<Item class="Folder" referent="RBX371B2F7EBCDD46BEA6FAC74423CF6520">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">StarterPlayerScripts</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="Folder" referent="RBX729BBBB4D9D54A5B87F2218F4ED53C66">
+				<Item class="Folder" referent="RBX4DC23E9F0D8C48D3B6C8F412E99107FF">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">ToolObjects</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="Folder" referent="RBX0B7D21AB39A847F984F4C45C71D1B327">
+					<Item class="Folder" referent="RBXE501840DD31E4E3EA0D797AB8CF78C88">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Sounds</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="Folder" referent="RBX1524A24595A949D5A24CE81D3A7F120D">
+						<Item class="Folder" referent="RBXF78DAFA0800B473E87884DD1321C60B1">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Hit</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Sound" referent="RBXC626AEF304274966B9C18A3856CA4FE4">
+							<Item class="Sound" referent="RBXCBBFFE3BC6124866B09F6489BE2E4B77">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10614,7 +10649,7 @@ end]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBX4C6230C12DDC4AE1A1F5F029962C80D3">
+							<Item class="Sound" referent="RBXCE4DD5BC9FD549019B14EC9BC989E255">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10635,7 +10670,7 @@ end]]></ProtectedString>
 									<float name="Volume">1.29999995</float>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
-								<Item class="EqualizerSoundEffect" referent="RBX3F667EF512404C0280E6A1D3A63153B1">
+								<Item class="EqualizerSoundEffect" referent="RBXEF916C54D2ED421AB58D656F4B64AEAB">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<bool name="Enabled">true</bool>
@@ -10649,7 +10684,7 @@ end]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="Sound" referent="RBXD39C7DEF42074AE9B5812547A24687F0">
+							<Item class="Sound" referent="RBX6DEC54474822476BAE0D2D83CC825707">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10671,7 +10706,7 @@ end]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBX44156DE604DF4974A93945E39F9E6339">
+							<Item class="Sound" referent="RBX648179F3DEC344C893942BF87871EDA3">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10693,7 +10728,7 @@ end]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBX17649D2DDD484394A952304D3E9296A3">
+							<Item class="Sound" referent="RBXEED876B93ED6452D9AA8A60044508BD0">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10715,7 +10750,7 @@ end]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBX908DF5CD57B44F9097210BF547C9B325">
+							<Item class="Sound" referent="RBXCCAD05E2BD8B418FB18E8D0B5A224487">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10738,14 +10773,14 @@ end]]></ProtectedString>
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBXF938640338FF4A0586DCE884EDD71497">
+						<Item class="Folder" referent="RBXB3C576F1AE6245578F1B2EB675955541">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Kill</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Sound" referent="RBX8F4FF3E7783F47358E23F74378BF1D61">
+							<Item class="Sound" referent="RBX7E663A5A7CB44D1F92E0B648D3BF5146">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10767,7 +10802,7 @@ end]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBX0F1AD396FDE94797B9B1DE73EDED7E58">
+							<Item class="Sound" referent="RBX60D9C779701942EC8A07AD83F292BC35">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10789,7 +10824,7 @@ end]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBX1CDB57DCA3D04EED92B6801B45A0569E">
+							<Item class="Sound" referent="RBXED6D8218D8CA4D01B0DA13720330A10F">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10811,7 +10846,7 @@ end]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBX457576F5542E48D08A22B394F007DBFA">
+							<Item class="Sound" referent="RBXE4156DCBDCF54825ADC8A5560DB19DA3">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10832,7 +10867,7 @@ end]]></ProtectedString>
 									<float name="Volume">1.29999995</float>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
-								<Item class="EqualizerSoundEffect" referent="RBXC9C56EADB04A45079728DCC08A396C4A">
+								<Item class="EqualizerSoundEffect" referent="RBXFE63279990E8495992264CF012D6AFA0">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<bool name="Enabled">true</bool>
@@ -10846,7 +10881,7 @@ end]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="Sound" referent="RBX8A086E1263EE4408803711578C57C363">
+							<Item class="Sound" referent="RBX9490A4CBBE4941CA9E0CB3D8A4F495F6">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10869,14 +10904,14 @@ end]]></ProtectedString>
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX4CE9515254244400BFA99E028C05B158">
+						<Item class="Folder" referent="RBXC7447761C43840F7ABF9F1EFD2C035CE">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">Blocked</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Sound" referent="RBX3AD8D278A28042FAB16EF645FC1DA208">
+							<Item class="Sound" referent="RBXB06BCCFD0C8E4AC893A6C4533977553F">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10897,7 +10932,7 @@ end]]></ProtectedString>
 									<float name="Volume">1.29999995</float>
 									<float name="xmlRead_MaxDistance_3">10000</float>
 								</Properties>
-								<Item class="EqualizerSoundEffect" referent="RBX8AE812F228684D1B8DEEE2C221DB3730">
+								<Item class="EqualizerSoundEffect" referent="RBXFFDF5CD768E44A60BEE55301F68675BA">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<bool name="Enabled">true</bool>
@@ -10910,7 +10945,7 @@ end]]></ProtectedString>
 										<BinaryString name="Tags"></BinaryString>
 									</Properties>
 								</Item>
-								<Item class="PitchShiftSoundEffect" referent="RBX90453FCD5ED14412AC98AD3B2D9F36C5">
+								<Item class="PitchShiftSoundEffect" referent="RBX806DD09ABDE7473FABA7D3C3D2D9120B">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<bool name="Enabled">true</bool>
@@ -10921,7 +10956,7 @@ end]]></ProtectedString>
 										<BinaryString name="Tags"></BinaryString>
 									</Properties>
 								</Item>
-								<Item class="PitchShiftSoundEffect" referent="RBX92A40334017B49ADB6FB6EC0B1DE4DD0">
+								<Item class="PitchShiftSoundEffect" referent="RBX57FD23A7526742618B08D1B6874760B3">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<bool name="Enabled">true</bool>
@@ -10932,7 +10967,7 @@ end]]></ProtectedString>
 										<BinaryString name="Tags"></BinaryString>
 									</Properties>
 								</Item>
-								<Item class="PitchShiftSoundEffect" referent="RBX5FE953636ED94FCF94133ACC870368B4">
+								<Item class="PitchShiftSoundEffect" referent="RBX44F7CABAEEF54637BEC7C2930C85FCB1">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<bool name="Enabled">true</bool>
@@ -10944,7 +10979,7 @@ end]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="Sound" referent="RBX56E8CC013654470AA866C92AD2AF8FA0">
+							<Item class="Sound" referent="RBX5C96003DCAAD471388A235D175451D16">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10967,14 +11002,14 @@ end]]></ProtectedString>
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX025FD6EC1B094098B9C19A6649ABE16D">
+						<Item class="Folder" referent="RBXEC802496672249E3AB399727D050B6C8">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">SuperballSounds</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Sound" referent="RBX4DC9F2B4B6FB4BE0AD3F5111FB928D18">
+							<Item class="Sound" referent="RBX6ECC7461A8AA435AA0F24D58512AA848">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -10997,14 +11032,14 @@ end]]></ProtectedString>
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX3152B480679B413DBDBCF394AE06FF0E">
+						<Item class="Folder" referent="RBX5D622861B8174ABDB9AB7E201D43222F">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">SlingshotSounds</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Sound" referent="RBXBBCEAF66A7A24095BBB8B02C526A8DDC">
+							<Item class="Sound" referent="RBX81F82B1B2F1E4D23BD9A51DDD9A68847">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -11026,7 +11061,7 @@ end]]></ProtectedString>
 									<float name="xmlRead_MaxDistance_3">500</float>
 								</Properties>
 							</Item>
-							<Item class="Sound" referent="RBXC8D0617AAC2540D7BEF9AEEA73DBBF0E">
+							<Item class="Sound" referent="RBXE5EF157ED2234B509D7DC3A74C4B3654">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -11049,21 +11084,21 @@ end]]></ProtectedString>
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBXA70D1265D8DA4F359AE7039075EA4127">
+						<Item class="Folder" referent="RBXFE30FC3C6AE8492EAADB2704A419B250">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">RocketSounds</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Folder" referent="RBX8BD0BA2BF2254879B92AAD41BBCEF101">
+							<Item class="Folder" referent="RBXAD79F5BA34A94894A4AB5E80E0D2287B">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<string name="Name">Boom</string>
 									<int64 name="SourceAssetId">-1</int64>
 									<BinaryString name="Tags"></BinaryString>
 								</Properties>
-								<Item class="Sound" referent="RBXE7A2E406FC904A38B12A3DD824DC51BD">
+								<Item class="Sound" referent="RBXDCD6F1EC19C64660B2E793E2C48B21EE">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<float name="EmitterSize">10</float>
@@ -11085,7 +11120,7 @@ end]]></ProtectedString>
 										<float name="xmlRead_MaxDistance_3">300</float>
 									</Properties>
 								</Item>
-								<Item class="Sound" referent="RBX1655273729D742D69E057C7129092166">
+								<Item class="Sound" referent="RBX18BAA34C66F54584AA7221A034A40DCF">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<float name="EmitterSize">10</float>
@@ -11108,7 +11143,7 @@ end]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="Sound" referent="RBXF024160087DC4DB98E81E4E6023AB599">
+							<Item class="Sound" referent="RBX23D59930E13A4715941D1A6FC3FC3E86">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -11131,21 +11166,21 @@ end]]></ProtectedString>
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Folder" referent="RBX83C2E1487412465597FF28191B65E7B8">
+						<Item class="Folder" referent="RBX62F1B89E63CA4992989FF33576A94C81">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<string name="Name">BombSounds</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="Folder" referent="RBX9588479FEC074DC7AC3E648E8190CE35">
+							<Item class="Folder" referent="RBX76CEF5F4D2CB4FC8BD98A3A71F9A4F32">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<string name="Name">Boom</string>
 									<int64 name="SourceAssetId">-1</int64>
 									<BinaryString name="Tags"></BinaryString>
 								</Properties>
-								<Item class="Sound" referent="RBXA4C0155B61FF443D8126CB9BC25B8EC5">
+								<Item class="Sound" referent="RBX3CC7D72E72B4454AA8DAF797299C9ECA">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<float name="EmitterSize">10</float>
@@ -11167,7 +11202,7 @@ end]]></ProtectedString>
 										<float name="xmlRead_MaxDistance_3">300</float>
 									</Properties>
 								</Item>
-								<Item class="Sound" referent="RBX7A79F7ADD5D947FE87E65B2DCD961238">
+								<Item class="Sound" referent="RBX316DF6B9A2FA4D22B4179F6D2EB602BC">
 									<Properties>
 										<BinaryString name="AttributesSerialize"></BinaryString>
 										<float name="EmitterSize">10</float>
@@ -11190,7 +11225,7 @@ end]]></ProtectedString>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="Sound" referent="RBX8A3B83604E9C4B9F8665F44FCF812983">
+							<Item class="Sound" referent="RBXC98A1C009449447A90A3EAE62267A654">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<float name="EmitterSize">10</float>
@@ -11214,7 +11249,7 @@ end]]></ProtectedString>
 							</Item>
 						</Item>
 					</Item>
-					<Item class="ModuleScript" referent="RBX04329079AF2A4D809DABFF12B9922608">
+					<Item class="ModuleScript" referent="RBX40FD042246F94C31B5CC05709BF8A7EA">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -11315,7 +11350,7 @@ end
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBX4C43A19FD8E644EC916E71624797B3E8">
+					<Item class="ModuleScript" referent="RBXE74B279808AE4892B9DF8E095B9F370B">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -11437,7 +11472,7 @@ end
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="LocalScript" referent="RBX3DA93877AAC74A4A97736626EDE1092F">
+					<Item class="LocalScript" referent="RBX8C72E67B9D98474CB97E3DDF611A5959">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<bool name="Disabled">false</bool>
@@ -11674,7 +11709,7 @@ end)
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="ModuleScript" referent="RBXAD03C283434A4AEF81C4C0C33C9596C7">
+						<Item class="ModuleScript" referent="RBX5C46074C3D1D4263A77550814C504557">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -11747,7 +11782,7 @@ return Targeting]]></ProtectedString>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="ModuleScript" referent="RBXC997C0BE460D47F9AC7250E634905610">
+						<Item class="ModuleScript" referent="RBX172784D0DE0C4CB19B4CB1AE0913AD91">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -12359,7 +12394,7 @@ return Extrapolation]]></ProtectedString>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="ModuleScript" referent="RBXF782D056462D4FCA84CE3253B9F962C3">
+						<Item class="ModuleScript" referent="RBX008341A9975E4960BB3B4CF260380303">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
 								<Content name="LinkedSource"><null></null></Content>
@@ -12412,7 +12447,7 @@ end
 							</Properties>
 						</Item>
 					</Item>
-					<Item class="ModuleScript" referent="RBX3C0310EE0BE14D9EBEB40F2F2BB15659">
+					<Item class="ModuleScript" referent="RBX2B87E725771243C3B1A74FE83C419277">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -12501,7 +12536,7 @@ end
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBX34421373B22C44ED86AC46DAE7A2A6C4">
+					<Item class="ModuleScript" referent="RBX72F787487D8544AFA86272E8E98D3951">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -12615,7 +12650,7 @@ end
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBX70BFAA2A9C94404E810080571AA15C7F">
+					<Item class="ModuleScript" referent="RBXED87C42A8EC24AACAE6ED092BF135CCB">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -12725,7 +12760,7 @@ end
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBXC348C97C8F684ADCAD79FE6A821FFD74">
+					<Item class="ModuleScript" referent="RBX588F39707F4C4E0B820AC7763C612736">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -12828,7 +12863,7 @@ end
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBX5ACAD62B45AF4C798A962C28C35EAC2C">
+					<Item class="ModuleScript" referent="RBXAAE07F0241434298B63F64A6F252DF8F">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -12957,7 +12992,7 @@ end]]></ProtectedString>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="ModuleScript" referent="RBX4F208E7F5B044B25B891AB5186540569">
+					<Item class="ModuleScript" referent="RBX5CD7A87586D949A786698F53E3A01369">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
@@ -12998,21 +13033,21 @@ end
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Folder" referent="RBX1557FB0028D84E159A04A8087EC220DF">
+			<Item class="Folder" referent="RBXB2E6BFDF40AD44809C293CF2D603DA8D">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">Workspace</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="Folder" referent="RBXF4DA3643FD444A8E9A71E0145B5B8A0F">
+				<Item class="Folder" referent="RBXAA8C3E50154C47B18F9E60EEC52365D5">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Projectiles</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="Folder" referent="RBX7E61B141F25E4FECB9DC978BE4AF9A99">
+					<Item class="Folder" referent="RBX3AAAE21BCCE94708BCFFFA1174853AC0">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Active</string>
@@ -13020,7 +13055,7 @@ end
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Folder" referent="RBX5653FA35AA58422DA0639127C462E5CC">
+					<Item class="Folder" referent="RBX1C9750FBC272406F87E18F2AECB79381">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Buffers</string>
@@ -13028,7 +13063,7 @@ end
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
 					</Item>
-					<Item class="Folder" referent="RBX26457A8CC7BC44C78C16833F750E5F19">
+					<Item class="Folder" referent="RBX0FD1F8110BEA405C9418B565D08742B2">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Extrapolated</string>
@@ -13038,21 +13073,21 @@ end
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Folder" referent="RBX910D351A6A7F4E8883D15D12DE8B3137">
+			<Item class="Folder" referent="RBX78CB452B43F243F5B1D01B962214F5D6">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">StarterPlayer</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="Folder" referent="RBX1B0A58EA12F64CCF931BAB370B7AAC75">
+				<Item class="Folder" referent="RBX849BAC0BC04142D8873BE5B71FB996EE">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Buffers</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="ObjectValue" referent="RBX94593E3C3F2847FFACDC50B8DD696D75">
+					<Item class="ObjectValue" referent="RBXCDAAAAEAF368448FA35B10AD24FA2140">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Wall</string>
@@ -13062,7 +13097,7 @@ end
 						</Properties>
 					</Item>
 				</Item>
-				<Item class="BoolValue" referent="RBXCBF726CBACA540F9BD9BEDED3FFB87CE">
+				<Item class="BoolValue" referent="RBX2D2B44E5FCE842D1966F150F373481A5">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">CanDamage</string>
@@ -13072,14 +13107,14 @@ end
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Folder" referent="RBX2657D88541A745A0B80B2B9ADE04091C">
+			<Item class="Folder" referent="RBX045741EC00CF4569B3F2386469090FB9">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">StarterGui</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="LocalScript" referent="RBXD1D58AE475284EB3B6B2AAD4C92E4104">
+				<Item class="LocalScript" referent="RBXCF1B492850AD4E299527889E535BAA53">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<bool name="Disabled">false</bool>
@@ -13106,7 +13141,7 @@ script:Destroy()]]></ProtectedString>
 				</Item>
 			</Item>
 		</Item>
-		<Item class="ModuleScript" referent="RBXE5511C323C034045A0783EE4D4167BC7">
+		<Item class="ModuleScript" referent="RBXE8D5C9E9960E4E91BAF4C3C85F3CEBDB">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
@@ -13444,7 +13479,7 @@ return Settings
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBX1C716814E6EB4332854350257E2827CC">
+			<Item class="ModuleScript" referent="RBX6C59DC381347404796DA921448A188C9">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
@@ -13459,14 +13494,14 @@ return Settings
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="Folder" referent="RBX392260EBCECE44219AEA6627FC6C30C3">
+			<Item class="Folder" referent="RBX8D3640A0C56B45438429B7DF2CFFD6C0">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">Callbacks</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="ModuleScript" referent="RBXE189300E59D043C6AAD1D63B07024573">
+				<Item class="ModuleScript" referent="RBXD89DF441BBBA4989BAA3B96589634407">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
@@ -13490,7 +13525,7 @@ end]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX00EFD207BF4C415283DDE8B31B9B41EC">
+				<Item class="ModuleScript" referent="RBX067CBB2E4BFA40AA89C658A3F408683B">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
@@ -13509,7 +13544,7 @@ end]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX033B843C12E7474DB8031776F026116E">
+				<Item class="ModuleScript" referent="RBX681490BF604A4D92A4A40C0F915E7480">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
@@ -13524,7 +13559,7 @@ end]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBXF680611CEC5042E68DDED31C5B3F7578">
+				<Item class="ModuleScript" referent="RBX98B37691ED174DB78F9928A53DE2AC30">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
@@ -13537,7 +13572,7 @@ end]]></ProtectedString>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="RBX637D59FD24AF49BCBE27D64D17DFB444">
+				<Item class="ModuleScript" referent="RBX32643786BA20402F8C11D39FF0A4C590">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
@@ -13552,7 +13587,7 @@ end]]></ProtectedString>
 				</Item>
 			</Item>
 		</Item>
-		<Item class="Model" referent="RBX58B213F91DAF4FDCB09A48BA6FF2D1B6">
+		<Item class="Model" referent="RBX69A3201551E649E78900E9C0A5ECE8FE">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<token name="LevelOfDetail">0</token>
@@ -13579,12 +13614,12 @@ end]]></ProtectedString>
 				<token name="ModelStreamingMode">0</token>
 				<string name="Name">SecurityDummy</string>
 				<bool name="NeedsPivotMigration">false</bool>
-				<Ref name="PrimaryPart">RBX1D7E0161FD7F442988723BFC843D7E54</Ref>
+				<Ref name="PrimaryPart">RBXBD1E34C30DA74A49BDFE97CBD893B3CF</Ref>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 				<OptionalCoordinateFrame name="WorldPivotData"></OptionalCoordinateFrame>
 			</Properties>
-			<Item class="Part" referent="RBX1D7E0161FD7F442988723BFC843D7E54">
+			<Item class="Part" referent="RBXBD1E34C30DA74A49BDFE97CBD893B3CF">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13678,7 +13713,7 @@ end]]></ProtectedString>
 						<Z>1</Z>
 					</Vector3>
 				</Properties>
-				<Item class="BodyAngularVelocity" referent="RBX7671D43B1E1A4101BFDECC049C7624F6">
+				<Item class="BodyAngularVelocity" referent="RBX27B523BF491F4626ABD3219903E490A5">
 					<Properties>
 						<Vector3 name="AngularVelocity">
 							<X>0</X>
@@ -13698,7 +13733,7 @@ end]]></ProtectedString>
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Part" referent="RBX1DB0FA23B48D472D82474DA705A09B1B">
+			<Item class="Part" referent="RBX6F522858E48E43A89E4E4E939C8BC66E">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13793,7 +13828,7 @@ end]]></ProtectedString>
 					</Vector3>
 				</Properties>
 			</Item>
-			<Item class="Part" referent="RBXD5E086729832407A928702F9DD915A56">
+			<Item class="Part" referent="RBX5D18F9EE2DC74312A099658D4346032E">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13888,7 +13923,7 @@ end]]></ProtectedString>
 					</Vector3>
 				</Properties>
 			</Item>
-			<Item class="Part" referent="RBX6963F62DE13A4EF280CA97711B0A8CE9">
+			<Item class="Part" referent="RBXAC224083FC5945DD8A675F3C4B01E005">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -13983,7 +14018,7 @@ end]]></ProtectedString>
 					</Vector3>
 				</Properties>
 			</Item>
-			<Item class="Part" referent="RBX098909B3476E4A699D19838267E503FC">
+			<Item class="Part" referent="RBXE63AAA036E824A08912DC0E8FEFC9FC6">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -14078,7 +14113,7 @@ end]]></ProtectedString>
 					</Vector3>
 				</Properties>
 			</Item>
-			<Item class="Part" referent="RBXF3F532B7A4E64DFAA5E5EEB588E3EF34">
+			<Item class="Part" referent="RBX216BE9A865BB412B8B1C56C56E21E2E2">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -14173,7 +14208,7 @@ end]]></ProtectedString>
 					</Vector3>
 				</Properties>
 			</Item>
-			<Item class="Part" referent="RBX51A605DB77794E52991C58E848EC9AD6">
+			<Item class="Part" referent="RBX3F08A915302A453F9DE7220CC1C2B4F7">
 				<Properties>
 					<bool name="Anchored">true</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -14269,7 +14304,7 @@ end]]></ProtectedString>
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="ModuleScript" referent="RBX75B99463AC08451B8B30A64822EF564E">
+		<Item class="ModuleScript" referent="RBX7A4B1103C4A14C2A88EECE2FD2B7D572">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
@@ -14363,7 +14398,7 @@ return CustomPhysicsReplicator]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBXA4CAA21A3F424E24AD62B699B20FD2B1">
+		<Item class="ModuleScript" referent="RBX4982992721C44340B1575FFD799EDB0E">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
@@ -14489,7 +14524,7 @@ end]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="ModuleScript" referent="RBX1C452121ED90451DA1B896C4AF0EB8D7">
+		<Item class="ModuleScript" referent="RBX062A03EAEF5F45B2BCD429C2B0594093">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
@@ -14506,7 +14541,7 @@ end]]></ProtectedString>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBX1E25DBE2FD984EB6AE6AE0E0318C0F03">
+			<Item class="ModuleScript" referent="RBXBFDC772508E94F04AA3EAD7C4B99BA80">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>

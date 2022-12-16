@@ -9,11 +9,13 @@ function gameActions.gamemodeStarted(gamemodeId)
 	}
 end
 
-function gameActions.gamemodeEnded(gamemodeId)
+function gameActions.gamemodeEnded(gamemodeId, winningUserIds, losingUserIds)
 	return {
 		type = "game_gamemodeEnded",
 		payload = {
 			gamemodeId = gamemodeId,
+			winningUserIds = winningUserIds,
+			losingUserIds = losingUserIds,
 		},
 	}
 end

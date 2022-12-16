@@ -63,19 +63,23 @@ local function window(props, hooks)
 				Size = UDim2.fromScale(1, 1),
 				BackgroundTransparency = 1,
 
-				[Roact.Event.MouseEnter] = function()
-					api.start({
-						hoverAlpha = 1,
-						config = { tension = 600 },
-					})
-				end,
+				[Roact.Event.MouseEnter] = if not props.draggable
+					then nil
+					else function()
+						api.start({
+							hoverAlpha = 1,
+							config = { tension = 600 },
+						})
+					end,
 
-				[Roact.Event.MouseLeave] = function()
-					api.start({
-						hoverAlpha = 0,
-						config = { tension = 600 },
-					})
-				end,
+				[Roact.Event.MouseLeave] = if not props.draggable
+					then nil
+					else function()
+						api.start({
+							hoverAlpha = 0,
+							config = { tension = 600 },
+						})
+					end,
 			}, {
 				Icon = e("ImageLabel", {
 					Image = props.image,

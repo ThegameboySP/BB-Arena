@@ -38,6 +38,7 @@ return function(EventBus)
 					if new == Enum.HumanoidStateType.Dead then
 						local player = Players:GetPlayerFromCharacter(character)
 							or Players:FindFirstChild(character.Name)
+
 						if not player then
 							return
 						end

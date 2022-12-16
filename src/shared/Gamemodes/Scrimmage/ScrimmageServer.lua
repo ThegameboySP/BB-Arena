@@ -203,7 +203,16 @@ function Scrimmage:finishGame(winningTeam)
 		stayOpen = true,
 	})
 
-	self.service:StopGamemode(true)
+	local losingPlayers = {}
+	for _, team in self.fightingTeams do
+		if team ~= winningTeam then
+			for _, player in team:GetPlayers() do
+				table.insert(losingPlayers, player)
+			end
+		end
+	end
+
+	self.service:StopGamemode(winningTeam:GetPlayers(), losingPlayers)
 end
 
 function Scrimmage:announce(msg)

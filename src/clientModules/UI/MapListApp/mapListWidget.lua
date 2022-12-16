@@ -262,7 +262,7 @@ local function mapListWidget(props, hooks)
 		table.insert(
 			rowElements,
 			e("TextButton", {
-				BackgroundTransparency = 0.6,
+				BackgroundTransparency = if isSelected then 0.6 else 1,
 				BackgroundColor3 = if isSelected then theme.accent elseif isActive then theme.text else theme.foreground,
 				Text = "",
 

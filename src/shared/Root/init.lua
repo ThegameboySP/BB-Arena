@@ -138,6 +138,35 @@ function Root:QueueDespawn(id)
 	self.world:insert(id, MatterComponents.QueuedForRemoval())
 end
 
+function Root:KillCharacter(character, cause)
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid or humanoid.Health <= 0 then
+		return
+	end
+
+	local player = Players:GetPlayerFromCharacter(character)
+	if player == nil then
+		return
+	end
+
+	-- Override dumb legacy hit info.
+	while humanoid:FindFirstChild("creator") do
+		humanoid:FindFirstChild("creator").Parent = nil
+	end
+
+	while humanoid:FindFirstChildWhichIsA("ForceField") do
+		humanoid:FindFirstChildWhichIsA("ForceField").Parent = nil
+	end
+
+	humanoid:SetAttribute("DeathCause", cause)
+
+	-- Setting health to 0 will sometimes allow the default health script to heal that frame, preventing death.
+	-- Setting health to below 0 doesn't work since it's capped at 0.
+	-- You can't directly set a humanoid's state to Dead.
+	-- TakeDamage is the only way I know of to get around the above problems.
+	humanoid:TakeDamage(math.huge)
+end
+
 function Root:GetFullNameByUserId(userId)
 	return self:GetUserInfoByUserId(userId):andThen(function(info)
 		return getFullPlayerName(info)
@@ -163,7 +192,7 @@ function Root:GetUserInfoByUserId(userId)
 
 		resolve(info)
 	end):catch(function(err)
-		warn(err)
+		warn(tostring(err))
 		self._infosByUserId[userId] = nil
 	end)
 

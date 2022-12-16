@@ -19,13 +19,13 @@ local function registerDefaultStats()
 	local registeredStats = {
 		KOs = { default = 0, priority = 1, show = true },
 		WOs = { default = 0, priority = 0, show = true },
-		AlltimeWins = { default = 0 },
-		AlltimeLosses = { default = 0 },
-		BestKillstreak = { default = 0 },
+		alltimeWins = { default = 0 },
+		alltimeLosses = { default = 0 },
+		bestKillstreak = { default = 0 },
 		-- XP = {default = 0};
-		LongRange = { default = {} },
-		MediumRange = { default = {} },
-		CloseRange = { default = {} },
+		longRange = { default = {} },
+		mediumRange = { default = {} },
+		closeRange = { default = {} },
 	}
 
 	for _, gamemode in Gamemodes:GetChildren() do

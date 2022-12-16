@@ -86,7 +86,7 @@ function GatekeepingService:OnStart()
 		elseif lockedMessage then
 			player:Kick(lockedMessage)
 		else
-			self.Root.Store:dispatch(actions.userJoined(player.UserId))
+			self.Root.Store:dispatch(actions.userJoined(player.UserId, player.DisplayName, player.Name))
 		end
 	end
 
@@ -95,9 +95,12 @@ function GatekeepingService:OnStart()
 		onPlayerAdded(player)
 	end
 
+	local GameDataStoreService = self.Root:GetService("GameDataStoreService")
 	Players.PlayerRemoving:Connect(function(player)
 		if self.Root.Store:getState().users.activeUsers[player.UserId] then
-			self.Root.Store:dispatch(actions.userLeft(player.UserId))
+			GameDataStoreService:OnPlayerRemoving(player):timeout(10):finally(function()
+				self.Root.Store:dispatch(actions.userLeft(player.UserId))
+			end)
 		end
 	end)
 end

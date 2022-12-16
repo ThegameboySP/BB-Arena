@@ -106,11 +106,13 @@ function actions.setUserBanned(userId, isBanned, byUser)
 	end
 end
 
-function actions.userJoined(userId)
+function actions.userJoined(userId, displayName, name)
 	return {
 		type = "users_joined",
 		payload = {
 			userId = userId,
+			displayName = displayName,
+			name = name,
 		},
 	}
 end
@@ -132,6 +134,16 @@ function actions.datastoreFetchFailed(userId)
 		},
 		meta = {
 			interestedUserIds = { userId },
+		},
+	}
+end
+
+function actions.setTimePlayed(userId, timePlayed)
+	return {
+		type = "users_setTimePlayed",
+		payload = {
+			userId = userId,
+			timePlayed = timePlayed,
 		},
 	}
 end

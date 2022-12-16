@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 local Llama = require(ReplicatedStorage.Packages.Llama)
@@ -19,12 +20,21 @@ return Rodux.createReducer({
 
 	userSettings = {},
 	locallyEditedSettings = {},
+	userSettingsToSave = {},
 }, {
 	-- Events
 	users_joined = function(state, action)
 		return Dictionary.mergeDeep(state, {
-			activeUsers = { [action.payload.userId] = true },
+			activeUsers = {
+				[action.payload.userId] = {
+					name = action.payload.name,
+					displayName = action.payload.displayName,
+					joinedTimestamp = Workspace:GetServerTimeNow(),
+					timePlayed = 0,
+				},
+			},
 			userSettings = { [action.payload.userId] = {} },
+			userSettingsToSave = { [action.payload.userId] = {} },
 		})
 	end,
 	users_left = function(state, action)
@@ -32,6 +42,12 @@ return Rodux.createReducer({
 			activeUsers = { [action.payload.userId] = Llama.None },
 			userSettings = { [action.payload.userId] = Llama.None },
 			usersFailedDatastore = { [action.payload.userId] = Llama.None },
+			userSettingsToSave = { [action.payload.userId] = Llama.None },
+		})
+	end,
+	users_setTimePlayed = function(state, action)
+		return Dictionary.mergeDeep(state, {
+			activeUsers = { [action.payload.userId] = { timePlayed = action.payload.timePlayed } },
 		})
 	end,
 	users_datastoreFetchFailed = function(state, action)
@@ -90,8 +106,9 @@ return Rodux.createReducer({
 			end
 		end
 
-		return Dictionary.mergeDeep(state, {
-			userSettings = { [payload.userId] = toSave },
+		return Dictionary.merge(state, {
+			userSettings = Dictionary.merge({ [payload.userId] = toSave }),
+			userSettingsToSave = { [payload.userId] = toSave },
 		})
 	end,
 	users_setLocalSetting = function(state, action)

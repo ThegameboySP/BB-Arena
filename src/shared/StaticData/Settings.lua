@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Sounds = ReplicatedStorage.Assets.Sounds
 
+local Llama = require(ReplicatedStorage.Packages.Llama)
 local ForcefieldThemes = require(ReplicatedStorage.Common.GameEnum.ForcefieldThemes)
 local WeaponThemes = require(script.Parent.WeaponThemes)
 
@@ -19,6 +20,7 @@ local array = {
 			"Superball",
 			"PaintballGun",
 		},
+		equals = Llama.List.equals,
 		type = "toolOrder",
 		name = "Tool order",
 		description = "The hotkey order of your tools",

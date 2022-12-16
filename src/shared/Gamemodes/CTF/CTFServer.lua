@@ -42,6 +42,7 @@ end
 
 function CTFServer:OnInit(config, teams)
 	self:OnConfigChanged(config)
+	self.teams = teams
 
 	local stolenRemote = self.service:GetRemoteEvent("CTF_Stolen")
 	local capturedRemote = self.service:GetRemoteEvent("CTF_Captured")
@@ -212,7 +213,17 @@ function CTFServer:finish(winningTeam)
 	self.service:AnnounceEvent(formatWonGame(winningTeam, self.scores), {
 		stayOpen = true,
 	})
-	self.service:StopGamemode()
+
+	local losingPlayers = {}
+	for _, team in self.teams do
+		if team ~= winningTeam then
+			for _, player in team:GetPlayers() do
+				table.insert(losingPlayers, player)
+			end
+		end
+	end
+
+	self.service:StopGamemode(winningTeam:GetPlayers(), losingPlayers)
 end
 
 return CTFServer

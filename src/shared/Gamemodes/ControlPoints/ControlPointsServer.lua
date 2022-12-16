@@ -44,6 +44,8 @@ end
 function ControlPointsServer:OnInit(config, fightingTeams)
 	self:OnConfigChanged(config)
 
+	self.teams = fightingTeams
+
 	local replicatedRoot = Instance.new("Folder")
 	replicatedRoot.Name = "ControlPointsValues"
 
@@ -258,7 +260,16 @@ function ControlPointsServer:finish(winningTeam)
 		stayOpen = true,
 	})
 
-	self.service:StopGamemode(true)
+	local losingPlayers = {}
+	for _, team in self.teams do
+		if team ~= winningTeam then
+			for _, player in team:GetPlayers() do
+				table.insert(losingPlayers, player)
+			end
+		end
+	end
+
+	self.service:StopGamemode(winningTeam:GetPlayers(), losingPlayers)
 end
 
 return ControlPointsServer

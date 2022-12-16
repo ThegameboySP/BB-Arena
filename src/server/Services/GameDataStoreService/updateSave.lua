@@ -23,7 +23,10 @@ end
 
 local function updateSave(new, old)
 	return Dictionary.merge(new, {
+		-- settings can have Llama.None in it (default), so it's important to call merge here.
+		settings = Dictionary.merge(old and old.settings or {}, new.settings),
 		stats = updateStats(new.stats, old and old.stats),
+		timePlayed = (new.timePlayed or 0) + ((old and old.timePlayed) or 0),
 	})
 end
 

@@ -72,17 +72,6 @@ local function increment(state, userId, keys, delta, extraKey)
 	return final
 end
 
-local function pushTo3(list, item)
-	local clone = table.clone(list)
-
-	table.insert(clone, item)
-	if #list > 3 then
-		table.remove(clone, 1)
-	end
-
-	return clone
-end
-
 local registeredStats, defaultStats = registerDefaultStats()
 
 return RoduxUtils.createReducer({
@@ -98,7 +87,9 @@ return RoduxUtils.createReducer({
 		WOs = true,
 	},
 	usersReceivedGamemodeStats = {},
+
 	-- XPSources = {};
+	currentKillstreak = {},
 	registeredStats = registeredStats,
 }, {
 	rodux_hotReloaded = function(state)
@@ -114,6 +105,7 @@ return RoduxUtils.createReducer({
 		serialized.visualStats = RoduxUtils.numberIndicesToString(state.visualStats)
 		serialized.ranks = RoduxUtils.numberIndicesToString(state.ranks)
 		serialized.usersReceivedGamemodeStats = RoduxUtils.numberIndicesToString(state.usersReceivedGamemodeStats)
+		serialized.currentKillstreak = RoduxUtils.numberIndicesToString(state.currentKillstreak)
 		serialized.visibleRegisteredStats = state.visibleRegisteredStats
 
 		return serialized
@@ -127,6 +119,7 @@ return RoduxUtils.createReducer({
 		patch.visualStats = RoduxUtils.stringIndicesToNumber(serialized.visualStats)
 		patch.ranks = RoduxUtils.stringIndicesToNumber(serialized.ranks)
 		patch.usersReceivedGamemodeStats = RoduxUtils.stringIndicesToNumber(serialized.usersReceivedGamemodeStats)
+		patch.currentKillstreak = RoduxUtils.stringIndicesToNumber(serialized.currentKillstreak)
 		patch.visibleRegisteredStats = serialized.visibleRegisteredStats
 
 		return Dictionary.merge(state, patch)
@@ -176,15 +169,28 @@ return RoduxUtils.createReducer({
 			})
 		end
 
+		newState = Dictionary.mergeDeep(newState, { currentKillstreak = { [payload.userId] = 0 } })
+
 		if
 			payload.deathCause ~= GameEnum.DeathCause.Admin
 			and payload.killerId
 			and payload.userId ~= payload.killerId
 		then
 			newState = increment(newState, payload.killerId, DEFAULT_STAT_KEYS, {
-				XP = Constants.XP_ON_KILL,
 				KOs = 1,
 			})
+
+			local currentKillstreak = newState.currentKillstreak[payload.killerId] + 1
+			newState =
+				Dictionary.mergeDeep(newState, { currentKillstreak = { [payload.killerId] = currentKillstreak } })
+
+			-- Don't need to merge since the table has already been copied
+			for _, stat in DEFAULT_STAT_KEYS do
+				local bestKillstreak = newState[stat][payload.killerId].bestKillstreak
+				if currentKillstreak > bestKillstreak then
+					newState[stat][payload.killerId].bestKillstreak = currentKillstreak
+				end
+			end
 
 			-- newState.XPSources = pushTo3(newState.XPSources, { reason = GameEnum.DeathCause.Kill, XP = Constants.XP_ON_KILL })
 		end
@@ -192,11 +198,11 @@ return RoduxUtils.createReducer({
 		if payload.weapon and payload.distance then
 			local range
 			if payload.distance <= 70 then
-				range = "CloseRange"
+				range = "closeRange"
 			elseif payload.distance <= 120 then
-				range = "MediumRange"
+				range = "mediumRange"
 			else
-				range = "LongRange"
+				range = "longRange"
 			end
 
 			newState = increment(newState, payload.killerId, DEFAULT_STAT_KEYS, {
@@ -218,16 +224,25 @@ return RoduxUtils.createReducer({
 			end
 		end
 
-		local visualStatsPatch = {}
-		for userId in state.usersReceivedGamemodeStats do
-			visualStatsPatch[userId] = noneStats
+		local newState = state
+		local winDelta = { [gamemodeId .. "Wins"] = 1, alltimeWins = 1 }
+		for _, userId in action.payload.winningUserIds do
+			newState = increment(newState, userId, DEFAULT_STAT_KEYS, winDelta)
 		end
 
-		return Dictionary.merge(state, {
-			visualStats = Dictionary.mergeDeep(state.visualStats, visualStatsPatch),
-			usersReceivedGamemodeStats = {},
-			visibleRegisteredStats = Dictionary.merge(state.visibleRegisteredStats, visibleRegisteredStats),
-		})
+		local loseDelta = { [gamemodeId .. "Losses"] = 1, alltimeLosses = 1 }
+		for _, userId in action.payload.losingUserIds do
+			newState = increment(newState, userId, DEFAULT_STAT_KEYS, loseDelta)
+		end
+
+		for userId in state.usersReceivedGamemodeStats do
+			newState = Dictionary.mergeDeep(newState, { visualStats = { [userId] = noneStats } })
+		end
+
+		newState.usersReceivedGamemodeStats = {}
+		newState.visibleRegisteredStats = Dictionary.merge(state.visibleRegisteredStats, visibleRegisteredStats)
+
+		return newState
 	end,
 	game_gamemodeStarted = function(state, action, rootState)
 		local gamemodeId = action.payload.gamemodeId
@@ -261,8 +276,8 @@ return RoduxUtils.createReducer({
 	users_left = function(state, action)
 		return Dictionary.mergeDeep(state, {
 			serverStats = { [action.payload.userId] = Llama.None },
-			alltimeStats = { [action.payload.userId] = Llama.None },
 			visualStats = { [action.payload.userId] = Llama.None },
+			currentKillstreak = { [action.payload.userId] = Llama.None },
 			ranks = { [action.payload.userId] = Llama.None },
 		})
 	end,
@@ -271,6 +286,7 @@ return RoduxUtils.createReducer({
 			serverStats = { [action.payload.userId] = defaultStats },
 			visualStats = { [action.payload.userId] = defaultStats },
 			alltimeStats = { [action.payload.userId] = defaultStats },
+			currentKillstreak = { [action.payload.userId] = 0 },
 			ranks = { [action.payload.userId] = GameEnum.Ranks.F },
 		})
 	end,

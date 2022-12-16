@@ -65,7 +65,7 @@ SettingsApp = RoactRodux.connect(function(state, props)
 			description = setting.description,
 			id = id,
 			order = setting.order,
-			isChanged = value ~= savedValue,
+			isChanged = if setting.equals then not setting.equals(value, savedValue) else value ~= savedValue,
 		}
 
 		if setting.mobile and UserInputService.TouchEnabled then

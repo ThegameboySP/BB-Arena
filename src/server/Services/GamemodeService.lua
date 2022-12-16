@@ -160,7 +160,7 @@ function GamemodeService:_runGamemodeProtoypes(definition)
 	end)
 end
 
-function GamemodeService:StopGamemode(completedSuccessfully)
+function GamemodeService:StopGamemode(winningPlayers: { Player }?, losingPlayers: { Player }?)
 	if self.gamemodeProcess then
 		self.gamemodeProcess:Destroy()
 		self.gamemodeProcess = nil
@@ -181,8 +181,18 @@ function GamemodeService:StopGamemode(completedSuccessfully)
 		self.binder:Destroy()
 		self.binder = nil
 
-		self.Root.Store:dispatch(RoduxFeatures.actions.gamemodeEnded(nameId))
-		self.GamemodeOver:Fire({ cancelled = not completedSuccessfully })
+		local winningUserIds = {}
+		for _, player in winningPlayers or {} do
+			table.insert(winningUserIds, player.UserId)
+		end
+
+		local losingUserIds = {}
+		for _, player in losingPlayers or {} do
+			table.insert(losingUserIds, player.UserId)
+		end
+
+		self.Root.Store:dispatch(RoduxFeatures.actions.gamemodeEnded(nameId, winningUserIds, losingUserIds))
+		self.GamemodeOver:Fire({ cancelled = winningUserIds == nil })
 
 		return true
 	end

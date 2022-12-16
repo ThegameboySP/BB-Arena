@@ -1,8 +1,14 @@
-<roblox version="4">
-  <Item class="ModuleScript" referent="0">
-    <Properties>
-      <string name="Name">DataStoreService</string>
-      <string name="Source"><![CDATA[--[[
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="ModuleScript" referent="RBX0626CF5759FE4E0D853E4C27892D1C0A">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<Content name="LinkedSource"><null></null></Content>
+			<string name="Name">MockDataStoreService</string>
+			<string name="ScriptGuid">{3CB1CA4E-1ED3-4938-9971-D73890915895}</string>
+			<ProtectedString name="Source"><![CDATA[--[[
 	DataStoreService.lua
 	This module decides whether to use actual datastores or mock datastores depending on the environment.
 
@@ -10,35 +16,41 @@
 	https://github.com/buildthomas/MockDataStoreService/blob/master/LICENSE
 ]]
 
+local TestService = game:GetService("TestService")
+local RunService = game:GetService("RunService")
+
 local MockDataStoreServiceModule = script.MockDataStoreService
 
 local shouldUseMock = false
-if game.GameId == 0 then -- Local place file
+if RunService:IsStudio() then
 	shouldUseMock = true
-elseif game:GetService("RunService"):IsStudio() then -- Published file in Studio
-	local status, message = pcall(function()
-		-- This will error if current instance has no Studio API access:
-		game:GetService("DataStoreService"):GetDataStore("__TEST"):SetAsync("__TEST", "__TEST_" .. os.time())
-	end)
-	if not status and message:find("403", 1, true) then -- HACK
-		-- Can connect to datastores, but no API access
-		shouldUseMock = true
-	end
 end
 
 -- Return the mock or actual service depending on environment:
 if shouldUseMock then
 	warn("INFO: Using MockDataStoreService instead of DataStoreService")
+	
+	-- We rapidly run tests with datastores. Waiting isn't desirable here!
+	if TestService.ExecuteWithStudioRun and RunService:IsStudio() then
+		local Constants = require(script.MockDataStoreService.MockDataStoreConstants)
+		Constants.WRITE_COOLDOWN = 0.0
+	end
+	
 	return require(MockDataStoreServiceModule)
 else
 	return game:GetService("DataStoreService")
 end
-]]></string>
-    </Properties>
-    <Item class="ModuleScript" referent="1">
-      <Properties>
-        <string name="Name">MockDataStoreService</string>
-        <string name="Source"><![CDATA[--[[
+]]></ProtectedString>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="ModuleScript" referent="RBX59871E18C0E4482EAB536D96DB987C13">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">MockDataStoreService</string>
+				<string name="ScriptGuid">{0D580770-02F3-44F3-9930-597B4601779D}</string>
+				<ProtectedString name="Source"><![CDATA[--[[
 	MockDataStoreService.lua
 	This module implements the API and functionality of Roblox's DataStoreService class.
 
@@ -214,12 +226,17 @@ function MockDataStoreService:ExportToJSON() -- luacheck: ignore self
 end
 
 return MockDataStoreService
-]]></string>
-      </Properties>
-      <Item class="ModuleScript" referent="2">
-        <Properties>
-          <string name="Name">MockDataStoreConstants</string>
-          <string name="Source"><![CDATA[--[[
+]]></ProtectedString>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+			<Item class="ModuleScript" referent="RBX6D6E743C08614CADBEE4BA1181936AE1">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">MockDataStoreConstants</string>
+					<string name="ScriptGuid">{A972E1C6-1374-43B8-86BC-960578BC09D4}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
     MockDataStoreConstants.lua
     Contains all constants used by the entirety of MockDataStoreService and its sub-classes.
 
@@ -296,13 +313,18 @@ return {
     BUDGET_UPDATE_INTERVAL = 1.0;   -- Time interval in seconds at which budgets are updated (do not put too low)
 
 }
-]]></string>
-        </Properties>
-      </Item>
-      <Item class="ModuleScript" referent="3">
-        <Properties>
-          <string name="Name">MockDataStoreManager</string>
-          <string name="Source"><![CDATA[--[[
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX3D27BD6005C54FEF96C9D76C3EDF42E7">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">MockDataStoreManager</string>
+					<string name="ScriptGuid">{2A20307E-DBD7-4B7F-ACB2-F99B52D9453D}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
 	MockDataStoreManager.lua
 	This module does bookkeeping of data, interfaces and request limits used by MockDataStoreService and its sub-classes.
 
@@ -726,13 +748,18 @@ function MockDataStoreManager.ResetData()
 end
 
 return MockDataStoreManager
-]]></string>
-        </Properties>
-      </Item>
-      <Item class="ModuleScript" referent="4">
-        <Properties>
-          <string name="Name">MockDataStorePages</string>
-          <string name="Source"><![CDATA[--[[
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXC56604FE67D442918193194B8D2B0066">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">MockDataStorePages</string>
+					<string name="ScriptGuid">{C10136E8-E805-4EC6-A0E3-6CB83D99DA80}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
 	MockDataStorePages.lua
 	This module implements the API and functionality of Roblox's DataStorePages class.
 
@@ -788,13 +815,18 @@ function MockDataStorePages:AdvanceToNextPageAsync()
 end
 
 return MockDataStorePages
-]]></string>
-        </Properties>
-      </Item>
-      <Item class="ModuleScript" referent="5">
-        <Properties>
-          <string name="Name">MockDataStoreUtils</string>
-          <string name="Source"><![CDATA[--[[
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXE0E9135F42F7427294309FC05500EE1C">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">MockDataStoreUtils</string>
+					<string name="ScriptGuid">{7CB99959-11B8-49B1-9935-09B0E4D1B07E}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
 	MockDataStoreUtils.lua
 	Contains helper and utility functions used by other classes.
 
@@ -1075,13 +1107,18 @@ MockDataStoreUtils.simulateYield = simulateYield
 MockDataStoreUtils.simulateErrorCheck = simulateErrorCheck
 
 return MockDataStoreUtils
-]]></string>
-        </Properties>
-      </Item>
-      <Item class="ModuleScript" referent="6">
-        <Properties>
-          <string name="Name">MockGlobalDataStore</string>
-          <string name="Source"><![CDATA[--[[
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX4AEB45260C6240A78D8C451736A84F53">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">MockGlobalDataStore</string>
+					<string name="ScriptGuid">{13BE8E59-0EB2-4730-97EE-9E95366001FC}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
 	MockGlobalDataStore.lua
 	This module implements the API and functionality of Roblox's GlobalDataStore class.
 
@@ -1529,13 +1566,18 @@ function MockGlobalDataStore:ImportFromJSON(json, verbose)
 end
 
 return MockGlobalDataStore
-]]></string>
-        </Properties>
-      </Item>
-      <Item class="ModuleScript" referent="7">
-        <Properties>
-          <string name="Name">MockOrderedDataStore</string>
-          <string name="Source"><![CDATA[--[[
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX5C0CDA4127A84A9481C2F4E8CD3D457D">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">MockOrderedDataStore</string>
+					<string name="ScriptGuid">{BCF40C86-F8CD-473D-8649-21777D85612E}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
 	MockOrderedDataStore.lua
 	This module implements the API and functionality of Roblox's OrderedDataStore class.
 
@@ -2064,9 +2106,11 @@ function MockOrderedDataStore:ImportFromJSON(json, verbose)
 end
 
 return MockOrderedDataStore
-]]></string>
-        </Properties>
-      </Item>
-    </Item>
-  </Item>
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+	</Item>
 </roblox>
