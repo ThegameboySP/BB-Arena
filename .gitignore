@@ -7,6 +7,7 @@
 /DevPackages
 
 /trashbin
+/sourcemap.json
 
 # Roblox Studio lock files
 /*.rbxlx.lock
