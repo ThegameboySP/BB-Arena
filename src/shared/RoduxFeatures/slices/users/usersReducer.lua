@@ -106,8 +106,8 @@ return Rodux.createReducer({
 			end
 		end
 
-		return Dictionary.merge(state, {
-			userSettings = Dictionary.mergeDeep(state.userSettings, { [payload.userId] = toSave }),
+		return Dictionary.mergeDeep(state, {
+			userSettings = { [payload.userId] = toSave },
 			userSettingsToSave = { [payload.userId] = toSave },
 		})
 	end,

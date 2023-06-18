@@ -324,7 +324,7 @@ local test = {
 		["supportsCTF"] = false,
 		["supportsControlPoints"] = false,
 		["teamSize"] = 2,
-		["thumbnail"] = "rbxassetid://11567441815",
+		["thumbnail"] = { image = "rbxassetid://11567441815", snow = true },
 	},
 	["Duel5"] = {
 		["creator"] = "koke15",

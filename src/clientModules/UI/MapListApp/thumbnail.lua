@@ -7,11 +7,11 @@ local RoactSpring = require(ReplicatedStorage.Packages.RoactSpring)
 local e = Roact.createElement
 
 local blendAlpha = require(script.Parent.Parent.Utils.blendAlpha)
-local snowfall = require(script.Parent.Parent.Effects.snowfall)
+local Snowfall = require(script.Parent.Parent.Effects.Snowfall)
 local classicHalloweenSounds = require(script.Parent.Parent.Effects.classicHalloweenSounds)
 
 local function useSnow(props)
-	return true --not props.thumbnail or props.thumbnail.snow
+	return if type(props.thumbnail) == "table" then props.thumbnail.snow == true else false
 end
 
 local function thumbnail(props, hooks)
@@ -19,7 +19,7 @@ local function thumbnail(props, hooks)
 	local thumbnailRef = hooks.useBinding()
 	local effectsRef = hooks.useBinding()
 	local styles, api = RoactSpring.useSpring(hooks, function()
-		return { static = 1, transparency = 0, blendThumbnails = 0, effects = 0 }
+		return { static = 1, transparency = 0, blendThumbnails = 0, effects = 0, snowAlpha = 0 }
 	end)
 
 	local thumbnailImage = if props.thumbnail then props.thumbnail.image else nil
@@ -77,22 +77,45 @@ local function thumbnail(props, hooks)
 		end
 	end, {})
 
-	-- local lastProps = hooks.useValue(props)
-
+	local snowfall = hooks.useValue(nil)
 	hooks.useEffect(function()
-		local undoSnowfall = snowfall(effectsRef:getValue(), 600)
-		-- if not props.thumbnail or props.thumbnail.snow then
-		-- 	undoSnowfall = snowfall(effectsRef:getValue(), 600)
-		-- end
+		if not snowfall.instance then
+			snowfall.instance = Snowfall.new(effectsRef:getValue(), 600)
+		end
+
+		local lastConnection = snowfall.connection
+		if useSnow(props) then
+			if snowfall.connection then
+				snowfall.connection:Disconnect()
+			end
+
+			snowfall.connection = RunService.Heartbeat:Connect(function(dt)
+				snowfall.instance:Update(dt)
+			end)
+		end
+
+		local promise = api.start({ snowAlpha = if useSnow(props) then 0 else 1 })
 
 		return function()
-			undoSnowfall()
+			promise:andThen(function()
+				if lastConnection and not useSnow(props) then
+					lastConnection:Disconnect()
+				end
+			end)
+		end
+	end)
+
+	hooks.useEffect(function()
+		return function()
+			if snowfall.connection then
+				snowfall.connection:Disconnect()
+			end
+
+			snowfall.instance:Destroy()
 		end
 	end, {})
 
-	-- lastProps.value = props
-
-	local blendedAlpha = Roact.joinBindings({
+	local blendedThumbnailAlpha = Roact.joinBindings({
 		transparency = styles.transparency:map(function(value)
 			return 0.8 * (1 - value)
 		end),
@@ -151,7 +174,7 @@ local function thumbnail(props, hooks)
 			Position = UDim2.new(0.5, 0, 0.5, 0),
 
 			Image = lastThumbnail.value,
-			ImageTransparency = blendedAlpha:map(function(values)
+			ImageTransparency = blendedThumbnailAlpha:map(function(values)
 				return blendAlpha({ values.transparency, values.blendThumbnails })
 			end),
 			BackgroundTransparency = 1,
@@ -159,7 +182,7 @@ local function thumbnail(props, hooks)
 			BlendThumbnail = e("ImageLabel", {
 				Size = UDim2.new(1, 0, 1, 0),
 				Image = thumbnailImage,
-				ImageTransparency = blendedAlpha:map(function(values)
+				ImageTransparency = blendedThumbnailAlpha:map(function(values)
 					return blendAlpha({ values.transparency, 1 - values.blendThumbnails })
 				end),
 				BackgroundTransparency = 1,
@@ -168,9 +191,12 @@ local function thumbnail(props, hooks)
 				[Roact.Ref] = effectsRef,
 
 				Size = UDim2.new(1, 0, 1, 0),
-				GroupTransparency = styles.transparency:map(function(value)
-					return (1 - value) * 0.9
-				end),
+				GroupTransparency = Roact.joinBindings({
+					styles.transparency:map(function(value)
+						return (1 - value) * 0.9
+					end),
+					styles.snowAlpha,
+				}):map(blendAlpha),
 				BackgroundTransparency = 1,
 			}),
 		}),

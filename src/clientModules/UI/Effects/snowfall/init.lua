@@ -1,5 +1,3 @@
-local RunService = game:GetService("RunService")
-
 local function randomDirection(random)
 	local degrees = math.rad(random:NextNumber(230, 310))
 	return Vector3.new(math.cos(degrees), -math.sin(degrees), 0)
@@ -28,59 +26,65 @@ local function newSnowflake(random)
 	return clone, scale, direction
 end
 
-local function snowfall(target, yCutoff)
-	local flakes = {}
-	local random = Random.new() --Random.new(30)
-	local lastSpawned = 0
+local Snowfall = {}
+Snowfall.__index = Snowfall
 
-	local connection = RunService.Heartbeat:Connect(function(dt)
-		local now = os.clock()
+function Snowfall.new(target, yCutoff)
+	return setmetatable({
+		target = target,
+		yCutoff = yCutoff,
 
-		if (now - lastSpawned) > 1 / 30 then
-			local newFlake, scale, direction = newSnowflake(random)
-			newFlake.Parent = target
+		flakes = {},
+		random = Random.new(),
+		lastSpawned = 0,
+	}, Snowfall)
+end
 
-			local small = 1 - scale
-
-			flakes[newFlake] = {
-				xPercent = random:NextNumber(),
-				direction = direction,
-				speed = math.clamp(scale + 0.2, 0, 1) * random:NextNumber(2, 4) * 60,
-				spawnedOn = now,
-				--[[0.2]]
-				offset = 120 * 0.4 * random:NextNumber(0, 3.5) * random:NextNumber(0.8, 1),
-				period = (math.pi * 2) / (1 * random:NextNumber(1, 2)),
-				inactive = (math.pi * 2) / (random:NextNumber(8, 10) * small),
-				position = Vector3.yAxis * -12,
-			}
-
-			lastSpawned = now
-		end
-
-		for flake, data in flakes do
-			if data.position.Y > yCutoff then
-				flake.Parent = nil
-				flakes[flake] = nil
-				continue
-			end
-
-			data.position += data.direction * data.speed * dt
-
-			flake.Position = UDim2.new(data.xPercent, data.position.X, 0, data.position.Y)
-
-			flake.Rotation += dt * data.offset * math.sin((now - data.spawnedOn) * data.period) * math.cos(
-				(now - data.spawnedOn) * data.inactive
-			)
-		end
-	end)
-
-	return function()
-		connection:Disconnect()
-
-		for flake in flakes do
-			flake.Parent = nil
-		end
+function Snowfall:Destroy()
+	for flake in self.flakes do
+		flake.Parent = nil
 	end
 end
 
-return snowfall
+function Snowfall:Update(dt)
+	local now = os.clock()
+
+	if (now - self.lastSpawned) > 1 / 30 then
+		local newFlake, scale, direction = newSnowflake(self.random)
+		newFlake.Parent = self.target
+
+		local small = 1 - scale
+
+		self.flakes[newFlake] = {
+			xPercent = self.random:NextNumber(),
+			direction = direction,
+			speed = math.clamp(scale + 0.2, 0, 1) * self.random:NextNumber(2, 4) * 60,
+			spawnedOn = now,
+			--[[0.2]]
+			offset = 120 * 0.4 * self.random:NextNumber(0, 3.5) * self.random:NextNumber(0.8, 1),
+			period = (math.pi * 2) / (1 * self.random:NextNumber(1, 2)),
+			inactive = (math.pi * 2) / (self.random:NextNumber(8, 10) * small),
+			position = Vector3.yAxis * -12,
+		}
+
+		self.lastSpawned = now
+	end
+
+	for flake, data in self.flakes do
+		if data.position.Y > self.yCutoff then
+			flake.Parent = nil
+			self.flakes[flake] = nil
+			continue
+		end
+
+		data.position += data.direction * data.speed * dt
+
+		flake.Position = UDim2.new(data.xPercent, data.position.X, 0, data.position.Y)
+
+		flake.Rotation += dt * data.offset * math.sin((now - data.spawnedOn) * data.period) * math.cos(
+			(now - data.spawnedOn) * data.inactive
+		)
+	end
+end
+
+return Snowfall

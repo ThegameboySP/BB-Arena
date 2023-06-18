@@ -14,6 +14,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local function respectSettings(root)
 	local weaponGroup = SoundService:FindFirstChild("Tools")
+	local projectiles = Workspace:FindFirstChild("Projectiles")
 
 	local colorCorrection = Instance.new("ColorCorrectionEffect")
 	colorCorrection.Name = "IlluminanceCorrection"
@@ -39,7 +40,7 @@ local function respectSettings(root)
 		if descendant:IsA("Sound") then
 			if
 				descendant:FindFirstAncestorWhichIsA("Tool")
-				or descendant:IsDescendantOf(Workspace)
+				or descendant:IsDescendantOf(projectiles)
 				or descendant:FindFirstAncestor("ToolObjects")
 			then
 				descendant.SoundGroup = weaponGroup
