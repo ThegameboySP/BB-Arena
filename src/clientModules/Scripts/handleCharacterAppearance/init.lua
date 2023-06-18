@@ -84,6 +84,14 @@ local function handleCharacterAppearance(root)
 
 					clone.Parent = head
 				end
+			elseif child.Name == "Mesh" then
+				local clone = child:Clone()
+				CollectionService:AddTag(clone, tag)
+
+				local head = character:FindFirstChild("Head")
+				if head then
+					clone.Parent = head
+				end
 			end
 		end
 	end

@@ -192,22 +192,22 @@ return RoduxUtils.createReducer({
 				end
 			end
 
-			-- newState.XPSources = pushTo3(newState.XPSources, { reason = GameEnum.DeathCause.Kill, XP = Constants.XP_ON_KILL })
-		end
+			if payload.weapon and payload.distance then
+				local range
+				if payload.distance <= 70 then
+					range = "closeRange"
+				elseif payload.distance <= 120 then
+					range = "mediumRange"
+				else
+					range = "longRange"
+				end
 
-		if payload.weapon and payload.distance then
-			local range
-			if payload.distance <= 70 then
-				range = "closeRange"
-			elseif payload.distance <= 120 then
-				range = "mediumRange"
-			else
-				range = "longRange"
+				newState = increment(newState, payload.killerId, DEFAULT_STAT_KEYS, {
+					[payload.weapon] = 1,
+				}, range)
 			end
 
-			newState = increment(newState, payload.killerId, DEFAULT_STAT_KEYS, {
-				[payload.weapon] = 1,
-			}, range)
+			-- newState.XPSources = pushTo3(newState.XPSources, { reason = GameEnum.DeathCause.Kill, XP = Constants.XP_ON_KILL })
 		end
 
 		return newState

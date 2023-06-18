@@ -19,6 +19,16 @@ return function()
 			expect(map[1].payload.settings.weaponTheme).to.equal("test")
 			expect(map[2].payload.settings.lighting).to.equal(nil)
 			expect(map[2].payload.settings.weaponTheme).to.equal("test")
+
+			local map2 = actionReplicators.users_saveSettings.replicate(
+				{ 1, 2 },
+				actions.saveSettings(1, {
+					lighting = 0.5,
+				})
+			)
+
+			expect(map2[1].payload.settings.lighting).to.equal(0.5)
+			expect(map2[2]).to.equal(nil)
 		end)
 
 		it("should handle requests properly", function()

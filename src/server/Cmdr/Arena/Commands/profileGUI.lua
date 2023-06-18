@@ -57,7 +57,7 @@ if RunService:IsClient() then
 	end
 
 	-- For legacy menu GUI
-	_G.ToggleMapList = toggleEnabled
+	_G.ToggleProfile = toggleEnabled
 end
 
 return {

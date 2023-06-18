@@ -65,8 +65,7 @@ function Services:GetServerService(name)
 		error("Cannot call GetServerService until Root is initialized")
 	end
 
-	return
-if self.serverServices then self.serverServices[name] or error("No server service named " .. name) else nil
+	return if self.serverServices then self.serverServices[name] or error("No server service named " .. name) else nil
 end
 
 function Services:Start(root)

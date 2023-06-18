@@ -3,13 +3,19 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Llama = require(ReplicatedStorage.Packages.Llama)
 local Dictionary = Llama.Dictionary
 
+local exceptions = {
+	bestKillstreak = math.max,
+}
+
 local function updateStats(new, old)
 	old = old or {}
 
 	local newStats = table.clone(old)
 
 	for name, value in new do
-		if type(value) == "number" and type(old[name]) == "number" then
+		if exceptions[name] then
+			newStats[name] = exceptions[name](value, old[name] or 0)
+		elseif type(value) == "number" and type(old[name]) == "number" then
 			newStats[name] = old[name] + value
 		elseif type(value) == "table" then
 			newStats[name] = updateStats(value, old[name])

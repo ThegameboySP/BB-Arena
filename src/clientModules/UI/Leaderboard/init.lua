@@ -11,7 +11,7 @@ local e = Roact.createElement
 local ThemeController = require(script.Parent.ThemeController)
 local leaderboardWidget = require(script.leaderboardWidget)
 
-local Leaderboard = Roact.Component:extend("Leaderboard")
+local Leaderboard = Roact.PureComponent:extend("Leaderboard")
 
 function Leaderboard:render()
 	return e(ThemeController, {}, {
@@ -31,29 +31,45 @@ local function withCommas(number)
 	return table.concat(parts)
 end
 
-Leaderboard = RoactRodux.connect(function(state, props)
-	local userInfo = {}
+Leaderboard = RoactRodux.connect(function()
+	local lastUsers = nil
+	local cachedUserInfo = nil
 
-	for index, info in state.leaderboard.users do
-		table.insert(userInfo, {
-			["User"] = info.name,
-			["KOs"] = withCommas(info.KOs),
-			["WOs"] = withCommas(info.WOs),
-			["KDR"] = string.format("%.1f", if info.WOs == 0 then info.KOs else info.KOs / info.WOs),
-			["image"] = Promise.try(function()
-				return Players:GetUserThumbnailAsync(
-					info.userId,
-					Enum.ThumbnailType.AvatarBust,
-					Enum.ThumbnailSize.Size100x100
-				)
-			end),
-			index = index,
+	return function(state, props)
+		if cachedUserInfo and lastUsers == state.leaderboard.users then
+			return Llama.Dictionary.merge(props, {
+				userInfo = cachedUserInfo,
+			})
+		end
+
+		local userInfo = {}
+
+		for index, info in state.leaderboard.users do
+			local KDR = if info.WOs == 0 then info.KOs else info.KOs / info.WOs
+
+			table.insert(userInfo, {
+				User = info.name,
+				KOs = { original = info.KOs, string = withCommas(info.KOs) },
+				WOs = { original = info.WOs, string = withCommas(info.WOs) },
+				KDR = { original = KDR, string = string.format("%.1f", KDR) },
+				image = Promise.try(function()
+					return Players:GetUserThumbnailAsync(
+						info.userId,
+						Enum.ThumbnailType.AvatarBust,
+						Enum.ThumbnailSize.Size100x100
+					)
+				end),
+				index = index,
+			})
+		end
+
+		cachedUserInfo = userInfo
+		lastUsers = state.leaderboard.users
+
+		return Llama.Dictionary.merge(props, {
+			userInfo = userInfo,
 		})
 	end
-
-	return Llama.Dictionary.merge(props, {
-		userInfo = userInfo,
-	})
 end)(Leaderboard)
 
 return Leaderboard

@@ -206,8 +206,10 @@ function Scrimmage:finishGame(winningTeam)
 	local losingPlayers = {}
 	for _, team in self.fightingTeams do
 		if team ~= winningTeam then
-			for _, player in team:GetPlayers() do
-				table.insert(losingPlayers, player)
+			for player, data in self.fightingPlayers do
+				if data.team == team then
+					table.insert(losingPlayers, player)
+				end
 			end
 		end
 	end

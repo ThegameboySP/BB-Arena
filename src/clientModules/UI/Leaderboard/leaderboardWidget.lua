@@ -19,19 +19,19 @@ local columns = {
 }
 
 local numberSort = function(a, b)
-	return a.sortingColumn > b.sortingColumn
+	return a.sortingValue > b.sortingValue
 end
 
 local reverseNumberSort = function(a, b)
-	return a.sortingColumn < b.sortingColumn
+	return a.sortingValue < b.sortingValue
 end
 
 local defaultSort = function(a, b)
-	return a.sortingColumn < b.sortingColumn
+	return a.sortingValue < b.sortingValue
 end
 
 local reverseDefaultSort = function(a, b)
-	return a.sortingColumn > b.sortingColumn
+	return a.sortingValue > b.sortingValue
 end
 
 local KOSort = function(a, b)
@@ -122,12 +122,17 @@ local function leaderboardWidget(props, hooks)
 
 	for _, userInfo in props.userInfo do
 		local sortingColumn = userInfo[sortBy]
-		if type(sortingColumn) == "string" then
-			sortingColumn = string.lower(sortingColumn)
+
+		local value = sortingColumn
+		if type(sortingColumn) == "table" and sortingColumn.original then
+			value = sortingColumn.original
+		elseif type(sortingColumn) == "string" then
+			value = string.lower(sortingColumn)
 		end
 
 		table.insert(rowValues, {
 			sortingColumn = sortingColumn,
+			sortingValue = value,
 			userInfo = userInfo,
 		})
 	end
@@ -145,6 +150,9 @@ local function leaderboardWidget(props, hooks)
 
 		for _, column in columns do
 			local value = entry.userInfo[column]
+			if type(value) == "table" and value.original then
+				value = value.string
+			end
 
 			local max = 550
 			local textBounds
@@ -261,8 +269,8 @@ local function leaderboardWidget(props, hooks)
 			image = "rbxassetid://10866961648",
 			imageSize = Vector2.new(63, 50),
 			name = "Leaderboard",
-			useExitButton = true,
-			draggable = true,
+			useExitButton = false,
+			draggable = false,
 
 			outerRef = outerRef,
 			onClosed = props.onClosed,

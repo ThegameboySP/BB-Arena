@@ -69,7 +69,6 @@ local function updateHUD(root)
 	end)
 
 	local activeHumanoid = nil
-	local toolTip = ""
 
 	local function equipTool(tool)
 		-- I don't know why, but if the character's parent is nil (when spawning),
@@ -86,27 +85,41 @@ local function updateHUD(root)
 	end
 
 	local cachedTools = {}
-	local cachedMappedTools = {}
+	local equippedItemBinding, setEquippedItem = Roact.createBinding()
+	local secondsTimerBinding, setSecondsTimer = Roact.createBinding(0)
+	local toolsBinding, setTools = Roact.createBinding({})
+	local toolTipBinding, setToolTip = Roact.createBinding("")
+	local humanoidInfoBinding, setHumanoidInfo = Roact.createBinding({})
+	local displayBattleInfoBinding, setDisplayBattleInfo = Roact.createBinding(false)
 
-	local displayBattleInfo = false
-
-	local function getProps()
+	local function updateProps()
 		cachedTools = table.freeze(root.Tools:GetEquippedTools())
-		cachedMappedTools =
-			table.freeze(mapTools(cachedTools, selectors.getLocalSetting(root.Store:getState(), "weaponOrder")))
+		setTools(table.freeze(mapTools(cachedTools, selectors.getLocalSetting(root.Store:getState(), "weaponOrder"))))
 
 		local equippedTool = root.Tools:GetEquippedTool()
+		if equippedTool then
+			setEquippedItem(equippedTool.Name)
+		end
 
 		local timestamp = ReplicatedStorage:GetAttribute("TimerTimestamp")
+		if timestamp then
+			setSecondsTimer(timestamp - Workspace:GetServerTimeNow())
+		end
+
+		if activeHumanoid then
+			setHumanoidInfo({
+				health = activeHumanoid.Health,
+				maxHealth = activeHumanoid.MaxHealth,
+				isGodded = activeHumanoid:GetAttribute("IsGodded"),
+			})
+		end
 
 		return {
-			equippedItemName = equippedTool and equippedTool.instance.Name,
-			items = cachedMappedTools,
+			equippedItemBinding = equippedItemBinding,
+			itemsBinding = toolsBinding,
 
-			toolTip = toolTip,
-			health = activeHumanoid and activeHumanoid.Health,
-			maxHealth = activeHumanoid and activeHumanoid.MaxHealth,
-			isGodded = activeHumanoid and activeHumanoid:GetAttribute("IsGodded"),
+			toolTipBinding = toolTipBinding,
+			humanoidInfoBinding = humanoidInfoBinding,
 
 			failedAction = Input.ActionFailure,
 
@@ -114,8 +127,8 @@ local function updateHUD(root)
 				equipTool(getToolInstanceByName(cachedTools, itemName))
 			end,
 
-			displayBattleInfo = displayBattleInfo,
-			secondsTimer = if timestamp then timestamp - Workspace:GetServerTimeNow() else 0,
+			displayBattleInfoBinding = displayBattleInfoBinding,
+			secondsTimerBindingBinding = secondsTimerBinding,
 		}
 	end
 
@@ -125,14 +138,14 @@ local function updateHUD(root)
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	screenGui.Parent = LocalPlayer.PlayerGui
 
-	local handle = Roact.mount(Roact.createElement(HUD, getProps()), screenGui)
+	local handle = Roact.mount(Roact.createElement(HUD, updateProps()), screenGui)
 
 	local function onTeamChanged()
 		local team = LocalPlayer.Team
 		if team and CollectionService:HasTag(team, "ToolsEnabled") then
-			displayBattleInfo = true
+			setDisplayBattleInfo(true)
 		else
-			displayBattleInfo = false
+			setDisplayBattleInfo(false)
 		end
 	end
 
@@ -155,18 +168,18 @@ local function updateHUD(root)
 		end
 
 		local newToolTip = table.concat(strs, " ")
-		if newToolTip ~= toolTip then
-			toolTip = newToolTip
+		if newToolTip ~= toolTipBinding:getValue() then
+			setToolTip(newToolTip)
 		end
 
 		if handle then
-			Roact.update(handle, Roact.createElement(HUD, getProps()))
+			updateProps()
 		end
 	end)
 
 	root.Input.EquippedItemHotkey:Connect(function(order)
-		local item = cachedMappedTools[order]
-		if displayBattleInfo and item then
+		local item = toolsBinding:getValue()[order]
+		if displayBattleInfoBinding:getValue() and item then
 			local equippedTool = root.Tools:GetEquippedTool()
 			if equippedTool and equippedTool.instance.Name == item.name then
 				equipTool(nil)

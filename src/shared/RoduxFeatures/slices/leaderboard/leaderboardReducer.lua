@@ -16,16 +16,13 @@ return Rodux.createReducer({
 }, {
 	rodux_serialize = function(state)
 		local serialized = table.clone(state)
-		serialized.users = RoduxUtils.numberIndicesToString(state.users)
 		serialized.placeByUserId = RoduxUtils.numberIndicesToString(state.placeByUserId)
 
 		return serialized
 	end,
 	rodux_deserialize = function(state, action)
 		local serialized = action.payload.serialized.leaderboard
-		local patch = {}
-
-		patch.users = RoduxUtils.stringIndicesToNumber(serialized.users)
+		local patch = table.clone(serialized)
 		patch.placeByUserId = RoduxUtils.stringIndicesToNumber(serialized.placeByUserId)
 
 		return Dictionary.merge(state, patch)

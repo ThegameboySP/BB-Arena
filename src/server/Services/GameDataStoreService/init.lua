@@ -20,65 +20,64 @@ local GameDataStoreService = {
 	_isLoaded = {},
 }
 
-function GameDataStoreService:OnStart()
+local function stepData(data)
+	local index
+	for i, updater in updaters do
+		if updater.onVersion == data.version then
+			index = i
+			break
+		end
+	end
+
+	if index then
+		for i = index, #updaters do
+			local updater = updaters[i]
+			data = updater.step(data)
+		end
+	end
+
+	return data
+end
+
+function GameDataStoreService:OnPlayerAdded(player)
+	local userId = player.UserId
 	local store = self.Root.Store
 
-	self._playerData = DataStoreService:GetDataStore("PlayerData")
-	self._leaderboard = Leaderboard.new(store, DataStoreService:GetOrderedDataStore("PlayerKOLeaderboard"), warn)
-	self._leaderboard:Schedule()
-
-	local function onPlayerAdded(player)
-		local userId = player.UserId
-
-		local promise = Promise.new(function(resolve)
-			resolve(self._playerData:GetAsync(userId))
-		end):timeout(10)
-
-		local status, returned = promise:awaitStatus()
-
-		if status == Promise.Status.Rejected then
-			warn("[GameDataStoreService]", "Failed to fetch player data:", returned)
-			store:dispatch(RoduxFeatures.actions.datastoreFetchFailed(userId))
-		end
-
-		local isConnected = player:IsDescendantOf(game)
-
-		if isConnected and status == Promise.Status.Resolved then
-			if returned then
-				local index
-				for i, updater in updaters do
-					if updater.onVersion == returned.version then
-						index = i
-						break
-					end
-				end
-
-				if index then
-					for i = index, #updaters do
-						local updater = updaters[i]
-						returned = updater.step(returned)
-					end
-				end
+	return Promise.new(function(resolve)
+		resolve(self._playerData:GetAsync(userId))
+	end)
+		:timeout(10)
+		:andThen(function(data)
+			if player.Parent and data then
+				data = stepData(data)
 
 				-- Dispatch individual actions instead of one for data successfully fetched.
 				-- You can enforce replication rules and there's less redundancy.
-				store:dispatch(RoduxFeatures.actions.saveSettings(userId, returned.settings))
-				store:dispatch(RoduxFeatures.actions.initializeUserStats(userId, returned.stats))
-				store:dispatch(RoduxFeatures.actions.setTimePlayed(userId, { timePlayed = returned.timePlayed }))
+				store:dispatch(RoduxFeatures.actions.saveSettings(userId, data.settings))
+				store:dispatch(RoduxFeatures.actions.initializeUserStats(userId, data.stats))
+				store:dispatch(RoduxFeatures.actions.setTimePlayed(userId, data.timePlayed))
 			end
-		end
+		end)
+		:catch(function(err)
+			warn("[GameDataStoreService]", "Failed to fetch player data:", tostring(err))
+			store:dispatch(RoduxFeatures.actions.datastoreFetchFailed(userId))
+		end)
+		:finally(function()
+			local isConnected = player.Parent ~= nil
 
-		if self._isLoaded[userId] then
-			self._isLoaded[userId]:Fire(isConnected)
-		end
+			if self._isLoaded[userId] then
+				self._isLoaded[userId]:Fire(isConnected)
+			end
 
-		self._isLoaded[userId] = isConnected or nil
-	end
+			self._isLoaded[userId] = isConnected or nil
+		end)
+end
 
-	Players.PlayerAdded:Connect(onPlayerAdded)
-	for _, player in Players:GetPlayers() do
-		task.spawn(onPlayerAdded, player)
-	end
+function GameDataStoreService:OnInit()
+	self._playerData = DataStoreService:GetDataStore("PlayerData")
+	self._leaderboard =
+		Leaderboard.new(self.Root.Store, DataStoreService:GetOrderedDataStore("PlayerKOLeaderboard"), warn)
+	self._leaderboard:Schedule()
 end
 
 function GameDataStoreService:OnPlayerRemoving(player)
@@ -96,26 +95,44 @@ function GameDataStoreService:OnPlayerRemoving(player)
 		local newData
 		local oldData
 
-		self._playerData:UpdateAsync(userId, function(data)
-			oldData = data
-			newData = updateSave({
-				version = "0.0.3",
-				settings = state.users.userSettingsToSave[userId],
-				stats = state.stats.serverStats[userId],
-				timePlayed = Workspace:GetServerTimeNow() - state.users.activeUsers[userId].joinedTimestamp,
-			}, data)
+		local isNotPrivateServer = game.PrivateServerId == ""
 
-			return newData
+		local ok, err
+		self._playerData:UpdateAsync(userId, function(data)
+			ok, err = pcall(function()
+				oldData = if data then stepData(data) else {}
+
+				newData = updateSave({
+					version = "0.0.4",
+					settings = state.users.userSettingsToSave[userId],
+					stats = if isNotPrivateServer then state.stats.serverStats[userId] else {},
+					timePlayed = Workspace:GetServerTimeNow() - state.users.activeUsers[userId].joinedTimestamp,
+				}, oldData)
+			end)
+
+			if ok then
+				return newData
+			end
+
+			return nil
 		end)
+
+		if not ok then
+			error(err)
+		end
 
 		return newData, oldData
 	end)
+		:andThen(function(newData, oldData)
+			return self._leaderboard:OnUserDisconnecting(
+				userId,
+				newData.stats, -- was nil
+				if oldData then oldData.stats else nil,
+				player.Name
+			)
+		end)
 		:catch(function(err)
 			warn("[GameDataStoreService]", "Failed to update player data:", tostring(err))
-		end)
-		:andThen(function(newData, oldData)
-			-- Don't connect this promise, as we already provide all the info it needs and the data is immutable.
-			self._leaderboard:OnUserDisconnecting(userId, newData.stats, if oldData then oldData.stats else nil)
 		end)
 end
 

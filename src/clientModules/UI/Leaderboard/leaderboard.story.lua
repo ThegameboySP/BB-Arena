@@ -5,6 +5,7 @@ local RoactRodux = require(ReplicatedStorage.Packages.RoactRodux)
 local Rodux = require(ReplicatedStorage.Packages.Rodux)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local mountLeaderboards = require(ReplicatedStorage.ClientModules.Scripts.mountLeaderboards)
 
 local e = Roact.createElement
 
@@ -53,7 +54,9 @@ return function(target)
 
 	tree = Roact.mount(roactTree, target)
 
+	local undoMount = mountLeaderboards(store)
 	return function()
 		Roact.unmount(tree)
+		undoMount()
 	end
 end

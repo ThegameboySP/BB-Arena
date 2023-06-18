@@ -1,4 +1,4 @@
-local function getFullPlayerName(object)
+local function getFullPlayerName(object, second)
 	local displayName
 	local name
 
@@ -9,6 +9,9 @@ local function getFullPlayerName(object)
 	elseif type(object) == "table" then
 		displayName = object.DisplayName
 		name = object.Username
+	elseif type(object) == "string" and type(second) == "string" then
+		displayName = object
+		name = second
 	end
 
 	if displayName == name then

@@ -115,6 +115,10 @@ function Root:Start(systems: table | Instance, customBindSignals: callback?)
 	return self.services:Start(self)
 end
 
+function Root:OnStart()
+	return self.services:OnStart()
+end
+
 function Root:Bind(instance, newId)
 	local id = instance:GetAttribute(self.entityKey)
 

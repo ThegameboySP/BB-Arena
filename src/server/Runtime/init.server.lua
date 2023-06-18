@@ -15,7 +15,7 @@ local defaultGlobalValues = require(script.Parent.defaultGlobalValues)
 
 local loadTools = require(script.loadTools)
 local resetPlayer = require(script.resetPlayer)
-local roduxServer = require(script.roduxServer)
+local bindPlayers = require(script.bindPlayers)
 
 local ServerSystems = ServerScriptService.Server.ServerSystems
 
@@ -51,7 +51,7 @@ local function registerRoot()
 	Root.state.mapSupportsGladiators = true
 	Root.state.adminRequestsGladiators = true
 
-	Root:Start(ServerSystems):catch(warn):await()
+	Root:Start({}):catch(warn):await()
 
 	local startingMapName = Configuration:GetAttribute("StartingMapName")
 	if startingMapName then
@@ -96,20 +96,6 @@ local function spawnPlayers()
 		table.insert(connections, player.AncestryChanged:Connect(disconnect))
 		table.insert(connections, player.CharacterAdded:Connect(disconnect))
 	end)
-end
-
-local function initializePlayers()
-	local function onPlayerAdded(player)
-		-- hack
-		task.delay(0.2, function()
-			player:SetAttribute("Initialized", true)
-		end)
-	end
-
-	Players.PlayerAdded:Connect(onPlayerAdded)
-	for _, player in ipairs(Players:GetPlayers()) do
-		onPlayerAdded(player)
-	end
 end
 
 local function warnIfSlow()
@@ -167,10 +153,6 @@ local function setPlayerTags()
 	end)
 end
 
-local function registerRodux()
-	roduxServer(Root)
-end
-
 local function init()
 	local RemoteProperties = Instance.new("Folder")
 	RemoteProperties.Name = "RemoteProperties"
@@ -214,11 +196,10 @@ while not _G.BB do
 end
 
 init()
-registerRodux()
 registerRoot()
+bindPlayers(Root)
 runScripts()
 spawnPlayers()
-initializePlayers()
 warnIfSlow()
 setPlayerTags()
 

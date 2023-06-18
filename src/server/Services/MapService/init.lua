@@ -251,70 +251,58 @@ function MapService:GetMaps()
 end
 
 function MapService:_reconcileTeams(newNameToColor)
-	local TeamService = self.Root:GetService("TeamService")
-
 	local oldTeamMap = {}
-	local participatingPlayers = {}
-
-	for teamId, team in self.Root.world:query(MatterComponents.Team) do
-		if team.participating and not team.fromMap then
-			local players = TeamService:getPlayersFromTeam(teamId)
-			for _, playerId in players do
-				table.insert(participatingPlayers, playerId)
-			end
-
-			oldTeamMap[team.name] = {
-				players = players,
-				color = team.color,
-				id = teamId,
-			}
-		end
+	for _, team in CollectionService:GetTagged("FightingTeam") do
+		oldTeamMap[team.Name] = { players = team:GetPlayers(), color = team.TeamColor }
 	end
 
 	local reconciledTeams, newTeamsMap, untrackedPlayers =
-		reconcileTeams(participatingPlayers, newNameToColor, oldTeamMap)
+		reconcileTeams(CollectionService:GetTagged("FightingPlayer"), newNameToColor, oldTeamMap)
 
-	-- Team players that are not under any team to Spectators.
-	for _, id in untrackedPlayers do
-		self.Root.world:insert(
-			id,
-			self.Root.world:get(id, Components.Player):patch({
-				teamId = self.Root:getIdFromInstance(Teams.Spectators),
-			})
-		)
+	for _, player in untrackedPlayers do
+		player.Team = Teams.Spectators
 	end
 
-	-- Spawn/replace new teams over top old ones.
-	for name, team in newTeamsMap do
-		local newTeamComponent = MatterComponents.Team({
-			name = name,
-			participating = true,
-			enableTools = true,
-			fromMap = true,
-			color = team.color,
-		})
+	local toRemove = {}
+	for name in oldTeamMap do
+		table.insert(toRemove, Teams:FindFirstChild(name))
+	end
 
-		if team.replacingTeam then
-			self.Root.world:replace(team.replacingTeam.id, newTeamComponent)
+	local toAdd = {}
+	for name, data in newTeamsMap do
+		local newTeam = Instance.new("Team")
+		newTeam.AutoAssignable = false
+		CollectionService:AddTag(newTeam, "FightingTeam")
+		CollectionService:AddTag(newTeam, "ParticipatingTeam")
+		CollectionService:AddTag(newTeam, "ToolsEnabled")
+		CollectionService:AddTag(newTeam, "Map")
 
-			for _, playerId in team.players do
-				self.Root.world:get(playerId, MatterComponents.Player):patch({
-					teamId = team.id,
-				})
-			end
-		else
-			self.Root.world:spawn(newTeamComponent)
+		newTeam.TeamColor = data.color
+		newTeam.Name = name
+
+		toAdd[name] = {
+			players = data.players,
+			team = newTeam,
+		}
+	end
+
+	local reconciledRobloxTeams = {}
+	for oldTeamName, newTeam in reconciledTeams do
+		reconciledRobloxTeams[Teams:FindFirstChild(oldTeamName)] = toAdd[newTeam.name].team
+	end
+
+	for _, data in toAdd do
+		data.team.Parent = Teams
+		for _, player in data.players do
+			player.Team = data.team
 		end
 	end
 
-	-- Despawn old teams that have no corresponding new teams.
-	for oldTeamName, oldTeam in oldTeamMap do
-		if not reconciledTeams[oldTeamName] then
-			self.Root.world:despawn(oldTeam.id)
-		end
+	for _, team in toRemove do
+		team.Parent = nil
 	end
 
-	return reconciledTeams
+	return reconciledRobloxTeams
 end
 
 return MapService

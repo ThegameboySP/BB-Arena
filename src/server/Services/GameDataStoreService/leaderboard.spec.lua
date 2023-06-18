@@ -47,7 +47,7 @@ return function()
 		leaderboard:OnUserDisconnecting(userId, two, one):await()
 
 		datastore.RemoveAsync = removeAsync
-		leaderboard:Update()
+		leaderboard:Update():await()
 
 		expect(#store:getState().leaderboard.users).to.equal(1)
 		expect(store:getState().leaderboard.users[1].KOs).to.equal(two.KOs)

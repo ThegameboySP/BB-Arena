@@ -7,7 +7,6 @@ local Players = game:GetService("Players")
 local Root = require(ReplicatedStorage.Common.Root)
 local RemoteProperty = require(ReplicatedStorage.Common.RemoteProperty)
 local EventBus = require(ReplicatedStorage.Common.EventBus)
-local roduxClient = require(ReplicatedStorage.ClientModules.roduxClient)
 local SoundPlayer = require(ReplicatedStorage.Common.Utils.SoundPlayer)
 local Tools = require(ReplicatedStorage.ClientModules.Tools)
 local Input = require(ReplicatedStorage.ClientModules.Input)
@@ -124,10 +123,6 @@ local function runScripts()
 	end
 end
 
-local function registerRodux()
-	roduxClient(Root)
-end
-
 local function init()
 	Root.globals = {}
 	Root.SoundPlayer = SoundPlayer.new()
@@ -171,7 +166,6 @@ local function init()
 end
 
 init()
-registerRodux()
 registerRoot()
 Root.Input:Init()
 Root.Tools:Init()

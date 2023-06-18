@@ -25,7 +25,12 @@ local Themes = {
 	}),
 	Blue = darkmode({
 		accent = Color3.fromRGB(62, 149, 216),
-		button = Color3.fromRGB(62, 149, 216),
+		button = Color3.fromRGB(50, 118, 150),
+		lessImportantButton = Color3.fromRGB(33, 35, 39),
+	}),
+	Red = darkmode({
+		accent = Color3.fromRGB(216, 62, 57),
+		button = Color3.fromRGB(161, 44, 42),
 		lessImportantButton = Color3.fromRGB(33, 35, 39),
 	}),
 }

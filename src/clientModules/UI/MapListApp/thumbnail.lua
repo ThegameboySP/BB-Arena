@@ -7,18 +7,27 @@ local RoactSpring = require(ReplicatedStorage.Packages.RoactSpring)
 local e = Roact.createElement
 
 local blendAlpha = require(script.Parent.Parent.Utils.blendAlpha)
+local snowfall = require(script.Parent.Parent.Effects.snowfall)
+local classicHalloweenSounds = require(script.Parent.Parent.Effects.classicHalloweenSounds)
+
+local function useSnow(props)
+	return true --not props.thumbnail or props.thumbnail.snow
+end
 
 local function thumbnail(props, hooks)
 	local staticRef = hooks.useBinding()
 	local thumbnailRef = hooks.useBinding()
+	local effectsRef = hooks.useBinding()
 	local styles, api = RoactSpring.useSpring(hooks, function()
-		return { static = 1, transparency = 0, blendThumbnails = 0 }
+		return { static = 1, transparency = 0, blendThumbnails = 0, effects = 0 }
 	end)
-	local lastThumbnail = hooks.useValue(props.thumbnail)
+
+	local thumbnailImage = if props.thumbnail then props.thumbnail.image else nil
+	local lastThumbnail = hooks.useValue(thumbnailImage)
 
 	hooks.useEffect(function()
-		if lastThumbnail.value ~= props.thumbnail then
-			lastThumbnail.value = props.thumbnail
+		if lastThumbnail.value ~= thumbnailImage then
+			lastThumbnail.value = thumbnailImage
 
 			api.start({
 				from = { blendThumbnails = 0 },
@@ -58,11 +67,30 @@ local function thumbnail(props, hooks)
 			thumbnailRef:getValue().Position = UDim2.new(0.5, 0, 0.5, math.sin((os.clock() - started) * PERIOD) * 8)
 		end)
 
+		-- local sound, undoSound = classicHalloweenSounds(staticRef:getValue())
+		-- sound.Volume = 0.5
+
 		return function()
 			coroutine.close(thread)
 			connection:Disconnect()
+			-- undoSound()
 		end
 	end, {})
+
+	-- local lastProps = hooks.useValue(props)
+
+	hooks.useEffect(function()
+		local undoSnowfall = snowfall(effectsRef:getValue(), 600)
+		-- if not props.thumbnail or props.thumbnail.snow then
+		-- 	undoSnowfall = snowfall(effectsRef:getValue(), 600)
+		-- end
+
+		return function()
+			undoSnowfall()
+		end
+	end, {})
+
+	-- lastProps.value = props
 
 	local blendedAlpha = Roact.joinBindings({
 		transparency = styles.transparency:map(function(value)
@@ -98,6 +126,23 @@ local function thumbnail(props, hooks)
 			end),
 			ZIndex = -1,
 		}),
+		Static = e("ImageLabel", {
+			[Roact.Ref] = staticRef,
+
+			Visible = props.thumbnail ~= nil,
+
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.new(1, 0, 1, 0),
+
+			Image = "rbxassetid://268592485",
+			BackgroundTransparency = 1,
+			ImageTransparency = styles.static:map(function(value)
+				return 0.8 - (1 - value) * 0.9
+			end),
+
+			ImageRectSize = Vector2.new(1024, 1024),
+		}),
 		Thumbnail = e("ImageLabel", {
 			[Roact.Ref] = thumbnailRef,
 
@@ -113,29 +158,20 @@ local function thumbnail(props, hooks)
 		}, {
 			BlendThumbnail = e("ImageLabel", {
 				Size = UDim2.new(1, 0, 1, 0),
-				Image = props.thumbnail,
+				Image = thumbnailImage,
 				ImageTransparency = blendedAlpha:map(function(values)
 					return blendAlpha({ values.transparency, 1 - values.blendThumbnails })
 				end),
 				BackgroundTransparency = 1,
 			}),
-			Static = e("ImageLabel", {
-				[Roact.Ref] = staticRef,
+			Effects = e("CanvasGroup", {
+				[Roact.Ref] = effectsRef,
 
-				Visible = props.thumbnail ~= nil,
-
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				Position = UDim2.new(0.5, 0, 0.5, 0),
 				Size = UDim2.new(1, 0, 1, 0),
-
-				Image = "rbxassetid://268592485",
-				BackgroundTransparency = 1,
-				ZIndex = 3,
-				ImageTransparency = styles.static:map(function(value)
-					return 0.8 - (1 - value) * 0.9
+				GroupTransparency = styles.transparency:map(function(value)
+					return (1 - value) * 0.9
 				end),
-
-				ImageRectSize = Vector2.new(1024, 1024),
+				BackgroundTransparency = 1,
 			}),
 		}),
 	})

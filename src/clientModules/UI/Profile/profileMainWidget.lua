@@ -376,15 +376,16 @@ local function getPlaceString(place)
 
 	local str = tostring(place)
 	local last = string.sub(str, -1, -1)
-	local second = string.sub(str, -2, -2)
 
-	if last == "1" and second == "1" then
-		return str .. "th"
-	elseif last == "1" and second ~= "1" then
+	if str == "11" then
+		return "11th"
+	elseif str == "12" then
+		return "12th"
+	elseif str == "13" then
+		return "13th"
+	elseif last == "1" then
 		return str .. "st"
-	elseif last == "2" and second == "2" then
-		return str .. "th"
-	elseif last == "2" and second ~= "2" then
+	elseif last == "2" then
 		return str .. "nd"
 	elseif last == "3" then
 		return str .. "rd"
@@ -407,7 +408,7 @@ end
 local SECONDS_IN_DAY = 60 * 60 * 24
 local SECONDS_IN_HOUR = 60 * 60
 local function getTimePlayedString(secondsPlayed)
-	return string.format("%dd %dh", secondsPlayed / SECONDS_IN_DAY, secondsPlayed / SECONDS_IN_HOUR)
+	return string.format("%dd %dh", secondsPlayed / SECONDS_IN_DAY, (secondsPlayed % SECONDS_IN_DAY) / SECONDS_IN_HOUR)
 end
 
 local function profileMainWidget(props, hooks)
@@ -416,7 +417,7 @@ local function profileMainWidget(props, hooks)
 
 	local selectedTab, setSelectedTab = hooks.useState(STAT_TABS[1])
 	local selectedUserId, setSelectedUserId = hooks.useState(props.localUserId)
-	local selectedPlayer = props.players[selectedUserId]
+	local selectedPlayer = props.players[selectedUserId] or props.players[props.localUserId]
 
 	local advanceY = declareUtils.NumberAdvancer.new(0)
 	-- local advanceBarY = declareUtils.NumberAdvancer.new(0)
@@ -435,7 +436,7 @@ local function profileMainWidget(props, hooks)
 			useExitButton = true,
 			draggable = true,
 
-			topColor = Color3.fromRGB(29, 31, 35),
+			topColor = theme.foreground,
 			outerRef = outerRef,
 			onClosed = props.onClosed,
 		}, {
@@ -456,7 +457,7 @@ local function profileMainWidget(props, hooks)
 					Color = ColorSequence.new({
 						ColorSequenceKeypoint.new(0, theme.background),
 						ColorSequenceKeypoint.new(0.3, theme.background),
-						ColorSequenceKeypoint.new(1, theme.background:Lerp(Color3.new(0, 0, 0), 0.4)),
+						ColorSequenceKeypoint.new(1, theme.background:Lerp(Color3.new(0, 0, 0), 0)),
 					}),
 				}),
 			}),
@@ -558,7 +559,7 @@ local function profileMainWidget(props, hooks)
 			CharacterIcon = e(circle, {
 				position = UDim2.new(0, STROKE_THICKNESS + MARGIN / 2, 0, advanceY:add(MARGIN - 6)),
 				size = UDim2.new(0, 120 + STROKE_THICKNESS, 0, advanceY:advance(120 + STROKE_THICKNESS)),
-				color = Color3.fromRGB(29, 31, 35),
+				color = theme.foreground,
 				zIndex = 2,
 			}, {
 				-- Rank = e("ImageLabel", {
@@ -608,7 +609,7 @@ local function profileMainWidget(props, hooks)
 				Position = UDim2.new(0.5, 0, 0, advanceY:add(MARGIN)),
 				Size = UDim2.new(1, -MARGIN * 2, 0, advanceY:advance(100)),
 				BorderSizePixel = 0,
-				BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+				BackgroundColor3 = Color3.new(1, 1, 1),
 				ZIndex = 5,
 			}, {
 				UIGradient = e("UIGradient", {

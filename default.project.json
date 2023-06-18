@@ -42,7 +42,20 @@
           }
         },
         "Configuration": {
-          "$className": "Configuration"
+          "$className": "Configuration",
+          "$properties": {
+            "Attributes": {
+              "StartingMapName": {
+                "String": "Arena"
+              },
+              "IsDebug": {
+                "Bool": false
+              },
+              "MockDataStoreOverride": {
+                "String": ""
+              }
+            }
+          }
         }
       },
 

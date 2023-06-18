@@ -9,6 +9,11 @@ local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local IsDebug = RunService:IsStudio() and ReplicatedStorage:FindFirstChild("Configuration"):GetAttribute("IsDebug")
 local LocalPlayer = Players.LocalPlayer
 
+local RoduxController = {
+	Priority = math.huge,
+	Name = "RoduxController",
+}
+
 local function deserializeAction(serialized, actionType, state)
 	local serializers = RoduxFeatures.serializers[actionType]
 	if serializers then
@@ -28,7 +33,7 @@ local function serializeAction(action, state)
 	return action
 end
 
-local function makeClientMiddleware(requestRemote, root)
+function RoduxController:_makeClientMiddleware(requestRemote)
 	return function(nextDispatch)
 		return function(action)
 			local meta = action.meta
@@ -37,7 +42,7 @@ local function makeClientMiddleware(requestRemote, root)
 			end
 
 			if meta and meta.serverInterested and not meta.dispatchedByServer then
-				requestRemote:FireServer(serializeAction(action, root.Store:getState()))
+				requestRemote:FireServer(serializeAction(action, self.Root.Store:getState()))
 
 				if meta.interestedUserIds and not table.find(meta.interestedUserIds, LocalPlayer.UserId) then
 					return
@@ -49,41 +54,45 @@ local function makeClientMiddleware(requestRemote, root)
 	end
 end
 
-local function roduxClient(root)
-	local initStateRemote = root:getRemoteEvent("Rodux_InitState")
-	local requestRemote = root:getRemoteEvent("Rodux_Request")
-	local actionDispatchedRemote = root:getRemoteEvent("Rodux_ActionDispatched")
+function RoduxController:OnInit()
+	self.RoduxService = self.Root:GetServerService("RoduxService")
 
-	initStateRemote.OnClientEvent:Connect(function(state)
+	local thread = coroutine.running()
+	self.RoduxService.InitState:Connect(function(state)
 		local deserialized = RoduxFeatures.reducer({}, RoduxFeatures.actions.deserialize(state))
 
-		root.Store = Rodux.Store.new(
-			RoduxFeatures.reducer,
-			deserialized,
-			{
-				Rodux.thunkMiddleware,
-				makeClientMiddleware(requestRemote, root),
-				IsDebug and RoduxFeatures.middlewares.loggerMiddleware or nil,
-			}
-		)
+		self.Root.Store = Rodux.Store.new(RoduxFeatures.reducer, deserialized, {
+			Rodux.thunkMiddleware,
+			self:_makeClientMiddleware(self.RoduxService.Request),
+			IsDebug and RoduxFeatures.middlewares.loggerMiddleware or nil,
+		})
 
-		root.StoreChanged = Signal.new()
-		root.Store.changed:connect(function(...)
-			root.StoreChanged:Fire(...)
+		self.Root.StoreChanged = Signal.new()
+		self.Root.Store.changed:connect(function(...)
+			self.Root.StoreChanged:Fire(...)
 		end)
+
+		if coroutine.status(thread) == "suspended" then
+			task.spawn(thread)
+		end
 	end)
 
-	actionDispatchedRemote.OnClientEvent:Connect(function(action, serializedType)
+	if not self.Root.Store then
+		warn("[RoduxController]", "Yielding until InitState is received")
+		coroutine.yield()
+	end
+
+	self.RoduxService.ActionDispatched:Connect(function(action, serializedType)
 		local resolvedAction = action
 		if serializedType then
-			resolvedAction = deserializeAction(action, serializedType, root.Store:getState())
+			resolvedAction = deserializeAction(action, serializedType, self.Root.Store:getState())
 		end
 
 		resolvedAction.meta = resolvedAction.meta or {}
 		resolvedAction.meta.dispatchedByServer = true
 
-		root.Store:dispatch(resolvedAction)
+		self.Root.Store:dispatch(resolvedAction)
 	end)
 end
 
-return roduxClient
+return RoduxController

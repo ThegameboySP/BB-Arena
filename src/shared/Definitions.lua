@@ -34,7 +34,13 @@ Definitions.mapMeta = t.interface({
 	IslandBaseColor = t.optional(t.Color3),
 
 	Creator = t.optional(t.string),
-	Thumbnail = t.optional(t.string),
+	Thumbnail = t.optional(t.union(
+		t.string,
+		t.strictInterface({
+			image = t.string,
+			snow = t.optional(t.boolean),
+		})
+	)),
 })
 
 Definitions.map = mapChecker(t.instanceOf("Model", {

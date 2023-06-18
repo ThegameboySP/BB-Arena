@@ -2,7 +2,7 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="ModuleScript" referent="RBX0626CF5759FE4E0D853E4C27892D1C0A">
+	<Item class="ModuleScript" referent="RBX1E2666E104AB42E29CD2EDDDDEED271E">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<Content name="LinkedSource"><null></null></Content>
@@ -18,24 +18,49 @@
 
 local TestService = game:GetService("TestService")
 local RunService = game:GetService("RunService")
+local Configuration = game:GetService("ReplicatedStorage"):FindFirstChild("Configuration")
 
 local MockDataStoreServiceModule = script.MockDataStoreService
 
 local shouldUseMock = false
-if RunService:IsStudio() then
+if TestService.ExecuteWithStudioRun and RunService:IsStudio() then
 	shouldUseMock = true
+	-- We rapidly run tests with datastores. Waiting isn't desirable here!
+	local Constants = require(script.MockDataStoreService.MockDataStoreConstants)
+	Constants.WRITE_COOLDOWN = 0.0
+else
+	local overridden = false
+	
+	if Configuration:GetAttribute("MockDataStoreOverride") then
+		local override = Configuration:GetAttribute("MockDataStoreOverride")
+		if override == "yes" then
+			shouldUseMock = true
+			overridden = true
+		elseif override == "no" then
+			shouldUseMock = false
+			overridden = true
+		end
+	end
+	
+	if not overridden then
+		if game.GameId == 0 then -- Local place file
+			shouldUseMock = true
+		elseif game:GetService("RunService"):IsStudio() then -- Published file in Studio
+			local status, message = pcall(function()
+				-- This will error if current instance has no Studio API access:
+				game:GetService("DataStoreService"):GetDataStore("__TEST"):SetAsync("__TEST", "__TEST_" .. os.time())
+			end)
+			if not status and message:find("403", 1, true) then -- HACK
+				-- Can connect to datastores, but no API access
+				shouldUseMock = true
+			end
+		end
+	end
 end
 
 -- Return the mock or actual service depending on environment:
 if shouldUseMock then
 	warn("INFO: Using MockDataStoreService instead of DataStoreService")
-	
-	-- We rapidly run tests with datastores. Waiting isn't desirable here!
-	if TestService.ExecuteWithStudioRun and RunService:IsStudio() then
-		local Constants = require(script.MockDataStoreService.MockDataStoreConstants)
-		Constants.WRITE_COOLDOWN = 0.0
-	end
-	
 	return require(MockDataStoreServiceModule)
 else
 	return game:GetService("DataStoreService")
@@ -44,7 +69,7 @@ end
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="ModuleScript" referent="RBX59871E18C0E4482EAB536D96DB987C13">
+		<Item class="ModuleScript" referent="RBX0A421AD4AD234F32AC397CF1622FEF28">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<Content name="LinkedSource"><null></null></Content>
@@ -230,7 +255,7 @@ return MockDataStoreService
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="ModuleScript" referent="RBX6D6E743C08614CADBEE4BA1181936AE1">
+			<Item class="ModuleScript" referent="RBXA4A3E1A7397B4659B7D492684951C48D">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
@@ -318,7 +343,7 @@ return {
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX3D27BD6005C54FEF96C9D76C3EDF42E7">
+			<Item class="ModuleScript" referent="RBX53CEAE11BCA6465DB819BFBB21D174E5">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
@@ -753,7 +778,7 @@ return MockDataStoreManager
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXC56604FE67D442918193194B8D2B0066">
+			<Item class="ModuleScript" referent="RBX4F5DA50387D241AE983B1992F6E1A1FE">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
@@ -820,7 +845,7 @@ return MockDataStorePages
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBXE0E9135F42F7427294309FC05500EE1C">
+			<Item class="ModuleScript" referent="RBX7EA2ACF613624C24A9C779228507A166">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
@@ -1112,7 +1137,7 @@ return MockDataStoreUtils
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX4AEB45260C6240A78D8C451736A84F53">
+			<Item class="ModuleScript" referent="RBX17EE6C1B9B764AD3A9879E092DAF4DDD">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
@@ -1571,7 +1596,7 @@ return MockGlobalDataStore
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="ModuleScript" referent="RBX5C0CDA4127A84A9481C2F4E8CD3D457D">
+			<Item class="ModuleScript" referent="RBXDF7EEDC05F3F4957B9A0B9D3E9C473D4">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>

@@ -10,8 +10,19 @@ local Rodux = require(ReplicatedStorage.Packages.Rodux)
 local t = require(ReplicatedStorage.Packages.t)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
+local Root = require(ReplicatedStorage.Common.Root)
 local actions = RoduxFeatures.actions
 local actionReplicators = require(script.actionReplicators)
+
+local RoduxService = {
+	Priority = math.huge,
+	Client = {
+		InitState = Root.Services.remoteEvent(),
+		Request = Root.Services.remoteEvent(),
+		ActionDispatched = Root.Services.remoteEvent(),
+	},
+	Name = "RoduxService",
+}
 
 local function initState()
 	local place = ServerScriptService:FindFirstChild("Place")
@@ -33,32 +44,23 @@ end
 local function serializeAction(action, state, userIds)
 	local serializers = RoduxFeatures.serializers[action.type]
 
-	if serializers then
-		local serialized
-		if serializers.serialize then
-			serialized = serializers.serialize(action, state)
-		end
+	local serializedAction
+	if serializers and serializers.serialize then
+		serializedAction = serializers.serialize(action, state)
+	end
 
-		local actionMap
-		local replicator = actionReplicators[action.type]
-		if replicator and replicator.replicate then
-			actionMap = replicator.replicate(userIds, action, state, serialized)
-		else
-			actionMap = {}
-			for _, userId in userIds do
-				actionMap[userId] = serialized or action
-			end
-		end
-
-		return actionMap, serializers.id
+	local replicator = actionReplicators[action.type]
+	if replicator and replicator.replicate then
+		local actionMap = replicator.replicate(userIds, action, state, serializedAction)
+		return actionMap, if serializers then serializers.id else nil
 	end
 
 	local actionMap = {}
 	for _, userId in userIds do
-		actionMap[userId] = action
+		actionMap[userId] = serializedAction or action
 	end
 
-	return actionMap
+	return actionMap, if serializers then serializers.id else nil
 end
 
 local function getUserIds()
@@ -70,7 +72,7 @@ local function getUserIds()
 	return userIds
 end
 
-local function makeServerMiddleware(actionDispatchedRemote, root)
+function RoduxService:_makeServerMiddleware()
 	return function(nextDispatch)
 		return function(action)
 			local meta = action.meta
@@ -80,16 +82,16 @@ local function makeServerMiddleware(actionDispatchedRemote, root)
 
 			if not meta or meta.realm ~= "server" then
 				local userIds = meta and meta.interestedUserIds or getUserIds()
-				local actionMap, serializedType = serializeAction(action, root.Store:getState(), userIds)
+				local actionMap, serializedType = serializeAction(action, self.Root.Store:getState(), userIds)
 
 				for userId, userAction in actionMap do
 					local player = Players:GetPlayerByUserId(userId)
 
 					if player and player:GetAttribute("RoduxStateInitialized") then
 						if type(userAction) == "table" and userAction.type then
-							actionDispatchedRemote:FireClient(player, userAction)
+							self.Client.ActionDispatched:FireClient(player, userAction)
 						else
-							actionDispatchedRemote:FireClient(player, userAction, serializedType)
+							self.Client.ActionDispatched:FireClient(player, userAction, serializedType)
 						end
 					end
 				end
@@ -100,11 +102,25 @@ local function makeServerMiddleware(actionDispatchedRemote, root)
 	end
 end
 
+function RoduxService:OnPlayerAdded(player)
+	local serialized = RoduxFeatures.reducer(self.Root.Store:getState(), RoduxFeatures.actions.serialize(player.UserId))
+	self.Client.InitState:FireClient(player, serialized)
+	player:SetAttribute("RoduxStateInitialized", true)
+
+	self.Root.Store:dispatch(actions.userJoined(player.UserId, player.DisplayName, player.Name))
+end
+
+function RoduxService:OnPlayerRemoving(player)
+	self.Root.Store:dispatch(actions.userLeft(player.UserId))
+end
+
 local function deserializeAction(serialized, actionType, state)
 	local serializers = RoduxFeatures.serializers[actionType]
 	if serializers then
 		return serializers.deserialize(serialized, state)
 	end
+
+	return nil
 end
 
 local actionChecker = t.interface({
@@ -112,20 +128,13 @@ local actionChecker = t.interface({
 	payload = t.table,
 })
 
-local function roduxServer(root)
-	local initStateRemote = root:getRemoteEvent("Rodux_InitState")
-	local requestRemote = root:getRemoteEvent("Rodux_Request")
-	local actionDispatchedRemote = root:getRemoteEvent("Rodux_ActionDispatched")
-
-	root.Store = Rodux.Store.new(
-		RoduxFeatures.reducer,
-		nil,
-		{
-			Rodux.thunkMiddleware,
-			makeServerMiddleware(actionDispatchedRemote, root),
-			IsDebug and RoduxFeatures.middlewares.loggerMiddleware or nil,
-		}
-	)
+function RoduxService:OnInit()
+	local root = self.Root
+	root.Store = Rodux.Store.new(RoduxFeatures.reducer, nil, {
+		Rodux.thunkMiddleware,
+		self:_makeServerMiddleware(),
+		IsDebug and RoduxFeatures.middlewares.loggerMiddleware or nil,
+	})
 
 	root.StoreChanged = Signal.new()
 	root.Store.changed:connect(function(...)
@@ -134,18 +143,7 @@ local function roduxServer(root)
 
 	root.Store:dispatch(actions.merge(initState()))
 
-	local function onPlayerAdded(player)
-		local serialized = RoduxFeatures.reducer(root.Store:getState(), RoduxFeatures.actions.serialize(player.UserId))
-		initStateRemote:FireClient(player, serialized)
-		player:SetAttribute("RoduxStateInitialized", true)
-	end
-
-	Players.PlayerAdded:Connect(onPlayerAdded)
-	for _, player in pairs(Players:GetPlayers()) do
-		onPlayerAdded(player)
-	end
-
-	requestRemote.OnServerEvent:Connect(function(client, action, serializedType)
+	self.Client.Request:Connect(function(client, action, serializedType)
 		if type(action) == "string" and serializedType then
 			local ok, deserialized = pcall(deserializeAction, action, serializedType)
 			if not ok then
@@ -171,4 +169,4 @@ local function roduxServer(root)
 	end)
 end
 
-return roduxServer
+return RoduxService

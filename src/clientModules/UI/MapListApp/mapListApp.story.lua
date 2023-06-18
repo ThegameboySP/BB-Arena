@@ -75,7 +75,10 @@ local test = {
 		["supportsCTF"] = true,
 		["supportsControlPoints"] = true,
 		["teamSize"] = 2,
-		["thumbnail"] = "rbxassetid://11567442436",
+		["thumbnail"] = {
+			image = "rbxassetid://11571707494",
+			snow = true,
+		}, --"rbxassetid://11567442436",
 	},
 	["BALLERROADS2"] = {
 		["creator"] = "GloriedRage",

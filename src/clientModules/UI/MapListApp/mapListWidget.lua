@@ -68,13 +68,18 @@ local sortingMethods = {
 local PADDING_Y = 10
 
 local function getThumbnail(props, selected)
+	local mapThumbnail = nil
 	if props.mapInfo[selected] then
-		return props.mapInfo[selected].Thumbnail
+		mapThumbnail = props.mapInfo[selected].Thumbnail
+	elseif props.activeMap then
+		mapThumbnail = props.mapInfo[props.activeMap].Thumbnail
 	end
 
-	if props.activeMap then
-		return props.mapInfo[props.activeMap].Thumbnail
+	if type(mapThumbnail) == "string" then
+		return { image = mapThumbnail }
 	end
+
+	return mapThumbnail
 end
 
 local function mapListWidget(props, hooks)
@@ -201,8 +206,13 @@ local function mapListWidget(props, hooks)
 	local rowValues = {}
 
 	for _, mapInfo in props.mapInfo do
+		local sortingColumn = mapInfo[sortBy]
+		if type(sortingColumn) == "string" then
+			sortingColumn = string.lower(sortingColumn)
+		end
+
 		table.insert(rowValues, {
-			sortingColumn = mapInfo[sortBy],
+			sortingColumn = sortingColumn,
 			mapInfo = mapInfo,
 		})
 	end

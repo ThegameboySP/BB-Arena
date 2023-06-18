@@ -1,15 +1,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserService = game:GetService("UserService")
 
+local Llama = require(ReplicatedStorage.Packages.Llama)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local WebConstants = require(ReplicatedStorage.Common.StaticData.WebConstants)
+local getFullPlayerName = require(ReplicatedStorage.Common.Utils.getFullPlayerName)
+local base64 = require(script.Parent.base64)
 
 local function serializeKey(userId, WOs)
-	return string.pack("I8I8", userId, WOs)
+	return base64.encode(string.pack("I8I8", userId, WOs))
 end
 
 local function deserializeKey(key)
-	return string.unpack("I8I8", key)
+	return string.unpack("I8I8", base64.decode(key))
 end
 
 local Leaderboard = {}
@@ -40,6 +44,7 @@ function Leaderboard:Update()
 
 	local leaderboard = {}
 	local entryByUserId = {}
+	local userIds = {}
 	for _, entry in top100 do
 		local userId, WOs = deserializeKey(entry.key)
 
@@ -48,10 +53,15 @@ function Leaderboard:Update()
 		-- This shouldn't cause throttling since it's rare. And even if two servers do the same thing, they're setting it to the same value.
 		if existingEntry then
 			if entry.value >= existingEntry.KOs or WOs >= existingEntry.WOs then
+				self._log("[Leaderboard]", "Removing old entry", userId, existingEntry.WOs, existingEntry.KOs)
 				task.spawn(function()
-					self._leaderboard:SetAsync(serializeKey(existingEntry.userId, existingEntry.WOs), nil)
+					self._leaderboard:RemoveAsync(serializeKey(existingEntry.userId, existingEntry.WOs))
 				end)
+
+				-- This entry is older. Don't display it to users.
+				table.remove(leaderboard, table.find(leaderboard, userId))
 			else
+				self._log("[Leaderboard]", "Removing old entry", userId, entry.WOs, entry.KOs)
 				task.spawn(function()
 					self._leaderboard:RemoveAsync(serializeKey(userId, WOs))
 				end)
@@ -67,10 +77,42 @@ function Leaderboard:Update()
 			KOs = entry.value,
 		}
 
+		table.insert(userIds, userId)
 		table.insert(leaderboard, entryByUserId[userId])
 	end
 
-	self._store:dispatch(RoduxFeatures.actions.leaderboardFetched(leaderboard))
+	return Promise.try(function()
+		return UserService:GetUserInfosByUserIdsAsync(userIds)
+	end)
+		:andThen(function(userInfos)
+			local gotUserInfo = {}
+			for _, userInfo in userInfos do
+				entryByUserId[userInfo.Id].name = getFullPlayerName(userInfo.DisplayName, userInfo.Username)
+				gotUserInfo[userInfo.Id] = true
+			end
+
+			for i = #leaderboard, 1, -1 do
+				local entry = leaderboard[i]
+				if not gotUserInfo[entry.userId] then
+					self._log("[Leaderboard]", "Removing", entry.userId, entry.WOs, ": UserId is somehow invalid")
+
+					table.remove(leaderboard, i)
+
+					task.spawn(function()
+						self._leaderboard:RemoveAsync(serializeKey(entry.userId, entry.WOs))
+					end)
+				end
+			end
+
+			local current = self._store:getState().leaderboard.users
+			if not Llama.Dictionary.equalsDeep(current, leaderboard) then
+				self._log("[Leaderboard]", "Dispatching leaderboard fetched because it's changed")
+				self._store:dispatch(RoduxFeatures.actions.leaderboardFetched(leaderboard))
+			end
+		end)
+		:catch(function(infosErr)
+			self._log("[Leaderboard]", "Failed to fetch users info:", tostring(infosErr))
+		end)
 end
 
 function Leaderboard:Schedule()
@@ -78,7 +120,7 @@ function Leaderboard:Schedule()
 	self:Update()
 end
 
-function Leaderboard:OnUserDisconnecting(userId, newStats, oldStats)
+function Leaderboard:OnUserDisconnecting(userId, newStats, oldStats, name)
 	local alltimeKOs = newStats.KOs
 	local alltimeWOs = newStats.WOs
 	local oldKOs = if oldStats then oldStats.KOs else 0
@@ -86,18 +128,23 @@ function Leaderboard:OnUserDisconnecting(userId, newStats, oldStats)
 
 	-- Don't update anything if there has been no change, or if they never had a KO.
 	if (oldKOs == alltimeKOs and oldWOs == alltimeWOs) or alltimeKOs <= 0 then
+		self._log("[Leaderboard]", "Not updating", name, "data")
 		return Promise.resolve()
 	end
 
+	self._log("[Leaderboard]", "Updating", name, "data")
+
 	return Promise.all({
 		Promise.try(function()
-			if oldStats then
+			if oldStats and alltimeWOs > oldWOs then
 				local oldKey = serializeKey(userId, oldWOs)
+				self._log(oldKey)
 				self._leaderboard:RemoveAsync(oldKey)
 			end
 		end),
 		Promise.try(function()
-			local newKey = serializeKey(userId, newStats.WOs)
+			local newKey = serializeKey(userId, alltimeWOs)
+			self._log(newKey)
 			self._leaderboard:SetAsync(newKey, alltimeKOs)
 		end),
 	}):catch(function(err)
