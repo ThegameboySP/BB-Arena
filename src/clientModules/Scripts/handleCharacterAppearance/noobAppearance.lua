@@ -1,10 +1,10 @@
 local bodyColors = Instance.new("BodyColors")
-bodyColors.HeadColor3 = Color3.fromRGB(245, 205, 48)
-bodyColors.LeftArmColor3 = Color3.fromRGB(245, 205, 48)
-bodyColors.LeftLegColor3 = Color3.fromRGB(18, 18, 18)
-bodyColors.RightArmColor3 = Color3.fromRGB(245, 205, 48)
-bodyColors.RightLegColor3 = Color3.fromRGB(18, 18, 18)
-bodyColors.TorsoColor3 = Color3.fromRGB(18, 18, 18)
+bodyColors.HeadColor3 = BrickColor.new("Bright yellow").Color
+bodyColors.LeftArmColor3 = BrickColor.new("Bright yellow").Color
+bodyColors.RightArmColor3 = BrickColor.new("Bright yellow").Color
+bodyColors.LeftLegColor3 = BrickColor.new("Br. yellowish green").Color
+bodyColors.RightLegColor3 = BrickColor.new("Br. yellowish green").Color
+bodyColors.TorsoColor3 = BrickColor.new("Bright blue").Color
 
 local face = Instance.new("Decal")
 face.Texture = "rbxasset://textures/face.png"
