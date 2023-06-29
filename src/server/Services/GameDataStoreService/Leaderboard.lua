@@ -21,11 +21,12 @@ Leaderboard.__index = Leaderboard
 Leaderboard.serializeKey = serializeKey
 Leaderboard.deserializeKey = deserializeKey
 
-function Leaderboard.new(store, leaderboardStore, log)
+function Leaderboard.new(store, leaderboardStore, log, getStatsForPlayer)
 	return setmetatable({
 		_store = store,
 		_leaderboard = leaderboardStore,
 		_log = log,
+		_getStatsForPlayer = getStatsForPlayer,
 	}, Leaderboard)
 end
 
@@ -45,25 +46,54 @@ function Leaderboard:Update()
 	local leaderboard = {}
 	local entryByUserId = {}
 	local userIds = {}
+	local authoritativeStatsByUserId = {}
+
 	for _, entry in top100 do
 		local userId, WOs = deserializeKey(entry.key)
-
 		local existingEntry = entryByUserId[userId]
-		-- If there are duplicate entries of the same user, be sure to delete the one that has fewer KOs or WOs (oldest).
-		-- This shouldn't cause throttling since it's rare. And even if two servers do the same thing, they're setting it to the same value.
+
+		-- If there are duplicate entries of the same user, be sure to delete the ones that are outdated.
+		-- This shouldn't cause throttling since it's rare. And even if two servers do the same thing,
+		-- they're setting it to the same value (removing it).
 		if existingEntry then
-			if entry.value >= existingEntry.KOs or WOs >= existingEntry.WOs then
-				self._log("[Leaderboard]", "Removing old entry", userId, existingEntry.WOs, existingEntry.KOs)
+			if not authoritativeStatsByUserId[userId] then
+				authoritativeStatsByUserId[userId] = self._getStatsForPlayer(userId)
+			end
+
+			local authoritativeKey = serializeKey(userId, authoritativeStatsByUserId[userId].WOs)
+			local existingKey = serializeKey(userId, existingEntry.WOs)
+			local thisKey = serializeKey(userId, WOs)
+
+			if authoritativeKey ~= existingKey then
+				self._log(
+					string.format(
+						"[Leaderboard] Removing old entry %s: KOs: %d WOs: %d",
+						tostring(userId),
+						existingEntry.KOs,
+						existingEntry.WOs
+					)
+				)
+
 				task.spawn(function()
-					self._leaderboard:RemoveAsync(serializeKey(existingEntry.userId, existingEntry.WOs))
+					self._leaderboard:RemoveAsync(existingKey)
 				end)
 
 				-- This entry is older. Don't display it to users.
 				table.remove(leaderboard, table.find(leaderboard, userId))
-			else
-				self._log("[Leaderboard]", "Removing old entry", userId, entry.WOs, entry.KOs)
+			end
+
+			if authoritativeKey ~= thisKey then
+				self._log(
+					string.format(
+						"[Leaderboard] Removing old entry %s: KOs: %d WOs: %d",
+						tostring(userId),
+						entry.value,
+						WOs
+					)
+				)
+
 				task.spawn(function()
-					self._leaderboard:RemoveAsync(serializeKey(userId, WOs))
+					self._leaderboard:RemoveAsync(thisKey)
 				end)
 
 				-- This entry is older. Don't display it to users.
@@ -127,7 +157,7 @@ function Leaderboard:OnUserDisconnecting(userId, newStats, oldStats, name)
 	local oldWOs = if oldStats then oldStats.WOs else 0
 
 	-- Don't update anything if there has been no change, or if they never had a KO.
-	if (oldKOs == alltimeKOs and oldWOs == alltimeWOs) or alltimeKOs <= 0 then
+	if oldKOs == alltimeKOs and oldWOs == alltimeWOs then
 		self._log("[Leaderboard]", "Not updating", name, "data")
 		return Promise.resolve()
 	end
@@ -138,13 +168,11 @@ function Leaderboard:OnUserDisconnecting(userId, newStats, oldStats, name)
 		Promise.try(function()
 			if oldStats and alltimeWOs > oldWOs then
 				local oldKey = serializeKey(userId, oldWOs)
-				self._log(oldKey)
 				self._leaderboard:RemoveAsync(oldKey)
 			end
 		end),
 		Promise.try(function()
 			local newKey = serializeKey(userId, alltimeWOs)
-			self._log(newKey)
 			self._leaderboard:SetAsync(newKey, alltimeKOs)
 		end),
 	}):catch(function(err)

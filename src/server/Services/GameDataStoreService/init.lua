@@ -6,6 +6,7 @@ local Players = game:GetService("Players")
 local DataStoreService = require(ServerScriptService.Packages.MockDataStoreService)
 local Promise = require(ReplicatedStorage.Packages.Promise)
 local Signal = require(ReplicatedStorage.Packages.Signal)
+local Llama = require(ReplicatedStorage.Packages.Llama)
 
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
@@ -75,8 +76,14 @@ end
 
 function GameDataStoreService:OnInit()
 	self._playerData = DataStoreService:GetDataStore("PlayerData")
-	self._leaderboard =
-		Leaderboard.new(self.Root.Store, DataStoreService:GetOrderedDataStore("PlayerKOLeaderboard"), warn)
+	self._leaderboard = Leaderboard.new(
+		self.Root.Store,
+		DataStoreService:GetOrderedDataStore("PlayerKOLeaderboard"),
+		warn,
+		function(userId)
+			return self._playerData:GetAsync(userId).stats
+		end
+	)
 	self._leaderboard:Schedule()
 end
 
@@ -126,7 +133,7 @@ function GameDataStoreService:OnPlayerRemoving(player)
 		:andThen(function(newData, oldData)
 			return self._leaderboard:OnUserDisconnecting(
 				userId,
-				newData.stats, -- was nil
+				newData.stats,
 				if oldData then oldData.stats else nil,
 				player.Name
 			)
@@ -154,6 +161,33 @@ function GameDataStoreService:IsPlayerLoaded(userId)
 	end
 
 	return Promise.reject()
+end
+
+-- If the player's data is being saved on a different server, there are three edge cases:
+-- A.) We update first. In which case, the other server will work off our latest value. No problem.
+-- B.) We update last. In which case, the stats they accumulated on that server will be removed,
+-- and the leaderboard info the other server just set likely will be removed as well, assuming
+-- there are no odd Datastore delays.
+-- C.) The above, but there was a delay, meaning the old leaderboard value and our new one both
+-- exist. If both are in the top 100, the oldest should be cleared next refresh.
+function GameDataStoreService:SetLeaderboardData(userId, key, value)
+	local oldStats
+	local newStats
+	Promise.promisify(self._playerData.UpdateAsync)(self._playerData, userId, function(data)
+		oldStats = Llama.Dictionary.copyDeep(data.stats)
+		newStats = data.stats
+
+		data.stats[key] = value
+
+		return data
+	end)
+		:andThen(function()
+			self.Root.Store:dispatch(RoduxFeatures.actions.initializeUserStats(userId, newStats))
+			return self._leaderboard:OnUserDisconnecting(userId, newStats, oldStats, tostring(userId))
+		end)
+		:andThen(function()
+			self._leaderboard:Update()
+		end)
 end
 
 return GameDataStoreService

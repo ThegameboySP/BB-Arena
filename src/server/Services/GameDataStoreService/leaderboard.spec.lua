@@ -27,11 +27,14 @@ return function()
 	it("should return top 100 player results, clearing and not displaying any dup entries", function()
 		local datastore = MockDataStoreService:GetOrderedDataStore(tostring({}))
 		local store = Rodux.Store.new(RoduxFeatures.reducer)
-		local leaderboard = Leaderboard.new(store, datastore, function() end)
+		local latest
+		local leaderboard = Leaderboard.new(store, datastore, function() end, function()
+			return latest
+		end)
 
 		local userId = 1
-		local one = { KOs = 1, WOs = 0 }
-		local two = { KOs = 2, WOs = 1 }
+		local one = { KOs = 2, WOs = 0 }
+		local two = { KOs = 1, WOs = 1 }
 		local oldKey = Leaderboard.serializeKey(userId, one.WOs)
 
 		local removeAsync = datastore.RemoveAsync
@@ -43,7 +46,9 @@ return function()
 			return removeAsync(self, key)
 		end
 
+		latest = one
 		leaderboard:OnUserDisconnecting(userId, one, nil):await()
+		latest = two
 		leaderboard:OnUserDisconnecting(userId, two, one):await()
 
 		datastore.RemoveAsync = removeAsync

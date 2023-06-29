@@ -5,4 +5,5 @@ return makeEnum("AdminTiers", {
 	None = 0,
 	Admin = 1,
 	Owner = 2,
+	SuperOwner = 3,
 })

@@ -29,9 +29,8 @@ local function canRun(permissions, userId, group)
 	local playerAdmin = permissions.admins[userId] or 0
 
 	if group == "Referee" then
-		return
-			(permissions.referees[userId] and playerAdmin >= GameEnum.AdminTiers.Admin)
-				or (not permissions.referees[userId] and playerAdmin >= GameEnum.AdminTiers.Owner)
+		return (permissions.referees[userId] and playerAdmin >= GameEnum.AdminTiers.Admin)
+			or (not permissions.referees[userId] and playerAdmin >= GameEnum.AdminTiers.Owner)
 	end
 
 	local requiredAdmin = 0
@@ -39,6 +38,8 @@ local function canRun(permissions, userId, group)
 		requiredAdmin = GameEnum.AdminTiers.Admin
 	elseif group == "Owner" or group == "DefaultDebug" then
 		requiredAdmin = GameEnum.AdminTiers.Owner
+	elseif group == "SuperOwner" then
+		requiredAdmin = GameEnum.AdminTiers.SuperOwner
 	end
 
 	return playerAdmin >= requiredAdmin
