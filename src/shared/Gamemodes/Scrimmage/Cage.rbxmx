@@ -2,7 +2,7 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="Model" referent="RBX707730573D6047B2B98387832668FFDB">
+	<Item class="Model" referent="RBXB7E422A137664DF3901C26146003A2E9">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<token name="LevelOfDetail">0</token>
@@ -26,15 +26,17 @@
 				<Y>0</Y>
 				<Z>0</Z>
 			</Vector3>
+			<token name="ModelStreamingMode">0</token>
 			<string name="Name">Cage</string>
 			<bool name="NeedsPivotMigration">false</bool>
-			<Ref name="PrimaryPart">RBX06706D78AE804F46B172B6DF0DC67B89</Ref>
+			<Ref name="PrimaryPart">RBXA46CF2E4CE7345E3B2FCA7EB306B0192</Ref>
+			<float name="ScaleFactor">1</float>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 			<OptionalCoordinateFrame name="WorldPivotData">
 				<CFrame>
 					<X>0</X>
-					<Y>292</Y>
+					<Y>792</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -48,7 +50,7 @@
 				</CFrame>
 			</OptionalCoordinateFrame>
 		</Properties>
-		<Item class="Part" referent="RBX06706D78AE804F46B172B6DF0DC67B89">
+		<Item class="Part" referent="RBXA46CF2E4CE7345E3B2FCA7EB306B0192">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -62,7 +64,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>292</Y>
+					<Y>792</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -78,11 +80,13 @@
 				<bool name="CanQuery">true</bool>
 				<bool name="CanTouch">true</bool>
 				<bool name="CastShadow">false</bool>
+				<string name="CollisionGroup">Default</string>
 				<int name="CollisionGroupId">0</int>
 				<Color3uint8 name="Color3uint8">4279970357</Color3uint8>
 				<PhysicalProperties name="CustomPhysicalProperties">
 					<CustomPhysics>false</CustomPhysics>
 				</PhysicalProperties>
+				<bool name="EnableFluidForces">false</bool>
 				<float name="FrontParamA">-0.5</float>
 				<float name="FrontParamB">0.5</float>
 				<token name="FrontSurface">0</token>
@@ -142,7 +146,7 @@
 				</Vector3>
 			</Properties>
 		</Item>
-		<Item class="Part" referent="RBX503542283855483A98D6C48742FC14DA">
+		<Item class="Part" referent="RBXF6A4FF51281A4BD894DB7F6C4F57E8D8">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -156,7 +160,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>305</Y>
+					<Y>805</Y>
 					<Z>-24.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -172,11 +176,13 @@
 				<bool name="CanQuery">true</bool>
 				<bool name="CanTouch">true</bool>
 				<bool name="CastShadow">false</bool>
+				<string name="CollisionGroup">Default</string>
 				<int name="CollisionGroupId">0</int>
 				<Color3uint8 name="Color3uint8">4279970357</Color3uint8>
 				<PhysicalProperties name="CustomPhysicalProperties">
 					<CustomPhysics>false</CustomPhysics>
 				</PhysicalProperties>
+				<bool name="EnableFluidForces">false</bool>
 				<float name="FrontParamA">-0.5</float>
 				<float name="FrontParamB">0.5</float>
 				<token name="FrontSurface">0</token>
@@ -236,7 +242,7 @@
 				</Vector3>
 			</Properties>
 		</Item>
-		<Item class="Part" referent="RBXAE248349F164405280B6DD6A68BA7577">
+		<Item class="Part" referent="RBXB164A4A8521A42F5AE4FC03191E72587">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -250,7 +256,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>305</Y>
+					<Y>805</Y>
 					<Z>24.5</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -266,11 +272,13 @@
 				<bool name="CanQuery">true</bool>
 				<bool name="CanTouch">true</bool>
 				<bool name="CastShadow">false</bool>
+				<string name="CollisionGroup">Default</string>
 				<int name="CollisionGroupId">0</int>
 				<Color3uint8 name="Color3uint8">4279970357</Color3uint8>
 				<PhysicalProperties name="CustomPhysicalProperties">
 					<CustomPhysics>false</CustomPhysics>
 				</PhysicalProperties>
+				<bool name="EnableFluidForces">false</bool>
 				<float name="FrontParamA">-0.5</float>
 				<float name="FrontParamB">0.5</float>
 				<token name="FrontSurface">0</token>
@@ -330,7 +338,7 @@
 				</Vector3>
 			</Properties>
 		</Item>
-		<Item class="Part" referent="RBXC3B8BB6050334BA196F6373B0BE2A791">
+		<Item class="Part" referent="RBX54E60756B4B24D43A596CBAC4B1B76FD">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -344,7 +352,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>-24.5</X>
-					<Y>305</Y>
+					<Y>805</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -360,11 +368,13 @@
 				<bool name="CanQuery">true</bool>
 				<bool name="CanTouch">true</bool>
 				<bool name="CastShadow">false</bool>
+				<string name="CollisionGroup">Default</string>
 				<int name="CollisionGroupId">0</int>
 				<Color3uint8 name="Color3uint8">4279970357</Color3uint8>
 				<PhysicalProperties name="CustomPhysicalProperties">
 					<CustomPhysics>false</CustomPhysics>
 				</PhysicalProperties>
+				<bool name="EnableFluidForces">false</bool>
 				<float name="FrontParamA">-0.5</float>
 				<float name="FrontParamB">0.5</float>
 				<token name="FrontSurface">0</token>
@@ -424,7 +434,7 @@
 				</Vector3>
 			</Properties>
 		</Item>
-		<Item class="Part" referent="RBX656EB80D7BFA4BC88EC909E207CFA616">
+		<Item class="Part" referent="RBX3B3B0F538F2C4053AD8DAE6325194C5F">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -438,7 +448,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>24.5</X>
-					<Y>305</Y>
+					<Y>805</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -454,11 +464,13 @@
 				<bool name="CanQuery">true</bool>
 				<bool name="CanTouch">true</bool>
 				<bool name="CastShadow">false</bool>
+				<string name="CollisionGroup">Default</string>
 				<int name="CollisionGroupId">0</int>
 				<Color3uint8 name="Color3uint8">4279970357</Color3uint8>
 				<PhysicalProperties name="CustomPhysicalProperties">
 					<CustomPhysics>false</CustomPhysics>
 				</PhysicalProperties>
+				<bool name="EnableFluidForces">false</bool>
 				<float name="FrontParamA">-0.5</float>
 				<float name="FrontParamB">0.5</float>
 				<token name="FrontSurface">0</token>
@@ -518,7 +530,7 @@
 				</Vector3>
 			</Properties>
 		</Item>
-		<Item class="Part" referent="RBXD0E1EA9A11B84303B124BC7D913CAE59">
+		<Item class="Part" referent="RBX28A4B0B8647D435D958EBEBF3EF3899C">
 			<Properties>
 				<bool name="Anchored">true</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -532,7 +544,7 @@
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
 					<X>0</X>
-					<Y>318</Y>
+					<Y>818</Y>
 					<Z>0</Z>
 					<R00>1</R00>
 					<R01>0</R01>
@@ -548,11 +560,13 @@
 				<bool name="CanQuery">true</bool>
 				<bool name="CanTouch">true</bool>
 				<bool name="CastShadow">false</bool>
+				<string name="CollisionGroup">Default</string>
 				<int name="CollisionGroupId">0</int>
 				<Color3uint8 name="Color3uint8">4279970357</Color3uint8>
 				<PhysicalProperties name="CustomPhysicalProperties">
 					<CustomPhysics>false</CustomPhysics>
 				</PhysicalProperties>
+				<bool name="EnableFluidForces">false</bool>
 				<float name="FrontParamA">-0.5</float>
 				<float name="FrontParamB">0.5</float>
 				<token name="FrontSurface">0</token>
