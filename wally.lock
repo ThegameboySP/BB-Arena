@@ -13,11 +13,6 @@ version = "1.9.0"
 dependencies = []
 
 [[package]]
-name = "evaera/matter"
-version = "0.6.2"
-dependencies = [["TestEZ", "roblox/testez@0.4.1"]]
-
-[[package]]
 name = "evaera/promise"
 version = "4.0.0"
 dependencies = []
@@ -65,4 +60,4 @@ dependencies = []
 [[package]]
 name = "thegameboysp/bb"
 version = "0.0.0"
-dependencies = [["Llama", "freddylist/llama@1.1.1"], ["Matter", "evaera/matter@0.6.2"], ["Promise", "evaera/promise@4.0.0"], ["Roact", "roblox/roact@1.4.4"], ["RoactHooks", "kampfkarren/roact-hooks@0.3.0"], ["RoactRodux", "roblox/roact-rodux@0.3.0"], ["RoactSpring", "chriscerie/roact-spring@1.1.6"], ["Rodux", "roblox/rodux@3.0.0"], ["Signal", "sleitnick/signal@1.1.0"], ["TestEZ", "roblox/testez@0.4.1"], ["t", "osyrisrblx/t@3.0.0"], ["Cmdr", "evaera/cmdr@1.9.0"]]
+dependencies = [["Llama", "freddylist/llama@1.1.1"], ["Promise", "evaera/promise@4.0.0"], ["Roact", "roblox/roact@1.4.4"], ["RoactHooks", "kampfkarren/roact-hooks@0.3.0"], ["RoactRodux", "roblox/roact-rodux@0.3.0"], ["RoactSpring", "chriscerie/roact-spring@1.1.6"], ["Rodux", "roblox/rodux@3.0.0"], ["Signal", "sleitnick/signal@1.1.0"], ["TestEZ", "roblox/testez@0.4.1"], ["t", "osyrisrblx/t@3.0.0"], ["Cmdr", "evaera/cmdr@1.9.0"]]

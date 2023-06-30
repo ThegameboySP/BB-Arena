@@ -15,7 +15,6 @@ Roact = "roblox/roact@1.4.2"
 RoactRodux = "roblox/roact-rodux@0.3.0"
 RoactHooks = "kampfkarren/roact-hooks@0.3.0"
 RoactSpring = "chriscerie/roact-spring@1.1.6"
-Matter = "evaera/matter@0.6.2"
 TestEZ = "roblox/testez@0.4.1"
 
 [server-dependencies]

@@ -13,7 +13,6 @@ local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 local Binder = require(ReplicatedStorage.Common.Components.Binder)
 local ClonerManager = require(ReplicatedStorage.Common.Component).ClonerManager
 local Definitions = require(ReplicatedStorage.Common.Definitions)
-local MatterComponents = require(ReplicatedStorage.Common.MatterComponents)
 
 local reconcileTeams = require(script.reconcileTeams)
 

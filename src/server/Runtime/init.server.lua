@@ -1,4 +1,3 @@
-local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local TestService = game:GetService("TestService")
@@ -16,8 +15,6 @@ local defaultGlobalValues = require(script.Parent.defaultGlobalValues)
 local loadTools = require(script.loadTools)
 local resetPlayer = require(script.resetPlayer)
 local bindPlayers = require(script.bindPlayers)
-
-local ServerSystems = ServerScriptService.Server.ServerSystems
 
 local Configuration = ReplicatedStorage.Configuration
 local Services = script.Parent.Services
@@ -48,9 +45,6 @@ end
 
 local function registerRoot()
 	Root.services:RegisterServicesIn(Services)
-	Root.state.mapSupportsGladiators = true
-	Root.state.adminRequestsGladiators = true
-
 	Root:Start({}):catch(warn):await()
 
 	local startingMapName = Configuration:GetAttribute("StartingMapName")
