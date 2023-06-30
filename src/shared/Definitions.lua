@@ -27,6 +27,18 @@ local function mapChecker(checker)
 	end
 end
 
+local thumbnailChecker = t.union(
+	t.string,
+	t.strictInterface({
+		image = t.string,
+		snow = t.optional(t.boolean),
+		creepy = t.optional(t.boolean),
+		scrollingDirection = t.optional(t.literal("X", "Y")),
+		scrollingBehavior = t.optional(t.literal("Sine", "Linear")),
+		scrollingTime = t.optional(t.number),
+	})
+)
+
 Definitions.mapMeta = t.interface({
 	Teams = t.map(t.string, t.BrickColor),
 
@@ -34,13 +46,7 @@ Definitions.mapMeta = t.interface({
 	IslandBaseColor = t.optional(t.Color3),
 
 	Creator = t.optional(t.string),
-	Thumbnail = t.optional(t.union(
-		t.string,
-		t.strictInterface({
-			image = t.string,
-			snow = t.optional(t.boolean),
-		})
-	)),
+	Thumbnail = t.optional(t.union(thumbnailChecker, t.array(thumbnailChecker))),
 })
 
 Definitions.map = mapChecker(t.instanceOf("Model", {
