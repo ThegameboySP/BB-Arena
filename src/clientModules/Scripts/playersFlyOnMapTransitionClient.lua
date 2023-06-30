@@ -81,7 +81,7 @@ local function playersFlyOnMapTransitionClient(root)
 					-- and all fighting players will be respawned anyway.
 					for _, descendant in LocalPlayer.Character:GetDescendants() do
 						if descendant:IsA("BasePart") then
-							PhysicsService:SetPartCollisionGroup(descendant, "Game_NoClip")
+							descendant.CollisionGroup = "Game_NoClip"
 						end
 					end
 				end

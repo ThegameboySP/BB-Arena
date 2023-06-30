@@ -27,14 +27,14 @@ function Load(Settings)
 	local ModSettings = require(SettingsScript.ModifiableSettingsArrays)
 	local Directories = script.Directories
 	local NewSettings = require(SettingsScript)
-	
+
 	OverwriteTable(NewSettings, Settings)
 
 	SettingsScript.Name = "BB_Settings"
 	SettingsScript.Parent = RepStorage
-	
+
 	OverwriteIncompatibleSettings(NewSettings)
-	
+
 	-- Handle ThemePacks
 	local themes = Directories.ReplicatedStorage.Themes
 	for _, Module in pairs(NewSettings.Themes.ThemePacks) do
@@ -61,7 +61,7 @@ function Load(Settings)
 			warn("Improper type for themepack: type() must return userdata (folder)")
 		end
 	end
-	
+
 	-- Set physics properties (these are all used entirely locally)
 	local PhysicsTable = {
 		ToolHandles = {
@@ -110,17 +110,17 @@ function Load(Settings)
 			BombJumpBombs = false;
 		};
 	}
-	
+
 	for Group, _ in pairs(PhysicsTable) do
-		Physics:CreateCollisionGroup(Group)
+		Physics:RegisterCollisionGroup(Group)
 	end
-	
+
 	for Group, Table in pairs(PhysicsTable) do
 		for OtherGroup, Collidable in pairs(Table) do
 			Physics:CollisionGroupSetCollidable(Group, OtherGroup, Collidable)
 		end
 	end
-	
+
 	-- Return settings upon client request
 	local CallbacksReparented = false
 	local CallbacksReparented_ = Instance.new("BindableEvent")
@@ -130,7 +130,7 @@ function Load(Settings)
 		end
 		return NewSettings
 	end
-	
+
 	-- Remove filtered weapons
 	for _, Tool in pairs(script.Directories.StarterPack:GetChildren()) do
 		local Tool_Filtered = table.find(NewSettings.WeaponsFiltered, Tool.Name) ~= nil
@@ -138,7 +138,7 @@ function Load(Settings)
 			Tool.Parent = ServerStorage
 		end
 	end
-	
+
 	-- If existent, parent weapons to custom directory
 	if NewSettings.CustomWeaponsDirectory then
 		for _,Tool in pairs(script.Directories.StarterPack:GetChildren()) do
@@ -146,16 +146,16 @@ function Load(Settings)
 		end
 		script.Directories.StarterPack:Destroy()
 	end
-	
+
 	local repStorage = Directories.ReplicatedStorage
-	
+
 	local TimeValue = repStorage.SERVER_TIME
 	local Remotes = repStorage.ToolNetworking
 	local Modules = repStorage.ToolModules
 	local ProjectileFolder = Directories.Workspace.Projectiles
 	local ActiveFolder = ProjectileFolder.Active
 	local BufferFolder = ProjectileFolder.Buffers -- for trowels
-	
+
 	-- Distribute objects
 	require(script.DistributeObjects)(script.Directories)
 
@@ -167,50 +167,50 @@ function Load(Settings)
 	GlobalTable.MasterTimeTable = {}
 	GlobalTable.ProjectileCounts = {}
 	GlobalTable.ServerTime = TimeValue
-	
+
 	-- Handle callbacks
 	local Callbacks = SettingsScript:WaitForChild("Callbacks")
 	Callbacks.Parent = Modules
-	
+
 	local approved = {}
 	for name, module in pairs(NewSettings.Callbacks) do
-		if typeof(module) == "Instance" 
-			and module:IsA("ModuleScript") 
+		if typeof(module) == "Instance"
+			and module:IsA("ModuleScript")
 			and type(require(module)) == "function" then
 			table.insert(approved, module)
 			module.Name = name
 			module.Parent = Callbacks
 		end
 	end
-	
+
 	for _, child in pairs (Callbacks:GetChildren()) do
 		if not table.find(approved, child) then
 			child:Destroy() -- delete unnecessary extrenuous modules
 		end
 	end
-	
+
 	CallbacksReparented = true
 	CallbacksReparented_:Fire()
 	game:GetService("Debris"):AddItem(CallbacksReparented_, 0)
-	
-	-- Functions to load weapons and data for players	
+
+	-- Functions to load weapons and data for players
 	local function CreateProjectileFolders(Player)
 		local PlayerBufferFolder = Instance.new("Folder")
 		PlayerBufferFolder.Name = Player.Name
 		PlayerBufferFolder.Parent = BufferFolder
-		
+
 		local PlayerActiveFolder = Instance.new("Folder")
 		PlayerActiveFolder.Name = Player.Name
 		PlayerActiveFolder.Parent = ActiveFolder
 	end
-	
+
 	local function AddBufferValues(Player)
 		local Buffers = Player:FindFirstChild("Buffers")
 		if not Buffers then
 			StarterPlayer:FindFirstChild("Buffers"):Clone().Parent = Player
 		end
 	end
-	
+
 	local function LoadModule(Tool,Buffers,Player,Character)
 		local ServerFolder = Tool:WaitForChild("Server",1)
 		local ServerModule = ServerFolder and ServerFolder:FindFirstChildWhichIsA("ModuleScript")
@@ -219,17 +219,17 @@ function Load(Settings)
 			require(ServerModule):Init(NewSettings, Modules, Buffers, Player, Character, ProjectileFolder)
 		end
 	end
-	
-	local function AddCharacter(Player, Character)		
+
+	local function AddCharacter(Player, Character)
 		local Buffers = Player:WaitForChild("Buffers")
 		--[[if not Character then
 			return
 		end]]
-		
+
 		if not Collections:HasTag(Character, "ToolsLoaded") then
 			local Backpack = Player:WaitForChild("Backpack")
 			Collections:AddTag(Character, "ToolsLoaded")
-			
+
 			-- Ensure player has weapons
 			local spawnedWithout = 0
 			if not NewSettings.CustomWeaponsDirectory then
@@ -240,18 +240,18 @@ function Load(Settings)
 					end
 				end
 			end
-			
+
 			if spawnedWithout > 0 then
 				--print(Player.Name.." spawned without", spawnedWithout, "tools.")
 			end
-			
+
 			-- Load weapon
 			for _,Tool in pairs(Backpack:GetChildren()) do
 				task.spawn(LoadModule, Tool, Buffers, Player, Character)
 			end
 		end
 	end
-	
+
 	local function AddPlayer(Player)
 		local emptyTable = {
 			Superballs = 0;
@@ -261,11 +261,11 @@ function Load(Settings)
 			Walls = 0;
 			Paintballs = 0;
 		}
-		
+
 		local directory = _G.BB and _G.BB or GlobalTable
 		directory.MasterTimeTable[Player.Name] = {}
 		directory.ProjectileCounts[Player.Name] = emptyTable
-		
+
 		local Theme = Instance.new("StringValue")
 		Theme.Name = "Theme"
 		Theme.Value = "Normal"
@@ -273,7 +273,7 @@ function Load(Settings)
 		task.spawn(CreateProjectileFolders,Player)
 		task.spawn(AddBufferValues,Player)
 	end
-	
+
 	local function RemovePlayer(Player)
 		local PlayerBufferFolder = BufferFolder:WaitForChild(Player.Name,1)
 		local PlayerActiveFolder = ActiveFolder:WaitForChild(Player.Name,1)
@@ -285,23 +285,23 @@ function Load(Settings)
 		end
 		_G.BB.ProjectileCounts[Player.Name] = nil
 	end
-	
+
 	-- Release global table
 	GlobalTable.LoadModule = LoadModule
 	GlobalTable.InitializeServer = AddCharacter
 	_G.BB = GlobalTable
-	
+
 	-- Load player modules
 	require(script.LoadPlayerModules)(AddPlayer, RemovePlayer, AddCharacter)
-	
-	
+
+
 	-- Distribute checker script to ensure players have mandatory client scripts
 	for _, Player in pairs (Players:GetPlayers()) do
 		if not Player:WaitForChild("PlayerGui"):FindFirstChild("Checker") then
 			StarterGui.Checker:Clone().Parent = Player.PlayerGui
 		end
 	end
-	
+
 	-- Create security part that is used in Explosion and PSPV
 	local SecurityPart = Instance.new("Part")
 	SecurityPart.Shape = Enum.PartType.Ball
@@ -310,13 +310,13 @@ function Load(Settings)
 	SecurityPart.Anchored = true
 	SecurityPart.Parent = workspace
 	SecurityPart.Touched:Connect(function() end)
-	
+
 	-- Initialize & hook up remotes
 	require(Modules.Explosion):RegisterEvents()
 	require(Modules.Hit):RegisterEvents()
 	require(Modules.Security):Init(SecurityPart, script.SecurityDummy, TimeValue)
 	require(script.CustomPhysicsReplicator):Init(Remotes, Modules)
-	
+
 	script.Parent = game:GetService("ServerScriptService")
 end
 
@@ -518,7 +518,7 @@ Aesthetics.TrailTypes  = {
 
 
 local function themesOn()
-	return _G.BB.Local and _G.BB.Local.Themes 
+	return _G.BB.Local and _G.BB.Local.Themes
 end
 
 local function themesHighGraphics()
@@ -526,7 +526,7 @@ local function themesHighGraphics()
 end
 
 local function returnRandomBrickColor(ctable)
-	return BrickColor.new(ctable[math.random(1, #ctable)])		
+	return BrickColor.new(ctable[math.random(1, #ctable)])
 end
 
 function Aesthetics:HasNeutralColors(Player)
@@ -562,8 +562,8 @@ end
 function Aesthetics:GetThemeObject(Player, ObjectName)
 	local Theme = self:DetermineTheme(Player)
 
-	local ThemeFolder = (Theme and Theme ~= "Team Color") 
-		and ThemesFolder:FindFirstChild(Theme) 
+	local ThemeFolder = (Theme and Theme ~= "Team Color")
+		and ThemesFolder:FindFirstChild(Theme)
 		or ThemesFolder:FindFirstChild("Normal")
 
 	local Object = ThemeFolder and ThemeFolder:FindFirstChild(ObjectName)
@@ -632,14 +632,14 @@ function Aesthetics:HandleSBHandle(Player, handle, colorEvent, initial)
 		handle.Material = Part.Material
 		handle.Reflectance = Part.Reflectance
 		handle.Transparency = Part.Transparency
-		
+
 		if initial then
 			for _,v in pairs(handle:GetChildren()) do
 				if v:IsA("ParticleEmitter") or v:IsA("Fire") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Texture") then
 					v:Destroy()
 				end
 			end
-			
+
 			for _,v in pairs(Part:GetChildren()) do
 				if v:IsA("Texture") then
 					local vv = v:Clone()
@@ -656,12 +656,12 @@ function Aesthetics:HandleSBHandle(Player, handle, colorEvent, initial)
 			"Team Color",
 		}
 
-		handle.Color = (themesOn() and not table.find(NonCustomThemes, Theme)) 
+		handle.Color = (themesOn() and not table.find(NonCustomThemes, Theme))
 			and (Part.Color)
 			or Theme == "Team Color"
-			and Player.TeamColor.Color 
-			or (_G.BB.Settings.Themes.RandomSuperballColors 
-				and self:RandomColor() 
+			and Player.TeamColor.Color
+			or (_G.BB.Settings.Themes.RandomSuperballColors
+				and self:RandomColor()
 				or Part.Color)
 
 		colorEvent:FireServer(handle.Color, handle.Transparency, handle.Reflectance, handle.Material)
@@ -672,7 +672,7 @@ function Aesthetics:HandleSBHandle(Player, handle, colorEvent, initial)
 	if initial then
 		ThemeValue.Changed:Connect(themeChanged)
 		_G.BB.Remotes:WaitForChild("ThemeActivation").Event:Connect(themeChanged)
-	end	
+	end
 end
 
 function Aesthetics:HandleSword(Player, handle, Server)
@@ -794,9 +794,9 @@ function Aesthetics:CreateSwordTrail(Handle, Creator, Server)
 
 	local AddedTrail = false
 	for _,Trail in pairs(Children) do
-		if not (Trail and Trail.ClassName and table.find(Aesthetics.TrailTypes,Trail.ClassName)) then 
-			--warn("No trail for",Creator,"with theme",Theme) 
-			continue 
+		if not (Trail and Trail.ClassName and table.find(Aesthetics.TrailTypes,Trail.ClassName)) then
+			--warn("No trail for",Creator,"with theme",Theme)
+			continue
 		end
 		AddedTrail = true
 
@@ -841,10 +841,10 @@ function Aesthetics:ToggleSwordTrail(handle,Activation)
 
 		if table.find(Aesthetics.TrailTypes,Child.ClassName)then
 
-			coroutine.wrap(function() 
+			coroutine.wrap(function()
 
 				if not Activation then
-					task.wait(.1)	
+					task.wait(.1)
 				end
 
 				if not (Activation and not themesHighGraphics()) then --If HighGraphics == false, trail can be disabled but not enabled
@@ -866,8 +866,8 @@ end
 function Aesthetics:CustomColorSequence(baseColor3)
 
 	local darkColor3 = Color3.new(
-		lowerVal(baseColor3.r), 
-		lowerVal(baseColor3.g), 
+		lowerVal(baseColor3.r),
+		lowerVal(baseColor3.g),
 		lowerVal(baseColor3.b)
 	)
 
@@ -908,7 +908,7 @@ function Aesthetics:HandleProjectileVisuals(Creator, Part, Theme)
 			end
 		end
 	end
-	
+
 	for _,v in pairs(Part:GetChildren()) do
 		if v:IsA("Texture") and (v:FindFirstChild("UOffsetSpeed") or v:FindFirstChild("VOffsetSpeed")) then
 			animateTexture(v)
@@ -930,9 +930,9 @@ function Aesthetics:AddTrail(Creator, Part)
 	local Children = Part:GetChildren()
 	for _,Trail in pairs(Children) do
 
-		if not (Trail and Trail.ClassName and table.find(self.TrailTypes, Trail.ClassName)) then 
-			--warn("No trail for", Creator, "with theme", Theme) 
-			continue 
+		if not (Trail and Trail.ClassName and table.find(self.TrailTypes, Trail.ClassName)) then
+			--warn("No trail for", Creator, "with theme", Theme)
+			continue
 		end
 
 		Trail = Trail:Clone()
@@ -1056,7 +1056,7 @@ function Aesthetics:PaintballColor(Hit, Color)
 	if reset then
 
 		local stillReset = true
-		local conn 
+		local conn
 
 		conn = Hit.Changed:Connect(function(property)
 			if property == "Color" then
@@ -1106,7 +1106,7 @@ function Aesthetics:ExplodePaintball(Paintball)
 	for i = 1, math.random(2, 3) do
 		local DebrisPart = Instance.new("Part")
 
-		Physics:SetPartCollisionGroup(DebrisPart, "Paintballs")
+		DebrisPart.CollisionGroup = "Paintballs"
 
 		DebrisPart.Name = "PaintballDebris"
 		DebrisPart.Size = Vector3.new(1,0.4,1)
@@ -1114,14 +1114,14 @@ function Aesthetics:ExplodePaintball(Paintball)
 
 		-- yuck
 		local RandomDistance = Vector3.new(
-			math.random(-10, 10) / 10, 
-			math.random(0, 10) / 10, 
+			math.random(-10, 10) / 10,
+			math.random(0, 10) / 10,
 			math.random(-10, 10) / 10
 		).Unit * (math.random(10, 20) / 10)
 
 		DebrisPart.CFrame = CFrame.lookAt(Paintball.Position + RandomDistance, Paintball.Position)
 
-		DebrisPart.Velocity = 15 * RandomDistance 
+		DebrisPart.Velocity = 15 * RandomDistance
 		DebrisPart.Parent = workspace
 		Debris:AddItem(DebrisPart, math.random(3, 5))
 	end
@@ -1152,7 +1152,7 @@ function Aesthetics:CreateCustomExplosion(Player, ExplosionPart)
 	local baseTime = ExplosionFolder:FindFirstChild("BaseTime")
 	local themeTime = ExplosionFolder:FindFirstChild("ThemeTime")
 
-	local TIME = HighGraphics and (themeTime and themeTime.Value or .6) 
+	local TIME = HighGraphics and (themeTime and themeTime.Value or .6)
 		or (baseTime and baseTime.Value or .3)
 
 	--[[local Fire = ExplosionPart:FindFirstChildWhichIsA("Fire")
@@ -1302,9 +1302,9 @@ function Aesthetics:CreateVisual(hitPart, player, highlightEntireCharacter)
 
 	if not _G.BB.Local.Themes then
 		return
-	end 
+	end
 
-	if hitPart == nil or hitPart.Parent == nil then 
+	if hitPart == nil or hitPart.Parent == nil then
 		return
 	end
 
@@ -1935,7 +1935,7 @@ local Tags = {
 
 function Kill:CanDamage(player, hitHumanoid, SelfKill, DeadException)
 	--print(2.7, hitHumanoid:GetFullName())
-	if player:FindFirstChild("CanDamage") and player.CanDamage.Value == false then 
+	if player:FindFirstChild("CanDamage") and player.CanDamage.Value == false then
 		return false
 	end
 
@@ -1971,11 +1971,11 @@ function Kill:CanDamage(player, hitHumanoid, SelfKill, DeadException)
 
 	---- Manipulated humanoid, could be godded
 	if not _G.BB.Settings.AllowHumanoidChanges then
-		if (((humanoid.MaxHealth ~= 100) or (humanoid.WalkSpeed~=16) or humanoid.JumpPower~=50)) 
+		if (((humanoid.MaxHealth ~= 100) or (humanoid.WalkSpeed~=16) or humanoid.JumpPower~=50))
 			or character:FindFirstChildWhichIsA("ForceField",true) then
 			return false
 		end
-	end 
+	end
 
 	-- Died, projectile is roaming around though
 	if (humanoid.Health <= 0) and not _G.BB.Settings.WeaponsDamageAfterDeath then
@@ -1990,7 +1990,7 @@ function Kill:CanDamage(player, hitHumanoid, SelfKill, DeadException)
 	if not otherPlr then
 		return true
 	end
-	
+
 	-- Callback functions available to add after module loads
 	for _, func in ipairs(callbacks) do
 		if not func(player, otherPlr) then
@@ -2011,7 +2011,7 @@ function Kill:CanDamage(player, hitHumanoid, SelfKill, DeadException)
 	-- Firing player could be a spectator and shouldn't deal damage
 	if not player.Neutral and player.Team ~= nil  then
 		t1Name = player.Team.Name
-		if _G.BB.Settings.SpectatorTeamActive 
+		if _G.BB.Settings.SpectatorTeamActive
 			and t1Name == _G.BB.Settings.SpectatorTeamName then
 			return false
 		end
@@ -2020,7 +2020,7 @@ function Kill:CanDamage(player, hitHumanoid, SelfKill, DeadException)
 	-- Hit player could be a spectator and shouldn't take damage
 	if not otherPlr.Neutral and otherPlr.Team ~= nil then
 		t2Name = otherPlr.Team.Name
-		if _G.BB.Settings.SpectatorTeamActive 
+		if _G.BB.Settings.SpectatorTeamActive
 			and t2Name == _G.BB.Settings.SpectatorTeamName then
 			return false
 		end
@@ -2028,7 +2028,7 @@ function Kill:CanDamage(player, hitHumanoid, SelfKill, DeadException)
 
 	-- For FFA scenarios
 	if player.Neutral or otherPlr.Neutral then
-		return true 
+		return true
 	end
 
 	-- Team kill
@@ -2037,10 +2037,10 @@ function Kill:CanDamage(player, hitHumanoid, SelfKill, DeadException)
 		if _G.BB.Settings.IgnoreCertainTeams then
 			return findFiltered(t1Name) or findFiltered(t2Name)
 		end
-		
+
 		return _G.BB.Settings.TeamKill
 	end
-	
+
 	return true
 end
 
@@ -2048,67 +2048,67 @@ function Kill:TagHumanoid(player, humanoid, obj, projectileType)
 	local currentTag = humanoid:FindFirstChild("creator");
 	local tag = obj and obj:FindFirstChild("creator")
 	local Lifetime = _G.BB.Settings.TagLifetime
-	
+
 	if currentTag and currentTag:IsA("ObjectValue") then
 		pcall(game.Destroy, currentTag)
 	end
-	
+
 	local NewTag = tag and tag:Clone() or Instance.new("ObjectValue")
 	NewTag.Name = "creator"
 	NewTag.Value = player
 	NewTag:SetAttribute("WeaponImageId", Tags[projectileType])
 	NewTag:SetAttribute("ProjectileType", projectileType)
-	
+
 	local FolderRef = Instance.new("ObjectValue")
 	FolderRef.Name = "FolderRef"
 	FolderRef.Value = obj
 	FolderRef.Parent = NewTag
 	--NewTag:SetAttribute("WeaponType", projectileType)
-	
+
 	local weapon = player:WaitForChild("Backpack"):FindFirstChild(projectileType) or player.Character:FindFirstChild(projectileType)
-			
+
 	local newWeaponTag = NewTag:FindFirstChild("Weapon") or Instance.new("ObjectValue")
 	newWeaponTag.Name = "Weapon"
 	newWeaponTag.Value = weapon
 	newWeaponTag.Parent = NewTag
-	
+
 	local newWeaponStringTag = NewTag:FindFirstChild("WeaponType") or Instance.new("StringValue")
 	newWeaponStringTag.Name = "WeaponType"
 	newWeaponStringTag.Value = projectileType
 	newWeaponStringTag.Parent = NewTag
-	
+
 	--[[
 	creator.Value = Player object
 	creator.Weapon.Value = Tool object
 	creator.WeaponType.Value = String of weapon type
 	]]
-	
+
 	NewTag.Parent = humanoid
-	
+
 	--print(
-	--	"\n PATH:", NewTag:GetFullName(), 
-	--	"\n VALUE:", NewTag.Value, 
-	--	"\n WEAPON OBJECT:", NewTag.Weapon.Value, 
+	--	"\n PATH:", NewTag:GetFullName(),
+	--	"\n VALUE:", NewTag.Value,
+	--	"\n WEAPON OBJECT:", NewTag.Weapon.Value,
 	--	"\n WEAPON STRING:", NewTag.WeaponType.Value
 	--)
-	
+
 	Debris:AddItem(NewTag, Lifetime)
 end
 
 function Kill:AddDamageRule(func)
 	local index = table.find(callbacks, func)
-	if index then 
+	if index then
 		warn("Function rule already exists.")
-		return 
+		return
 	end
 	table.insert(callbacks, func)
 end
 
 function Kill:RemoveDamageRule(func)
 	local index = table.find(callbacks, func)
-	if index == nil then 
+	if index == nil then
 		warn("No damage rule found for input function.")
-		return 
+		return
 	end
 	table.remove(callbacks, index)
 end
@@ -2199,14 +2199,14 @@ local function isDeadlyLimb(part)
 end
 
 local function canFlingPart(Part)
-	local Model = Part:FindFirstAncestorWhichIsA("Model") 
+	local Model = Part:FindFirstAncestorWhichIsA("Model")
 	return not (
-		Part.Anchored 
-			or Part:FindFirstAncestorWhichIsA("Tool") 
-			or Part:FindFirstAncestorWhichIsA("Accessory") 
+		Part.Anchored
+			or Part:FindFirstAncestorWhichIsA("Tool")
+			or Part:FindFirstAncestorWhichIsA("Accessory")
 			or Part:FindFirstChild("PhysicsFolder")
 			or (Model and Model:FindFirstChildWhichIsA("Humanoid"))
-			
+
 	)
 end
 
@@ -2222,7 +2222,7 @@ local function ClientFling(Part, Humanoid, Position, Explosion)
 	local Radius = Settings[ProjectileType].Radius
 	local ExplosionForce = Settings[ProjectileType].ExplosionForce
 	local ForceFactorOnSelf = Settings.Explosions.ForceFactorOnSelf
-	
+
 	local IsBomb = Part.Name == LocalPlayer.Name.."'s Bomb"
 	if (HitPlayer == Creator and Creator == LocalPlayer and Settings.Explosions.FlingYou) then
 
@@ -2250,52 +2250,52 @@ end
 function Explosion:HandleHitDetection(Explosion, HitPart, RocketPosition, DirectHitCFrames)
 	local player = Players.LocalPlayer
 	local localHum = player.Character.Humanoid
-	
+
 	local ProjectileType = Explosion.ProjectileType.Value
 	local Damage = Settings[ProjectileType].Damage
 	local SelfDamage = Settings[ProjectileType].SelfDamage
-	
+
 	-- Grab parts
 	local TempConnection = Explosion.Touched:Connect(function() end)
 	local TouchingParts = Explosion:GetTouchingParts()
 	TempConnection:Disconnect()
-	
+
 	if HitPart and not table.find(TouchingParts,HitPart) then
-		table.insert(TouchingParts,HitPart)	
+		table.insert(TouchingParts,HitPart)
 	end
-	
+
 	Explosion.Active.Value = false -- Stop sending updates
-	
+
 	-- Rocket sends new distance, bomb sends cframe
 	local ExplData = Explosion.Position
 	if ProjectileType == "Rocket" then
 		ExplData = (Explosion.Position - Explosion.Origin.Value.Position).Magnitude
 	end
-	
+
 	-- Determine what sounds to play, grab character positional data, + client dmg
 	local HitCharacterCFrames = {}
 	local Humanoids = {}
 	local Killed = false
 	local Blocked = false
 	for i,Part in pairs(TouchingParts) do
-		
+
 		if ExplosionCallback(Part, Explosion.creator.Value) == false then
 			continue
 		end
-		
+
 		local Humanoid = Part.Parent:FindFirstChildWhichIsA("Humanoid")
 		local position = RocketPosition and RocketPosition or Explosion.Position
-		
+
 		if Humanoid then
 			if Kill:CanDamage(player,Humanoid,SelfDamage) then
-				
+
 				if not HitCharacterCFrames[Humanoid.Parent.Name] then
 					HitCharacterCFrames[Humanoid.Parent.Name] = PSPV:CreateCharacterCFrameTable(Humanoid)
 				end
-				
+
 				if not Settings.Explosions.LimbRemoval or isDeadlyLimb(Part) then
 					if verifyTableElement(Humanoids, Humanoid) then
-						
+
 						-- Instantaneous damage for firer
 						if Settings.InstantDamage then
 							if ((Humanoid.Health-Damage)<=0) then
@@ -2307,9 +2307,9 @@ function Explosion:HandleHitDetection(Explosion, HitPart, RocketPosition, Direct
 								Humanoid:TakeDamage(Damage)
 							end
 						end
-						
+
 						Killed = ((Humanoid.Health-Damage)<=0) and not player.Character:IsAncestorOf(Humanoid)
-						
+
 						Aesthetics:CreateVisual(Humanoid.Parent.PrimaryPart,player,true)
 					end
 				end
@@ -2317,14 +2317,14 @@ function Explosion:HandleHitDetection(Explosion, HitPart, RocketPosition, Direct
 				Blocked = not player.Character:IsAncestorOf(Humanoid)
 			end
 		end
-		
+
 		ClientFling(Part, Humanoid, position, Explosion)
 	end
-	
+
 	if not Settings.Security.PSPV then
 		HitCharacterCFrames = {}
 	end
-	
+
 	-- Play sound
 	if Killed then
 		if _G.BB.Local.Hit~="None" then
@@ -2335,7 +2335,7 @@ function Explosion:HandleHitDetection(Explosion, HitPart, RocketPosition, Direct
 			_G.BB.ClientObjects.Sounds.Blocked[_G.BB.Local.BlockedHit]:Play()
 		end
 	end
-	
+
 	local ID_array = {Explosion.ProjectileType.Value, Explosion.Count.Value}
 
 	explodeRemote:FireServer(
@@ -2346,23 +2346,23 @@ function Explosion:HandleHitDetection(Explosion, HitPart, RocketPosition, Direct
 		DirectHitCFrames,
 		HitCharacterCFrames
 	)
-	
+
 end
 
 -- Used in client Extrapolation module
 function Explosion:ExtrapolateExplosion(ExtrapolatedProjectile, PhysicsFolder)
-	
+
 	PhysicsFolder.Exploded.Value = true
-	
+
 	local Radius = _G.BB.Settings[PhysicsFolder.ProjectileType.Value].Radius
 	ExtrapolatedProjectile.Size = Vector3.new(Radius*2,Radius*2,Radius*2)
-	
+
 	local ProjectileType = PhysicsFolder.ProjectileType.Value
 	local Damage = Settings[ProjectileType].Damage
 	local SelfDamage = Settings[ProjectileType].SelfDamage
-	
+
 	local SoundName
-	
+
 	if ProjectileType == "Bomb" then
 		SoundName = _G.BB.Local.BombExplosion
 
@@ -2370,10 +2370,10 @@ function Explosion:ExtrapolateExplosion(ExtrapolatedProjectile, PhysicsFolder)
 		ExtrapolatedProjectile.Tick:Destroy()
 	elseif ProjectileType == "Rocket" then
 		SoundName = _G.BB.Local.RocketExplosion
-		
+
 		ExtrapolatedProjectile.CFrame = (
-			PhysicsFolder.Origin.Value 
-				+ (PhysicsFolder.Origin.Value.lookVector 
+			PhysicsFolder.Origin.Value
+				+ (PhysicsFolder.Origin.Value.lookVector
 					* PhysicsFolder.LatestDistance.Value
 				)
 		)
@@ -2385,38 +2385,38 @@ function Explosion:ExtrapolateExplosion(ExtrapolatedProjectile, PhysicsFolder)
 	local Sound = Sounds:FindFirstChild(SoundName)
 	Sound.Parent = ExtrapolatedProjectile
 	Sound:Play()
-	
+
 	Aesthetics:CreateCustomExplosion(PhysicsFolder.creator.Value, ExtrapolatedProjectile)
-	
+
 	local connection = ExtrapolatedProjectile.Touched:Connect(function() end)
 	local CollectedParts = ExtrapolatedProjectile:GetTouchingParts()
 	connection:Disconnect()
-	
+
 	for _,Part in pairs (CollectedParts) do
-		
+
 		if ExplosionCallback(Part, PhysicsFolder.creator.Value) == false then
 			continue
 		end
-		
+
 		local CharacterModel = Part:FindFirstAncestorOfClass("Model")
 		local Humanoid = CharacterModel and CharacterModel:FindFirstChildOfClass("Humanoid")
 
 		ClientFling(Part,Humanoid,ExtrapolatedProjectile.Position,PhysicsFolder)
 	end
-	
-	Debris:AddItem(ExtrapolatedProjectile,5)	
+
+	Debris:AddItem(ExtrapolatedProjectile,5)
 end
 
 function Explosion:HandleHumanoid(PhysicsFolder, Humanoid, CharPartArray, ExplosionPosition)
 	-- When LimbRemoval is on, only hits to the torso/hrp, head, and right
 	-- arm deal certain damage.
-	
+
 	local ProjectileType = PhysicsFolder.ProjectileType.Value
 	local Damage = Settings[ProjectileType].Damage
 	local SelfDamage = Settings[ProjectileType].SelfDamage
 	local Radius = Settings[ProjectileType].Radius
 	local ExplosionForce = Settings[ProjectileType].ExplosionForce
-	
+
 	local Player = PhysicsFolder.creator.Value
 	local FirerHumanoid = Player.Character and Player.Character:FindFirstChild("Humanoid")
 	local HitPlayer = Players:GetPlayerFromCharacter(Humanoid.Parent)
@@ -2424,7 +2424,7 @@ function Explosion:HandleHumanoid(PhysicsFolder, Humanoid, CharPartArray, Explos
 
 	for _, Part in pairs(CharPartArray) do
 		if Kill:CanDamage(Player, Humanoid, SelfDamage) then
-			
+
 			if not Settings.Explosions.LimbRemoval or isDeadlyLimb(Part)then
 				if not Damaged then
 					Damaged = true
@@ -2432,7 +2432,7 @@ function Explosion:HandleHumanoid(PhysicsFolder, Humanoid, CharPartArray, Explos
 					Humanoid:TakeDamage(Settings[ProjectileType].Damage)
 					hitRemote:FireAllClients(Player,Humanoid.Parent.PrimaryPart, true)
 				end
-				
+
 			elseif Settings.Explosions.LimbRemoval then
 				-- Break limb off (Try to prevent wild fling issue)
 				Part:BreakJoints()
@@ -2440,10 +2440,10 @@ function Explosion:HandleHumanoid(PhysicsFolder, Humanoid, CharPartArray, Explos
 				Part.Parent = workspace
 			end
 		end
-		
+
 		if  _G.BB.Settings.Explosions.FlingEnemies then
 			if Kill:CanDamage(Player, Humanoid, false, true) then
-				
+
 				--print("Flinging hum:",Part,Humanoid.Parent)
 				Force:ExertDirectionally(ExplosionPosition, Part, Radius, ExplosionForce, Part:GetMass())
 			end
@@ -2461,7 +2461,7 @@ function Explosion:BlowUpPart(PhysicsFolder, Part, ExplosionPosition)
 	if Collections:HasTag(Part, _G.BB.Settings.Explosions.ExclusionTag) then
 		return
 	end
-	
+
 	if Part.Parent:IsA("Tool") then
 		return
 	elseif Part.Parent:IsA("Accessory") and Humanoid then
@@ -2469,11 +2469,11 @@ function Explosion:BlowUpPart(PhysicsFolder, Part, ExplosionPosition)
 			return
 		end
 	end
-	
+
 	if Part.Anchored then return end
-	
+
 	-- Teammates trowel's are protected, unless setting is off
-	if Collections:HasTag(Part,"TrowelWallBrick") and Settings.Explosions.ProtectTeammateWalls then 
+	if Collections:HasTag(Part,"TrowelWallBrick") and Settings.Explosions.ProtectTeammateWalls then
 		local OwnerValue = Part.creator.Value
 		if OwnerValue.Character then
 			local ownerHumanoid = OwnerValue.Character:FindFirstChild("Humanoid")
@@ -2482,11 +2482,11 @@ function Explosion:BlowUpPart(PhysicsFolder, Part, ExplosionPosition)
 			end
 		end
 	end
-	
+
 	local firingPlayer = PhysicsFolder.creator.Value
 	local PartJointsBroken = false
 
-	-- Break joints assuming settings is on, and humanoid is either dead, 
+	-- Break joints assuming settings is on, and humanoid is either dead,
 	-- nil, or LR is on
 	local destroyed = 0
 	local welds = WeldTracker:GetWeldsByPart(Part)
@@ -2496,17 +2496,17 @@ function Explosion:BlowUpPart(PhysicsFolder, Part, ExplosionPosition)
 			destroyed += 1
 		end
 	end
-	
+
 	-- Ensure mass is below threshold & fling
 	local Mass = Part:GetMass()
-	
+
 	if Settings.Explosions.FlingParts and destroyed == #welds then
 		--print("Flinging part:",Part,Part.Parent)
 		Force:Exert(ExplosionPosition,Part,Settings[ProjectileType].Radius,Settings[ProjectileType].ExplosionForce ,Mass)
 	end
-		
+
 	-- Destroy
-	if Mass < Settings[ProjectileType].MaxMassToDestroy 
+	if Mass < Settings[ProjectileType].MaxMassToDestroy
 		and not Part:IsA("SpawnLocation")
 		and not Humanoid
 		and (Settings.Explosions.DestroyParts
@@ -2517,7 +2517,7 @@ function Explosion:BlowUpPart(PhysicsFolder, Part, ExplosionPosition)
 		) then
 		Part:Destroy()
 	end
-	
+
 	if Settings.Explosions.DebrisTime > 0 then
 		Debris:AddItem(Part, Settings.Explosions.DebrisTime)
 	end
@@ -2526,65 +2526,65 @@ end
 -- Server
 function Explosion:RegisterEvents()
 	--[[
-		When the explosion is from a rocket, "ExplPosData" is 
+		When the explosion is from a rocket, "ExplPosData" is
 		the distance from the origin.
-		
-		Otherwise if explosion is from a bomb, "ExplPosData" is 
+
+		Otherwise if explosion is from a bomb, "ExplPosData" is
 		the client's last seen cframe.
 	]]
-	
+
 	local Security = require(_G.BB.Modules.Security)
-	
+
 	explodeRemote.OnServerEvent:Connect(function(
-		playerFired, 
-		ID_array, 
-		ExplPosData, 
+		playerFired,
+		ID_array,
+		ExplPosData,
 		HitPart,
-		Parts, 
-		DirectHitCharacterData, 
+		Parts,
+		DirectHitCharacterData,
 		RadiusCharacterData
 	)
-		
+
 		local PhysicsFolder = Security:GetPhysicsFolder(ID_array, playerFired, true)
 		if not PhysicsFolder then
 			return
 		end
-		
+
 		local ProjectileType = PhysicsFolder:FindFirstChild("ProjectileType")
-		local Creator = PhysicsFolder:FindFirstChild("creator")	
-		
+		local Creator = PhysicsFolder:FindFirstChild("creator")
+
 		local ExplosionPosition = ExplPosData
 		local RocketCFrame
-		
+
 		if ProjectileType.Value == "Rocket" then
 			local Origin = PhysicsFolder.Origin.Value
 			local ExplosionCFrame = (Origin) and (Origin + Origin.lookVector * ExplPosData)
-			
+
 			RocketCFrame = CFrame.new(ExplosionCFrame.Position - 2*ExplosionCFrame.LookVector, ExplosionCFrame.Position)
 			ExplosionPosition = ExplosionCFrame.Position
 		end
-		
+
 		local approvedHumanoids, approvedParts = Security:ApproveExplode(
-			PhysicsFolder, 
-			ExplPosData, 
-			Parts, 
-			HitPart, 
-			DirectHitCharacterData, 
-			RadiusCharacterData, 
+			PhysicsFolder,
+			ExplPosData,
+			Parts,
+			HitPart,
+			DirectHitCharacterData,
+			RadiusCharacterData,
 			RocketCFrame
 		)
-		
+
 		if not approvedHumanoids or not approvedParts then
 			return
 		end
-		
+
 		-- Rocket sends distance as its final update. Bomb send position.
 		local value = ProjectileType.Value == "Bomb" and "LatestPosition" or "LatestDistance"
 		PhysicsFolder[value].Value = ExplPosData
-		
-		-- Tell clients that this projectile has exploded		
-		PhysicsFolder.Active.Value = false 	
-		
+
+		-- Tell clients that this projectile has exploded
+		PhysicsFolder.Active.Value = false
+
 		-- Blow up only the approved parts
 		for _, Part in pairs(approvedParts) do
 			local function BlowUpPart()
@@ -2592,19 +2592,19 @@ function Explosion:RegisterEvents()
 			end
 			task.spawn(BlowUpPart)
 		end
-		
+
 		for Humanoid, CharPartArray in pairs(approvedHumanoids) do
 			local function BlowUpPlayer()
 				self:HandleHumanoid(PhysicsFolder, Humanoid, CharPartArray, ExplosionPosition)
 			end
 			task.spawn(BlowUpPlayer)
 		end
-				
+
 		-- Remove explosion
 		task.delay(2, function() PhysicsFolder:Destroy() end)
-		
-		if Settings.Bomb.TeleportOnExplode 
-			and not Settings.Bomb.SelfDamage 
+
+		if Settings.Bomb.TeleportOnExplode
+			and not Settings.Bomb.SelfDamage
 			and ProjectileType.Value == "Bomb" then
 			Creator.Value.Character:MoveTo(ExplosionPosition)
 		end
@@ -2667,7 +2667,7 @@ local function getExplosionImpulseValues(ExplosionPosition, Part, BlastRadius, P
 	local momentOfInertia = (2 * Part:GetMass() * radius * radius / 5) -- moment of inertia = 2/5*m*r^2 (assuming roughly spherical)
 	local deltaRotVelocity = rotImpulse / momentOfInertia
 	local torqueNeeded = 20 * momentOfInertia
-	
+
 	accelNeeded = accelNeeded * 10 * frac
 	torqueNeeded = torqueNeeded * 10 * frac
 
@@ -2676,15 +2676,15 @@ end
 
 --https://devforum.roblox.com/t/explosion-visible-true-false/6170/31
 function Force:Exert(ExplosionPosition, Part, BlastRadius, Pressure, Mass)
-	
+
 	if Part and workspace:IsAncestorOf(Part) and (Part:GetNetworkOwner() == nil) then
 
 		local dV, accel, dRV, torque = getExplosionImpulseValues(
 			ExplosionPosition, Part, BlastRadius, Pressure, Mass
 		)
-		
+
 		local dt = 0.1
-		
+
 		local force = accel * Part.Mass
 		local bodyV = Instance.new('BodyVelocity')
 		bodyV.velocity = Part.Velocity + dV
@@ -2710,23 +2710,23 @@ function Force:ExertDirectionally(ExplosionPosition, Part, BlastRadius, Pressure
 			ExplosionPosition, Part, BlastRadius, Pressure, Mass
 		)
 		local dt = 0.1
-		
+
 		--Boost for player and bomb
 		dV *= 1.5
-		
+
 		local IsInCharacter = (
 			(Part.Parent:FindFirstChildWhichIsA("Humanoid")
 			) or
 				(Part.Parent.Parent:FindFirstChildWhichIsA("Humanoid")
 				)
 		)
-		
+
 		if IsInCharacter then
 			local mul = 1.5
 			dV = Vector3.new(dV.X * mul, dV.Y, dV.Z * mul)
 		end
-		
-		
+
+
 		--[[
 		local maxSpeed = math.sqrt(3*accel^2) * dt
 		print(dV.Magnitude, maxSpeed)
@@ -2734,12 +2734,12 @@ function Force:ExertDirectionally(ExplosionPosition, Part, BlastRadius, Pressure
 			dV = dV.Unit * maxSpeed
 		end
 		]]
-		
+
 		local dx, dy, dz = dV.X, dV.Y, dV.Z
-		
+
 		--[[
 		local maxSpeed = accel * dt
-		
+
 		if dx > maxSpeed then dx = maxSpeed end
 		if dx < -maxSpeed then dx = -maxSpeed end
 		if dy > maxSpeed then dy = maxSpeed end
@@ -2758,9 +2758,9 @@ function Force:ExertDirectionally(ExplosionPosition, Part, BlastRadius, Pressure
 		if dy < -maxSpeed then dy = -maxSpeed end
 		if dz > maxSpeedXZ then dz = maxSpeedXZ end
 		if dz < -maxSpeedXZ then dz = -maxSpeedXZ end
-		
+
 		dV = Vector3.new(dx, dy, dz)
-		
+
 		Part.Velocity = Part.Velocity + dV
 
 	end
@@ -2771,14 +2771,14 @@ function Force:ExertLocally(ExplosionPosition,Part, BlastRadius, Pressure,Mass)
 		local dV, accel, dRV, torque = getExplosionImpulseValues(
 			ExplosionPosition, Part, BlastRadius, Pressure, Mass
 		)
-		
+
 		local force = accel * Part.Mass
 		--Get rid of bodymover later
 		local bodyV = Instance.new('BodyVelocity', Part)
 		bodyV.velocity = Part.Velocity + dV
 		bodyV.maxForce = Vector3.new(force, force, force)
 		game.Debris:AddItem(bodyV, 0.1)
-		
+
 		--Get rid of bodymover later
 		local rot = Instance.new('BodyAngularVelocity', Part)
 		rot.angularvelocity = Part.RotVelocity + dRV
@@ -2817,22 +2817,22 @@ end
 function WeldTracker:Start()
 	if self.didStart then return end
 	self.didStart = true
-	
+
 	local activeWelds = self.activeWelds
 	local weldsByPart = self.weldsByPart
 	local weldToCons = {}
-	
+
 	local function onDescendantAdded(i)
 		local class = i.ClassName
 		if class ~= "WeldConstraint" and class ~= "Weld" and class ~= "Snap" then return end
 		activeWelds[i] = true
-		
+
 		local part0 = i.Part0
 		local function onPart0Changed()
 			if weldsByPart[part0] then
 				weldsByPart[part0][i] = nil
 			end
-			
+
 			local newPart = i.Part0
 			if newPart then
 				weldsByPart[newPart] = weldsByPart[newPart] or {}
@@ -2840,13 +2840,13 @@ function WeldTracker:Start()
 			end
 			part0 = newPart
 		end
-		
+
 		local part1 = i.Part1
 		local function onPart1Changed()
 			if weldsByPart[part1] then
 				weldsByPart[part1][i] = nil
 			end
-			
+
 			local newPart = i.Part1
 			if newPart then
 				weldsByPart[newPart] = weldsByPart[newPart] or {}
@@ -2854,38 +2854,38 @@ function WeldTracker:Start()
 			end
 			part1 = newPart
 		end
-		
+
 		local cons = {}
 		weldToCons[i] = cons
-		
+
 		table.insert(cons, i:GetPropertyChangedSignal("Part0"):Connect(onPart0Changed))
 		table.insert(cons, i:GetPropertyChangedSignal("Part1"):Connect(onPart1Changed))
 		onPart0Changed()
 		onPart1Changed()
 	end
-	
+
 	self.root.DescendantAdded:Connect(onDescendantAdded)
 	for _, i in pairs(self.root:GetDescendants()) do
 		onDescendantAdded(i)
 	end
-	
+
 	self.root.DescendantRemoving:Connect(function(i)
 		local class = i.ClassName
 		if class ~= "WeldConstraint" and class ~= "Weld" and class ~= "Snap" then return end
 		activeWelds[i] = nil
-		
+
 		local part0 = i.Part0
 		if part0 then
 			local welds = weldsByPart[part0]
 			welds[i] = nil
 		end
-		
+
 		local part1 = i.Part1
 		if part1 then
 			local welds = weldsByPart[part1]
 			welds[i] = nil
 		end
-		
+
 		for _, con in pairs(weldToCons[i]) do
 			con:Disconnect()
 		end
@@ -2902,12 +2902,12 @@ function WeldTracker:GetWeldsByPart(part)
 	if entry == nil then
 		return {}
 	end
-	
+
 	local array = {}
 	for weld in pairs(entry) do
 		table.insert(array, weld)
 	end
-	
+
 	return array
 end
 
@@ -2949,7 +2949,7 @@ function Security:GetPhysicsFolder(ID_array, PlayerFired, DontWarn)
 	local ActiveFolder = findFolder(PlayerFired, "Active")
 
 	local PhysicsFolder = ActiveFolder:FindFirstChild(ID_array[1]..ID_array[2])
-		
+
 	local success, err = pcall(function()
 		assert(PhysicsFolder, "PhysicsFolder does not exist.")
 
@@ -2978,16 +2978,16 @@ function Security:GetPhysicsFolder(ID_array, PlayerFired, DontWarn)
 end
 
 function Security:ApproveActivation(Player, name, server)
-	
+
 	local Character = Player.Character
-	
+
 	local tool = Character and Character:FindFirstChildWhichIsA("Tool")
 
 	if tool == nil then
 		--print(Player, name, "NO TOOL FOUND", Character)
 		return false
 	end
-	
+
 	if tool and name then
 		if tool.Name ~= name then
 			--print(Player, name, "WRONG TOOL FOUND")
@@ -2999,15 +2999,15 @@ function Security:ApproveActivation(Player, name, server)
 		--print(Player, name, "TOOL NOT ENABLED")
 		return false
 	end
-	
+
 	local deathCheck = true
-	
+
 	if server then
 		deathCheck = _G.BB.Settings.Security.Master
 	end
 
 	if Character.Humanoid.Health > 0 or not deathCheck then
-		if (tool.Name == "Sword" or tool.Name == "Trowel") 
+		if (tool.Name == "Sword" or tool.Name == "Trowel")
 			or not Character:FindFirstChildWhichIsA("ForceField") then
 			return tool
 		else
@@ -3020,26 +3020,26 @@ end
 
 -- approves initial positions, velocities, etc
 function Security:ApproveInit(PhysicsFolder, handle)
-	
+
 	local projectileType = PhysicsFolder.ProjectileType.Value
 	local creator = PhysicsFolder.creator.Value
-	
+
 	local character = creator.Character
 	local head = character.Head
-	
-	local Settings = _G.BB.Settings	
-	
+
+	local Settings = _G.BB.Settings
+
 	if not self:ApproveActivation(creator, projectileType, true) then
 		--print(PhysicsFolder.Name, "denied activation approval.")
 		return false
 	end
-	
+
 	if Settings.Security.Master then
 		if projectileType == "Slingshot" then
 
 			local initPos = PhysicsFolder.LatestPosition.Value
 			--local initVel = PhysicsFolder.LatestVelocity.Value
-			--local initTime = PhysicsFolder.LatestTime.Value	
+			--local initTime = PhysicsFolder.LatestTime.Value
 
 			local MovementVector = head.Velocity * INTERP_CONSTANT
 			local projPos = head.Position + MovementVector
@@ -3069,21 +3069,21 @@ function Security:ApproveInit(PhysicsFolder, handle)
 					return false
 				end
 			end
-			
+
 		else
-			
+
 			local initPos = projectileType == "Rocket"
-				and PhysicsFolder.Origin.Value.Position 
+				and PhysicsFolder.Origin.Value.Position
 				or PhysicsFolder.LatestPosition.Value
-			
+
 			--local initVel = PhysicsFolder.LatestVelocity.Value
-			--local initTime = PhysicsFolder.LatestTime.Value	
+			--local initTime = PhysicsFolder.LatestTime.Value
 
 			-- Check velocity
 			--[[
 			local Vector = initVel.Magnitude--/initCF.LookVector
 			local Average = (Vector.X + Vector.Y + Vector.Z)/3
-			local Difference =math.abs(Average-Settings.Superball.Speed) 
+			local Difference =math.abs(Average-Settings.Superball.Speed)
 			if Difference>Settings.Security.Initial.SuperballVelocity then
 				if Settings.Security.Initial.Warn then
 					warn(
@@ -3104,10 +3104,10 @@ function Security:ApproveInit(PhysicsFolder, handle)
 
 			local vector2 = Vector2.new(initPos.X, initPos.Z)
 			local vector1 = Vector2.new(head.Position.X, head.Position.Z)
-			
+
 			local Magnitude2D = (vector2 - vector1).Magnitude
 			local Magnitude3D = (initPos - head.Position).Magnitude
-			
+
 			local limit2d = Settings.Security.Initial[projectileType.."2D"]
 			local limit3d = Settings.Security.Initial[projectileType.."3D"]
 
@@ -3126,18 +3126,18 @@ function Security:ApproveInit(PhysicsFolder, handle)
 			end
 		end
 	end
-	
+
 	return true
 end
 
 function Security:ApproveUpdate(PhysicsFolder, InfoArray, UpdateSet, DeltaTime)
 	local Parabola = require(script.Parabola)
-	
+
 	local RemoteSender = PhysicsFolder.creator.Value
 	local ProjectileType = PhysicsFolder.ProjectileType.Value
-	
+
 	if _G.BB.Settings.Security.Master then
-		
+
 		if ProjectileType == "Superball" or ProjectileType == "Slingshot" or ProjectileType == "PaintballGun" then
 			local LatestPosition = PhysicsFolder.LatestPosition
 			local LatestVelocity = PhysicsFolder.LatestVelocity
@@ -3151,7 +3151,7 @@ function Security:ApproveUpdate(PhysicsFolder, InfoArray, UpdateSet, DeltaTime)
 			local fallout = _G.BB.Settings.Security.Fallout[ProjectileType]
 			local g = Vector3.new(0, -workspace.Gravity, 0)
 
-			if not PhysicsFolder.Hacking.Value 
+			if not PhysicsFolder.Hacking.Value
 				and not Parabola:Check(p0, v0, g, p1, fallout) then
 
 				if UpdateSet.Warn then
@@ -3174,7 +3174,7 @@ function Security:ApproveUpdate(PhysicsFolder, InfoArray, UpdateSet, DeltaTime)
 					return false
 				end
 			end
-			
+
 		elseif ProjectileType == "Rocket" then
 			local LatestDistance = PhysicsFolder.LatestDistance
 			--local LatestVelocity = PhysicsFolder.LatestVelocity
@@ -3184,7 +3184,7 @@ function Security:ApproveUpdate(PhysicsFolder, InfoArray, UpdateSet, DeltaTime)
 			local NewDistance = InfoArray[2]
 
 			local Difference = NewDistance - OldDistance
-			
+
 			if (Difference > UpdateSet.Rocket or Difference < 0) then
 				if UpdateSet.Warn then
 					warn(
@@ -3207,7 +3207,7 @@ function Security:ApproveUpdate(PhysicsFolder, InfoArray, UpdateSet, DeltaTime)
 					)
 				end
 			end
-			
+
 		elseif ProjectileType == "Bomb" then
 			local Position1 = PhysicsFolder.LatestPosition.Value
 			local Position2 = InfoArray[2]
@@ -3265,24 +3265,24 @@ function Security:ApproveUpdate(PhysicsFolder, InfoArray, UpdateSet, DeltaTime)
 					return false
 				end
 			end
-		
+
 		end
-		
+
 	end
-	
+
 	return true
 end
 
 function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, DirectHitCharacterData, RadiusCharacterData, RocketCFrame)
-	local Settings = _G.BB.Settings	
-	
+	local Settings = _G.BB.Settings
+
 	local Kill = require(_G.BB.Modules.Kill)
 	local PSPV = self.PSPV
 	local ExplosionCallback = require(_G.BB.Modules.Callbacks.ExplodeMaster)
 
 	local ProjectileType = PhysicsFolder.ProjectileType.Value
 	local playerFired = PhysicsFolder.creator.Value
-	
+
 	local directCharData = DirectHitCharacterData
 	local Radius = Settings[ProjectileType].Radius
 	local Multiplier = Settings.Security.Hit.RadiusMultiplier -- Current default 5, 5*4=20 for rocket
@@ -3290,19 +3290,19 @@ function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, Dir
 	local ExplosionPosition = ExplPosData
 
 	local ID = playerFired.Name.."_"..PhysicsFolder.Name
-	
+
 	local SecurityPart = self.SecurityPart
 
 	if Settings.Security.Master then
 		-- Verify rocket hit a part
-		
+
 		if ProjectileType == "Rocket" then
 			if HitPart then
 				local Humanoid = HitPart.Parent:FindFirstChildWhichIsA("Humanoid")
 				if (Humanoid
-					and Players:GetPlayerFromCharacter(Humanoid.Parent) 
+					and Players:GetPlayerFromCharacter(Humanoid.Parent)
 					and Kill:CanDamage(playerFired,Humanoid,false)
-					and Humanoid.RigType == Enum.HumanoidRigType.R6  
+					and Humanoid.RigType == Enum.HumanoidRigType.R6
 					and Humanoid.Health>0)  then
 					local HitPlayer = Players:GetPlayerFromCharacter(Humanoid.Parent)
 
@@ -3312,7 +3312,7 @@ function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, Dir
 							warn("PSPV failed for direct rocket hit:",ID,"Hit player:",HitPlayer)
 						end
 						if Settings.Security.Hit.Deactivate then
-							PhysicsFolder.Active.Value = false		
+							PhysicsFolder.Active.Value = false
 							task.delay(2, function() PhysicsFolder:Destroy() end)
 							return false
 						end
@@ -3348,7 +3348,7 @@ function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, Dir
 					)
 				end
 				if Settings.Security.Hit.Disable then
-					PhysicsFolder.Active.Value = false		
+					PhysicsFolder.Active.Value = false
 					task.delay(2, function() PhysicsFolder:Destroy() end)
 					return false
 				end
@@ -3365,7 +3365,7 @@ function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, Dir
 						)
 					end
 					if Settings.Security.Hit.Disable then
-						PhysicsFolder.Active.Value = false	
+						PhysicsFolder.Active.Value = false
 						task.delay(2, function() PhysicsFolder:Destroy() end)
 						return false
 					end
@@ -3373,7 +3373,7 @@ function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, Dir
 			end
 		end
 	end
-	
+
 	-- Grab parts in same vicinity
 	local CollectedParts = {}
 	if Settings.Security.Master then
@@ -3412,7 +3412,7 @@ function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, Dir
 		--[[
 		Makes an exception for large, moving parts that were not collected
 		by the Server explosion.
-		
+
 		** This stinks and is probably unnecessary
 		]]
 		if Settings.Security.Master and not table.find(CollectedParts, Part) then
@@ -3436,7 +3436,7 @@ function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, Dir
 					end
 					if Settings.Security.Hit.Disable then
 						-- Part is not blown up and any possible humanoid is not damaged
-						continue	
+						continue
 					end
 				end
 			end
@@ -3447,15 +3447,15 @@ function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, Dir
 	--[[
 	This is our security check for hit characters. It uses
 	a system called Past Server Position Verification (coined
-	by GFink). 
+	by GFink).
 	]]
 	local ApprovedHumanoids = {}
 	for Humanoid,CharPartArray in pairs(Humanoids) do
 		local HitPlayer = Players:GetPlayerFromCharacter(Humanoid.Parent)
 		if HitPlayer
 			and Kill:CanDamage(playerFired, Humanoid, false)
-			and Humanoid.RigType == Enum.HumanoidRigType.R6 
-			and Settings.Security.Master 
+			and Humanoid.RigType == Enum.HumanoidRigType.R6
+			and Settings.Security.Master
 			and Humanoid.Health > 0 then
 
 			local TrueHit = PSPV:Verify(
@@ -3477,7 +3477,7 @@ function Security:ApproveExplode(PhysicsFolder, ExplPosData, Parts, HitPart, Dir
 			ApprovedHumanoids[Humanoid] = CharPartArray
 		end
 	end
-	
+
 	return ApprovedHumanoids, ApprovedParts
 end
 
@@ -3488,7 +3488,7 @@ function Security:ApproveHit(PhysicsFolder, HitPlayer, HitPart, p1, v1, t1, Char
 	local ka, kb, kc, kd, ke, kf, Lm, Mm -- Ewwww
 	local HitPosition, HitVelocity, HitTime, SameParabola
 	local HitPositionCandidates = {}
-	
+
 	local creator = PhysicsFolder.creator.Value
 	local ProjectileType = PhysicsFolder.ProjectileType.Value
 
@@ -3499,7 +3499,7 @@ function Security:ApproveHit(PhysicsFolder, HitPlayer, HitPart, p1, v1, t1, Char
 	local p0 = LatestPosition.Value
 	local v0 = LatestVelocity.Value
 	local t0 = LatestTime.Value
-	
+
 	if _G.BB.Settings.Security.Master then
 		local Hacking = PhysicsFolder:FindFirstChild("Hacking")
 
@@ -3508,7 +3508,7 @@ function Security:ApproveHit(PhysicsFolder, HitPlayer, HitPart, p1, v1, t1, Char
 		local VectorForce = PhysicsFolder:FindFirstChild("VectorForce")
 		local Mass = PhysicsFolder:FindFirstChild("Mass")
 		if VectorForce and Mass then
-			Accel = VectorForce.Value / Mass.Value 
+			Accel = VectorForce.Value / Mass.Value
 		end
 
 		Accel += Vector3.new(0, -workspace.Gravity, 0)
@@ -3536,7 +3536,7 @@ function Security:ApproveHit(PhysicsFolder, HitPlayer, HitPart, p1, v1, t1, Char
 					return false
 				end
 			end
-			
+
 			-- Post-touch position is confirmed, now we need to find candidates for the touch pos.
 			-- Physics get throttled at FPS < 15.
 			ClientPhysicsFPS = math.max(ClientPhysicsFPS, 15)
@@ -3550,9 +3550,9 @@ function Security:ApproveHit(PhysicsFolder, HitPlayer, HitPart, p1, v1, t1, Char
 
 		local DELTA_T = t1-HitTime
 
-		if (t1-t0 > 0) then 
+		if (t1-t0 > 0) then
 			if (not Hacking or Hacking.Value == false)
-				and not SameParabola 
+				and not SameParabola
 				and (Parabola:Check(p0, v0, Accel, HitPosition, _G.BB.Settings.Security.Fallout[ProjectileType]) == false) then
 
 				if _G.BB.Settings.Security.Hit.Warn then
@@ -3575,17 +3575,17 @@ function Security:ApproveHit(PhysicsFolder, HitPlayer, HitPart, p1, v1, t1, Char
 				PhysicsFolder.LatestTime.Value = t1
 			end
 		end
-		
+
 		-- No current PSPV security offered for NPCs.
-		if HitPlayer then 
+		if HitPlayer then
 			local Size = ProjectileType == "Superball" and Vector3.new(2,2,2) or Vector3.new(1,1,1)
 			local TrueHit = PSPV:Verify(
-				CharacterData, 
-				HitPositionCandidates, 
-				Size, 
-				Enum.PartType.Ball, 
-				HitPlayer.Name, 
-				PhysicsFolder, 
+				CharacterData,
+				HitPositionCandidates,
+				Size,
+				Enum.PartType.Ball,
+				HitPlayer.Name,
+				PhysicsFolder,
 				SameParabola)
 
 			if not TrueHit then
@@ -3599,14 +3599,14 @@ function Security:ApproveHit(PhysicsFolder, HitPlayer, HitPart, p1, v1, t1, Char
 			end
 		end
 	end
-	
+
 	return true
 end
 
 function Security:ApproveFuturePositions(Player,LocalCFrames)
 	if not _G.BB.Settings.Security.Master then
 		return true
-	end 
+	end
 	if not _G.BB.Settings.Security.FuturePositionApproval then
 		return true
 	end
@@ -3650,7 +3650,7 @@ end
 function Security:ApproveHandlePositions(Player,LocalCFrames)
 	if not _G.BB.Settings.Security.Master then
 		return true
-	end 
+	end
 	for _,frametable in pairs(LocalCFrames) do
 		local char = frametable[2]
 		local cf = char.Sword
@@ -3667,10 +3667,10 @@ end
 
 function Security:Init(SecurityPart, SecurityDummy, TimeValue)
 	self.SecurityPart = SecurityPart
-	
+
 	self.Parabola = require(script:WaitForChild("Parabola"))
 	self.PSPV = require(script:WaitForChild("PSPV"))
-	
+
 	self.PSPV:Init(SecurityPart, SecurityDummy, TimeValue)
 end
 
@@ -3701,20 +3701,20 @@ local function CubicRoots(A, B, C, D) -- Parameters are coefficients of a cubic 
 	local O = -B/(3*A)
 	local P = (3*A*C - B^2) / (3*A^2)
 	local Q = (2*B^3 - 9*A*B*C + 27*A*A*D) / (27*A^3)
-	
+
 	local Delta = -4*P^3 - 27*Q^2
-	
+
 	local z0, z1, z2
 	if Delta < 0 then
 		local k0, k1, k2
 		k0 = -Q/2
 		k1 = (Q^2)/4
 		k2 = (P^3)/27
-		
-		
+
+
 		--k1 + k2 is always positive here
 		local sqrtsum = math.sqrt(k1 + k2)
-		
+
 		z0 = CubeRoot(k0 + sqrtsum) + CubeRoot(k0 - sqrtsum)
 		--local z0 = (math.abs(k0) + math.sqrt(k1 + k2))^0.3333 + (math.abs(k0) - math.sqrt(k1 + k2))^0.3333
 		--if k0 < 0 then z0 = -z0 end
@@ -3733,11 +3733,11 @@ local h = 1/240
 
 local function ClosestTime(p0, v0, a, p1)
 	local dp = p0 - p1
-	
+
 	local vOff = v0 + .5 * h * a
-	
+
 	a *= 0.5
-	
+
 	--We only use those for verification right now
 	local QA, QB, QC, QD, QE
 	QA = a.Y^2 --yes
@@ -3745,19 +3745,19 @@ local function ClosestTime(p0, v0, a, p1)
 	QC = vOff:Dot(vOff) + 2*a.Y*dp.Y
 	QD = 2*vOff:Dot(dp)
 	QE = dp:Dot(dp)
-	
+
 	local A,B,C,D
 	A = 4*QA
 	B = 3*QB
 	C = 2*QC
 	D = QD
-	
+
 	local function quartic(t)
 		return QA*t^4 + QB*t^3 + QC*t^2 + QD*t + QE
 	end
-	
+
 	local roots = {CubicRoots(A,B,C,D)}
-	table.sort(roots, 
+	table.sort(roots,
 		function(t1, t2)
 			return quartic(t1) < quartic(t2)
 		end
@@ -3766,15 +3766,15 @@ local function ClosestTime(p0, v0, a, p1)
 end
 
 local function getOffset(a, t)
-	
+
 	return .5 * h * a * t
 end
 
 function ParabolaModule:ClosestVector(...)
 	local t = ClosestTime(...)
 	local p0, v0, a = ...
-	
-	return 
+
+	return
 		p0 + (v0 * t) + (0.5 * a * t^2) + getOffset(a,t), -- Position at time t
 		v0 + (a * t), -- Velocity at time t
 		t -- Time t (probably will not be used)
@@ -3783,7 +3783,7 @@ end
 function ParabolaModule:Eval(...)
 	local p0, v0, a, t0, t1 = ...
 	local dt = t1-t0
-	return 
+	return
 		p0 + (v0 * dt) + (0.5 * a * dt^2) + getOffset(a,dt), -- Position at time t
 		v0 + (a * dt)
 end
@@ -3814,25 +3814,25 @@ function ParabolaModule:FindTouchPoint(a,   p0, v0, t0,   p1, v1, t1)
 	We're only interested in time differences, so we set t0=0 for this calculation.
 	We revert this change at the very end of the function.
 	]]
-	
+
 	--local ERROR_CONSTANT = 0.0020387359836901
-	
+
 	--TODO: the "a" in the function params only accounts for the bodyforce.
 	--The "a" in our formula should account for gravity + bodyforce.
 
 	local dt = t1 - t0
 	local off = getOffset(a, dt)
-	
-	
+
+
 	local ka = 0.5 * a
 	local kb = v0
 	local kc = p0
-	
+
 	local kd = ka
 	local ke = v1 - a * dt
 	local kf = p1 - v1 * dt + 0.5 * a * dt^2
 	kf = kf - off
-	
+
 	--[[
 	local ka = 0.5 * a
 	local kb = v0
@@ -3870,19 +3870,19 @@ function ParabolaModule:FindTouchPoint(a,   p0, v0, t0,   p1, v1, t1)
 		local pCandidate = p1 + (v1 * w) + (kd * w^2) + getOffset(a, w)
 		local ClosestPosition = self:ClosestVector(p0, v0, a, pCandidate)
 		local Dist = (ClosestPosition - p).Magnitude
-		
+
 	end]]
 	local idt1 = tTouch - dt
 	local pTouch1 = p1 + (v1 * idt1) + (kd * idt1^2) + getOffset(a, idt1)
 	local vTouch = v1 + a * idt1
-	
+
 	--print(off * idt1)
 
 	--[[
 	print("COEFFICIENTS")
 	print(ka.magnitude, kb.magnitude, kc.magnitude)
 	print(kd.magnitude, ke.magnitude, kf.magnitude)
-	
+
 	print("Position:",CFrameIWant.Position)
 	print("Position 2:",p3)
 
@@ -3896,7 +3896,7 @@ function ParabolaModule:FindTouchPoint(a,   p0, v0, t0,   p1, v1, t1)
 	s1.CFrame = CFrame.new(pTouch1)
 	s1.BrickColor = BrickColor.new("Bright blue")
 	]]
-	
+
 	if ((p0-p1).magnitude < 10e-3) and ((v0-v1).magnitude < 10e-3) then
 		pTouch1 = p1
 		vTouch = v1
@@ -3941,24 +3941,24 @@ local function findTimeFromRoot(ClientRootPosition,HitPlayerName,ClientSeenTime)
 	local ReturningTable
 	local BestMagnitude = 100
 	local BestTimeDifference = 1
-	
+
 	--print("Evaluating with client time stamp:",ClientSeenTime)
-	
+
 	for  _,RecordedCharData in pairs(_G.BB.MasterTimeTable[HitPlayerName]) do
-		
+
 		local RecordedRootPosition = RecordedCharData[2]["HumanoidRootPart"].Position
 		local RecordedTime = RecordedCharData[1]
-		
+
 		local TimeDifference = math.abs(ClientSeenTime - RecordedCharData[1])
 		local Magnitude = (ClientRootPosition - RecordedRootPosition).Magnitude
-		
+
 		if ((Magnitude > 0.1 and Magnitude < BestMagnitude) or Magnitude <= 0.1) and TimeDifference < BestTimeDifference then
 			--print("Mag:",BestMagnitude,"TD:",BestTimeDifference)
 			BestMagnitude = Magnitude
 			BestTimeDifference = TimeDifference
 			ReturningTable = RecordedCharData
 		end
-		
+
 	end
 	--[[ Debug
 	local ReportMag = math.round(BestMagnitude*100)/100
@@ -3977,7 +3977,7 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 	local info = PhysicsFolder and PhysicsFolder.UniqueID.Value or "Sword"
 
 	--print(" >> PSPV","\n 1, Beginning PSPV for",info)
-	
+
 	--[[ Details
 		CharacterDataFrames = {
 			{Time, CFrameTable}, -- Post touch
@@ -3992,12 +3992,12 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 			etc
 		}
 	]]
-	
+
 	local ServerCFrames = {}
-	
+
 	-- Verify time
 	for i,CharacterData in pairs(CharacterDataFrames) do
-		
+
 		-- Prevent long lag shadow hits
 		local Now = time()
 		local Lag = Now-CharacterData[1]
@@ -4011,19 +4011,19 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 			end
 			--return false
 		end
-		
+
 		local SentRootPosition = CharacterData[2]["HumanoidRootPart"].Position
 		local MatchingServerTime, ServerCFramesAtFrame = findTimeFromRoot(
 			SentRootPosition,
 			HitPlayerName,
 			CharacterData[1] -- Time
 		)
-		
+
 		-- For reference when verifying limb positions
 		ServerCFrames[i] = ServerCFramesAtFrame
 
-		-- Comparing server time when character was 
-		-- at client seen position to client's seen time. 
+		-- Comparing server time when character was
+		-- at client seen position to client's seen time.
 		local TimeDifference = CharacterData[1] - MatchingServerTime
 
 		if (TimeDifference>.33) then
@@ -4037,10 +4037,10 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 			return false
 		end
 	end
-	
+
 	--[[ Debug
 	print("3, time difference of "..TimeDifference.." passed")
-	
+
 	local F = Instance.new("Folder")
 	local Now = math.round(time()*100)/100
 	F.Name = PhysicsFolder and PhysicsFolder.UniqueID.Value or "SwordHit"..Now
@@ -4049,27 +4049,27 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 	print("4, SameParabola = ",SameParabola)
 	SecurityPart.Touched:Connect(function() end)
 	SecurityPart.Parent = F
-	
-	
+
+
 	 Position dummy projectile + character
 	SecurityPart.Transparency = 0
-	
+
 	table.insert(CharacterCFrames,ServerCFrames)
 	local Colors = {Color3.fromRGB(0, 170, 0),Color3.fromRGB(147, 147, 147),Color3.fromRGB(255, 255, 255)}
 	local First
 	]]
-	
+
 	local TrueHit = false
 	local SecurityPart = self.SecurityPart
 	local SecurityDummy = self.SecurityDummy
 	SecurityPart.Size = ProjectileSize + Vector3.new(.35,.35,.35)
 	SecurityPart.Shape = ProjectileShape
-	
+
 	-- Loop through character candidates (may contain candidates for
 	-- multiple players, i.e., from a bomb explosion).
 	for i,CharacterData in pairs(CharacterDataFrames) do
 		local CharacterCFrames = CharacterData[2]
-		
+
 		--[[ Debug
 		SecurityDummy.Parent = F
 
@@ -4077,20 +4077,20 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 			First = SecurityDummy
 		end
 		]]
-		
+
 		local Player = game.Players:FindFirstChild(HitPlayerName)
-		
+
 		-- Position limbs
 		for PartName,PartCF in pairs(CharacterCFrames) do
 			local Part = SecurityDummy:FindFirstChild(PartName)
-			
+
 			--[[ Inactive check
 			-- Supposed to verify limb positions/distances
 			if ServerFrames[i][PartName] then
 				local ServerPart = ServerFrames[i][PartName]
 				print(PartName,(PartCF.Position-ServerPart.Position).Magnitude)
 			end
-			
+
 			local HRP = CharacterCFrames.HumanoidRootPart
 			local Magnitude = (HRP.Position-PartCF.Position).Magnitude
 			if MaxDistances[PartName] and (Magnitude>MaxDistances[PartName]) and Part then
@@ -4114,7 +4114,7 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 			end
 		end
 		--local name = 1
-		
+
 		-- Position projectile candidates
 		for _,CF in pairs(ProjectileCFrames) do
 			-- Position
@@ -4127,11 +4127,11 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 				visualPart.Name = "Candidate projectile "..name
 				visualPart.Parent = F
 				visualPart.CFrame = CF
-				visualPart.Color = Color3.new(0.172549, 0.0823529, 0.0196078) 
+				visualPart.Color = Color3.new(0.172549, 0.0823529, 0.0196078)
 				name = name + 1
 			end
 			]]
-			
+
 			-- See if projectile is touching a limb
 			local CollectedParts = SecurityPart:GetTouchingParts()
 			for _,CharacterPart in pairs(SecurityDummy:GetChildren()) do
@@ -4144,7 +4144,7 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 			end
 		end
 	end
-	
+
 	--[[ Debug
 	if First then
 		for _,DebugPart in pairs(First:GetChildren()) do
@@ -4152,7 +4152,7 @@ function PSPV:Verify(CharacterDataFrames, ProjectileCFrames, ProjectileSize, Pro
 			DebugPart.Transparency = 0
 		end
 	end
-	
+
 	if TrueHit then
 		F:Destroy()
 	end
@@ -4167,7 +4167,7 @@ function PSPV:CreateCharacterCFrameTable(Source)
 	local Character = Source:IsA("Player") and Source.Character or Source:IsA("Humanoid") and Source.Parent
 	if not Character then
 		warn("Not generating character cframes (could not find char), any hit on this player will not count. ")
-		return	
+		return
 	end
 	-- Grab character positional data at current seen server time
 	local CharacterCFrame = {}
@@ -4199,78 +4199,78 @@ function PSPV:CreateCharFrameTables(Player)
 			FrameData = {Time,CFrameTable}
 		}
 	]]
-		
+
 	return {PostFrameData,PreFrameData1,PreFrameData2}
 end
 
 function PSPV:Init(SecurityPart, SecurityDummy, ServerTimeValue)
-	
+
 	if not _G.BB.Settings.Security.PSPV then
 		RunService.Heartbeat:Connect(function()
 			_G.BB.ServerTime.Value = time()
 		end)
 		return
 	end
-	
+
 	self.SecurityDummy = SecurityDummy
 	self.SecurityPart = SecurityPart
-	
+
 	SecurityPart.Parent = workspace
 	SecurityDummy.Parent = workspace
-	
+
 	local function RecordPlayerPositions()
 		local Time = time()
 		_G.BB.ServerTime.Value = Time
-		
+
 		for _,Player in pairs (Players:GetPlayers()) do
 			if Player.Character then
-				
+
 				local CharacterData = self:CreateCharacterCFrameTable(Player)
-				
+
 				table.insert(_G.BB.MasterTimeTable[Player.Name],CharacterData)
-				
+
 				if #_G.BB.MasterTimeTable[Player.Name] > 360 then
 					table.remove(_G.BB.MasterTimeTable[Player.Name],1)
 				end
 			end
 		end
 	end
-	
+
 	RunService.Heartbeat:Connect(RecordPlayerPositions)
 end
 
 function PSPV:InitClient()
-	
+
 	if not _G.BB.Settings.Security.PSPV then
 		return
 	end
-	
+
 	local function addPlayer(Player)
 		_G.BB.SlaveTimeTable[Player.Name] = {}
 	end
-	
+
 	for _, Player in pairs(Players:GetPlayers()) do
 		addPlayer(Player)
 	end
-	
+
 	Players.PlayerAdded:Connect(addPlayer)
-	
+
 	local function RecordPlayerPositions()
 		for _,Player in pairs (Players:GetPlayers()) do
 			if Player.Character then
 				local CharacterData = self:CreateCharacterCFrameTable(Player)
-				
+
 				table.insert(_G.BB.SlaveTimeTable[Player.Name], CharacterData)
-				
+
 				if #_G.BB.SlaveTimeTable[Player.Name] > 2 then
 					table.remove(_G.BB.SlaveTimeTable[Player.Name],1)
 				end
 			end
 		end
 	end
-	
+
 	RunService.Heartbeat:Connect(RecordPlayerPositions)
-	
+
 end
 
 return PSPV
@@ -4293,7 +4293,7 @@ module.wait = function(t)
 	if maxSafeWait == 0 then
 		return task.wait(t)
 	end
-	
+
 	local totalWait = 0
 
 	local timeRemaining = t
@@ -4304,7 +4304,7 @@ module.wait = function(t)
 			timeRemaining -= dt
 		end
 	end
-	
+
 	return totalWait
 end
 
@@ -4352,22 +4352,22 @@ if RunService:IsClient() then
 end
 
 function IsAcceptableHit(player, hit)
-	return hit.Parent:FindFirstChildWhichIsA("Humanoid") or 
+	return hit.Parent:FindFirstChildWhichIsA("Humanoid") or
 		not (
-		Collections:HasTag(hit,"Projectile") 
-			or (hit.CanCollide == false) 
+		Collections:HasTag(hit,"Projectile")
+			or (hit.CanCollide == false)
 			or hit.Name == "Handle"
 	)
 end
 
 local function PaintballDamageMultiplier(Projectile, HitPart)
-	
+
 	local properPart = Settings.PaintballGun.MultiplierPartNames[HitPart.Name]
-		
+
 	if Projectile.ProjectileType.Value == "PaintballGun" and properPart then
-		
+
 		Projectile.Damage.Value *= 1 + 2 / 3
-		
+
 		return Projectile.Damage.Value
 	end
 	return false
@@ -4376,35 +4376,35 @@ end
 --[[
 	This function handles the hit detection for both the Superball and Slingshot.
 	Incorporates hit detection, damage and indicators all on the client to maximize
-	experience. 
+	experience.
 ]]
 
 function HitModule:HandleHitDetection(projectile)
 	--print("__________")
 	--print("Initializing:", PhysicsFolder.UniqueID.Value)
 	local Delete = require(_G.BB.ClientObjects:WaitForChild("Delete"))
-	
-	if projectile:FindFirstChildWhichIsA("TouchTransmitter") then 
-		return 
+
+	if projectile:FindFirstChildWhichIsA("TouchTransmitter") then
+		return
 	end
-	
+
 	projectile.Ready.Value = true
-	
+
 	local player = Players.LocalPlayer
 	local ProjectileType = projectile.ProjectileType.Value
 	local setting = Settings[ProjectileType]
 	local damage = projectile.Damage.Value
-	
+
 	local CanHalfDamage = setting.RicochetDamage
 	local hitHumanoid = false
 	local SetGlobal = false
-	
+
 	--local p0, v0, t0 = PhysicsFolder.LastSentPosition, PhysicsFolder.LastSentVelocity, PhysicsFolder.LastSentTime
-	
+
 	local TouchedConnection
-	
+
 	TouchedConnection = projectile.Touched:Connect(function(hit)
-		
+
 		local humanoid = hit.Parent:FindFirstChildWhichIsA("Humanoid")
 		local Player = Players:GetPlayerFromCharacter(hit.Parent)
 		local hat = table.find(PBG_Classes, hit.Parent.ClassName)
@@ -4422,18 +4422,18 @@ function HitModule:HandleHitDetection(projectile)
 				projectile.Boing:Play()
 			end
 		end
-		
+
 		-- Evaluate SB fly status
 		if ProjectileType == "Superball" and (Player and Player == Players.LocalPlayer) and not SetGlobal then
 			if Settings.SuperballJump and not Settings.SuperballFly then
 				if _G.BB.CanSBFly then
-					
-					SetGlobal = true					
+
+					SetGlobal = true
 					task.delay(.1, function() _G.BB.CanSBFly = false end)
-				end				
+				end
 			end
 		end
-		
+
 		-- Evaluate damage
 		if humanoid and not hitHumanoid then
 			if Kill:CanDamage(player, humanoid, false) then
@@ -4441,7 +4441,7 @@ function HitModule:HandleHitDetection(projectile)
 				FireToServer = true
 
 				PaintballDamageMultiplier(projectile, hit)
-				
+
 				-- Instant damage
 				if Settings.InstantDamage then
 					if (humanoid.Health - projectile.Damage.Value) <= 0 then
@@ -4453,56 +4453,56 @@ function HitModule:HandleHitDetection(projectile)
 						humanoid:TakeDamage(projectile.Damage.Value)
 					end
 				end
-				
+
 				-- Get character positions at multiple frames
 				if Player then
 					CharacterData = PSPV:CreateCharFrameTables(Player, _G.BB.SlaveTimeTable)
 				end
-				
+
 				-- Play sound
 				if _G.BB.Local.Hit ~= "None" then
 					_G.BB.ClientObjects.Sounds.Hit[_G.BB.Local.Hit]:Play()
 				end
-				
+
 				Aesthetics:CreateVisual(hit, player, false)
-				
+
 				TouchedConnection:Disconnect()
-				
+
 				if ProjectileType == "Superball" or ProjectileType == "Slingshot" then
 					Delete(projectile, 1)
 				end
-				
+
 			elseif humanoid.Parent ~= player.Character then
-								
+
 				if _G.BB.Local.BlockedHit ~="None" then
 					local Sound = _G.BB.ClientObjects.Sounds.Blocked[_G.BB.Local.BlockedHit]
 					if not Sound.Playing then
 						Sound:Play()
 					end
 				end
-				
+
 				if ProjectileType == "PaintballGun" and PaintballColorCallback(hit, player) and Settings.InstantDamage then
 					FireToServer = true
-					
+
 					projectile.Ready.Value = false
 					Aesthetics:PaintballColor(hit, projectile.Color)
 					Aesthetics:ExplodePaintball(projectile)
-					
+
 					TouchedConnection:Disconnect()
 				end
 			end
 		elseif CanHalfDamage and IsAcceptableHit(player,hit) then
 			CanHalfDamage = false
-			
+
 			-- Halving value on the client for instant damage purposes
 			if ProjectileType == "Superball" or ProjectileType == "Slingshot" then
 				local function halfDamage()
 					projectile.Damage.Value = projectile.Damage.Value / 2
 				end
-				
+
 				local halfDmgDelay = Settings.Ricochet.HalfDamageDelay
 				local resetDelay = Settings.Ricochet.ResetStateDelay
-				
+
 				local function evaluateRicochet()
 					if projectile.Damage.Value <= 3 then
 						Delete(projectile, .2)
@@ -4510,12 +4510,12 @@ function HitModule:HandleHitDetection(projectile)
 						CanHalfDamage = true -- reset bool
 					end
 				end
-				
+
 				task.delay(halfDmgDelay, halfDamage)
 				task.delay(resetDelay, evaluateRicochet)
 			end
 		end
-		
+
 		if IsAcceptableHit(player, hit) or (hat and ProjectileType == "PaintballGun" ) then
 			FireToServer = true
 
@@ -4523,42 +4523,42 @@ function HitModule:HandleHitDetection(projectile)
 				if PaintballColorCallback(hit, player) and Settings.InstantDamage then
 					Aesthetics:PaintballColor(hit, projectile.Color)
 				end
-				
+
 				if humanoid ~= player.Character.Humanoid and not hat then
 					TouchedConnection:Disconnect()
-					
+
 					projectile.Ready.Value = false
 					Aesthetics:ExplodePaintball(projectile)
-				end				
-			end	
+				end
+			end
 		end
-		
+
 		if FireToServer then
 			local ID_array = {
 				projectile.ProjectileType.Value, -- string
 				projectile.Count.Value -- integer
 			}
-			
-			
+
+
 			local sendingTable = {
-				ID_array, 
+				ID_array,
 				hit,  -- hit part
 				projectile.Damage.Value, -- integer
 			}
-			
+
 			if _G.BB.Settings.Security.Master then
-				
+
 				local securityInfo = {
 					p1, v1, t1, -- post hit position, velocity, and time
 					CharacterData, -- table with cframe of char data (nil if security is off)
 					FPS
 				}
-				
+
 				for i = 1, #securityInfo do
 					table.insert(sendingTable, securityInfo)
 				end
 			end
-				
+
 			HitRemote:FireServer(table.unpack(sendingTable))
 		end
 	end)
@@ -4567,9 +4567,9 @@ end
 function HitModule:RegisterEvents()
 	--[[
 	Velocity parameter (v1) here can be spoofed, as we can't verify its direction component.
-	Can't verify with a raycast because a ray is a singular collision point, 
+	Can't verify with a raycast because a ray is a singular collision point,
 	while the ball is a 3D collision box whose collision effects we cannot replicate
-	
+
 	p1 = PostPosition
 	v1 = PostVelocity
 	t1 = PostTime
@@ -4577,70 +4577,70 @@ function HitModule:RegisterEvents()
 	local Security = require(_G.BB.Modules.Security)
 	HitRemote.OnServerEvent:Connect(function(playerFired, ID_array, HitPart, sentDmg, p1, v1, t1, CharacterData, ClientPhysicsFPS)
 		local Now = time()
-		
+
 		local PhysicsFolder = Security:GetPhysicsFolder(ID_array, playerFired, true)
-		
+
 		if not PhysicsFolder then
 			return
 		end
-		
-		local ProjectileType = PhysicsFolder.ProjectileType.Value		
-		
+
+		local ProjectileType = PhysicsFolder.ProjectileType.Value
+
 		local UniqueID = PhysicsFolder.UniqueID.Value
 		local Humanoid = HitPart and (HitPart.Parent ~= nil) and HitPart.Parent:FindFirstChildWhichIsA("Humanoid")
 		local HitPlayer = Humanoid and Players:GetPlayerFromCharacter(HitPart.Parent)
-		
+
 		local hat = HitPart and HitPart.Parent and table.find(PBG_Classes, HitPart.Parent.ClassName)
-		
+
 		if not Security:ApproveHit(PhysicsFolder, HitPlayer, p1, v1, t1, CharacterData, ClientPhysicsFPS) then
 			return
 		end
-		
+
 		if not HitPart or not HitPart.Parent then
 			if _G.BB.Settings.Security.Update.Warn then
 				--print("Projectile hit a local part!")
 			end
 			return
 		end
-		
+
 		-- Verify hit via PSPV and deal damage
 		if Humanoid
 			and not hat
 			and PhysicsFolder.Active.Value
 			and Kill:CanDamage(playerFired, Humanoid, Settings[ProjectileType].SelfDamage) then
-			
-			local damage = PaintballDamageMultiplier(PhysicsFolder, HitPart) 
-				or (Settings.Security.Ricochet and PhysicsFolder.Damage.Value 
+
+			local damage = PaintballDamageMultiplier(PhysicsFolder, HitPart)
+				or (Settings.Security.Ricochet and PhysicsFolder.Damage.Value
 					or sentDmg)
-			
+
 			if not ProjectileType == "PaintballGun" and (damage > Settings[ProjectileType].Damage) then
 				warn(playerFired.Name.." exceeded max damage with weapon:", ProjectileType)
 				return
 			end
-			
+
 			-- Tag, deal damage, and deactivate
 			Kill:TagHumanoid(playerFired, Humanoid, PhysicsFolder, ProjectileType)
 			Humanoid:TakeDamage(damage)
 			HitRemote:FireAllClients(playerFired, HitPart, false) -- Hit indicators
-			PhysicsFolder.Active.Value = false			
+			PhysicsFolder.Active.Value = false
 		end
-		
+
 		if ProjectileType == "PaintballGun" and PaintballColorCallback(HitPart, playerFired) then
 			local ProjectileColor = PhysicsFolder.RandomColor.Value
 			Aesthetics:PaintballColor(HitPart, ProjectileColor)
 		end
-		
-		if not HitPart.CanCollide and 
-			(playerFired.Character:IsAncestorOf(HitPart)) and 
+
+		if not HitPart.CanCollide and
+			(playerFired.Character:IsAncestorOf(HitPart)) and
 			not _G.BB.Settings[ProjectileType].SelfDamage then
 			return
 		end
-				
+
 		if (ProjectileType == "PaintballGun" and HitPart.CanCollide and not Humanoid) then
 			PhysicsFolder.Active.Value = false
 			return
 		end
-		
+
 		-- Half damage
 		if Settings.Security.Ricochet then
 			local CanHalfDamage = PhysicsFolder:FindFirstChild("CanHalfDamage")
@@ -4663,7 +4663,7 @@ function HitModule:RegisterEvents()
 				task.delay(Settings.Ricochet.ResetStateDelay, evaluateRicochet)
 			end
 		end
-		
+
 	end)
 end
 
@@ -6344,7 +6344,7 @@ local function createClientSound(Name, handle)
 	local Sound = handle:WaitForChild(Name)
 
 	local NewSound = Sound:Clone()
-	NewSound.Name = "Client"..NewSound.Name 
+	NewSound.Name = "Client"..NewSound.Name
 	NewSound.Parent = handle
 	Sound:Destroy()
 
@@ -6358,7 +6358,7 @@ function Sword:Lunge()
 	local JumpHeight = _G.BB.Settings.Sword.JumpHeight
 	local LungeDelayTime = _G.BB.Settings.Sword.LungeDelayTime
 	local LungeExtensionTime = _G.BB.Settings.Sword.LungeExtensionTime
-	
+
 	createToolAnim("Lunge")
 
 	local root = self.Character:FindFirstChild("HumanoidRootPart")
@@ -6370,49 +6370,49 @@ function Sword:Lunge()
 	)
 
 	if root and (isInAirMaterial or isInAirState or isHoldingSpace or self.Humanoid.Jump) and (FloatAmount > 0) then
-		
+
 		--Once upon a time the sword Handle had a mass, making the character mass 14.84.
 		--Everyone defined their FloatAmount based on this mass value for the player.
 		--We fixed the sword having a mass, but this means characters now weigh 12.6 units.
 		--This correctionFactor makes it so people who override the floatAmount won't see a change in sword force when this is pushed.
 		local correctionFactor = 12.6 / 14.84
-		
+
 		local lungeForce = Instance.new("BodyVelocity")
 		lungeForce.Velocity = Vector3.new(0, JumpHeight, 0)
 		lungeForce.MaxForce = Vector3.new(0, FloatAmount * correctionFactor, 0)
 		lungeForce.Name = "LungeForce"
-		
+
 		Collections:AddTag(lungeForce, "SwordObject")
-		
+
 		lungeForce.Parent = root
-		
+
 		game:GetService("Debris"):AddItem(lungeForce, .5)
 	end
-	
+
 	if LungeDelayTime > 0 then
 		--task.wait(LungeDelayTime)
 		SafeWait.wait(LungeDelayTime)
 	end
-	
-	self.lungeSound:Play()	
-	
-	-- since input is delayed by .1 seconds to replicate classic feel, fire to the server ahead of time 
+
+	self.lungeSound:Play()
+
+	-- since input is delayed by .1 seconds to replicate classic feel, fire to the server ahead of time
 	self.GripEvent:FireServer("Out")
 
 	-- client only animations
 	currentState = ("Out")
 	self.SwordModule:PositionLunge(tool)
-	
+
 	--task.wait(LungeExtensionTime)
 	SafeWait.wait(LungeExtensionTime)
-	
+
 	currentState = ("Up")
 	self.SwordModule:PositionIdle(tool)
 	self.GripEvent:FireServer("Up")
 end
 
 function Sword:Slash()
-	self.slashSound:Play()	
+	self.slashSound:Play()
 	currentState = ("Attack")
 	createToolAnim("Slash")
 	self.GripEvent:FireServer("Down")
@@ -6421,10 +6421,10 @@ end
 function Sword:Init()
 	local Player = game:GetService("Players").LocalPlayer
 	local Character = Player.Character
-	
+
 	self.Character = Character
 	self.Humanoid = Character:WaitForChild("Humanoid")
-	
+
 	tool:WaitForChild("Handle")
 	self.GripEvent = tool:WaitForChild("Grip")
 	self.SwordModule = require(tool:WaitForChild("SwordModule"))
@@ -6438,7 +6438,7 @@ function Sword:Init()
 	local handle = tool:WaitForChild("Handle")
 	local Activation = tool:WaitForChild("Activation")
 	local Damage = tool:WaitForChild("Damage")
-	
+
 	local IsTrueMobile = UserInput.TouchEnabled and not UserInput.MouseEnabled
 	local lastInput = -1
 	local equipped = false
@@ -6449,52 +6449,52 @@ function Sword:Init()
 	self.equipSound = createClientSound("Equip", handle)
 	self.slashSound = createClientSound("Slash", handle)
 	self.lungeSound = createClientSound("Lunge", handle)
-	
+
 	local function Activate()
-		if not tool.Enabled or not equipped then 
+		if not tool.Enabled or not equipped then
 			return
 		end
-		
+
 		tool.Enabled = false
-		
+
 		local now = tick()
 		if now - lastInput < _G.BB.Settings.Sword.DoubleClickTime then
 			self:Lunge()
 		else
 			self:Slash()
 		end
-		
+
 		lastInput = now
-		
+
 		task.wait(_G.BB.Settings.Sword.ReloadTime)
-		
+
 		tool.Enabled = true
 	end
-	
+
 	Activation.Event:Connect(Activate)
-	
+
 	local mobileDoubleTapTime = 0.2
 	local last = -10
-	
+
 	local function ActivateJump()
 		local now = tick()
 
 		if _G.BB.TrueMobile and _G.BB.Local.MobileJump then
-						
+
 			if now - last < mobileDoubleTapTime then
 				Activate()
 			end
-			
+
 			last = now
 		end
 	end
-	
-	
-	if _G.BB.TrueMobile and _G.BB.Settings.Mobile.DoubleJumpToSwordLunge  
+
+
+	if _G.BB.TrueMobile and _G.BB.Settings.Mobile.DoubleJumpToSwordLunge
 		and _G.BB.Local.MobileJump then
 		UserInput.JumpRequest:Connect(ActivateJump)
 	end
-	
+
 	tool:GetPropertyChangedSignal("GripPos"):Connect(function()
 		if currentState == ("Out") then
 			self.SwordModule:PositionLunge(tool)
@@ -6502,41 +6502,41 @@ function Sword:Init()
 			self.SwordModule:PositionIdle(tool)
 		end
 	end)
-	
+
 	-- sword equip sound client:
 	tool.Equipped:Connect(function()
 		equipped = true
 		--if not _G.BB.TrueMobile then
 		--	equipSound.TimePosition = 0.1
 		--end
-		self.equipSound:Play()		
+		self.equipSound:Play()
 	end)
-	
+
 	tool.Unequipped:Connect(function()
 		equipped = false
 	end)
-	
+
 	handle.Touched:Connect(function(hit)
 		if hit.Parent then
-			
+
 			-- Don't damage if hit is HRP, commonly manipulated by
 			-- exploiters.
-			if hit.Name == "HumanoidRootPart" then 
-				return 
+			if hit.Name == "HumanoidRootPart" then
+				return
 			end
-			
+
 			local hitHumanoid = hit.Parent:FindFirstChildWhichIsA("Humanoid")
 			local hitPlayer = hitHumanoid and game.Players:GetPlayerFromCharacter(hitHumanoid.Parent)
 
-			if hitHumanoid 
-				and Kill:CanDamage(Player, hitHumanoid, false) 
+			if hitHumanoid
+				and Kill:CanDamage(Player, hitHumanoid, false)
 				and self.SwordModule:CheckJoint(Character, handle) then
-					
+
 				-- Gather security data, will return nil if Security is off
 				local Source = hitPlayer and hitPlayer or hitHumanoid
 				local HitCharacterData = PSPV:CreateCharFrameTables(Source)
 				local LocalCharacterData = PSPV:CreateCharFrameTables(Player)
-				
+
 				-- Send data to server (no debounce, stay true to old RBLX)
 				Damage:FireServer(
 					hit,
@@ -6579,7 +6579,7 @@ function Sword:Damage(hitHumanoid)
 	-- Find Character and Player
 	local hitCharacter = hitHumanoid.Parent;
 	local hitPlayer = players:GetPlayerFromCharacter(hitCharacter);
-	
+
 	if hitCharacter ~= nil then
 		-- Find torsos
 		local hitTorso = hitCharacter:FindFirstChild("HumanoidRootPart");
@@ -6588,23 +6588,23 @@ function Sword:Damage(hitHumanoid)
 		if hitTorso and localTorso then
 			-- Make sure user is within reasonable distance.
 			local mag = (hitTorso.Position - localTorso.Position).Magnitude;
-			
+
 			if mag < self.MaxKillDistance then
 				-- if they're a player, do tk check
-				if self.Kill:CanDamage(self.Player,hitHumanoid) 
+				if self.Kill:CanDamage(self.Player,hitHumanoid)
 					and (self.SwordModule:CheckJoint(self.Character, self.handle)) then
-					
+
 					-- Tag player
 					self.Kill:TagHumanoid(self.Player,hitHumanoid, self.handle, "Sword");
 
 					-- Decide damage
 					local Damage = self.Damages[state]
-					
+
 					--print(self.Player,"is damaging",hitCharacter)
-					
+
 					-- Deal damage
 					hitHumanoid:TakeDamage(Damage)
-				end				
+				end
 			end
 		end
 	end
@@ -6614,17 +6614,17 @@ function Sword:Init(Settings,Modules,Buffers,Player,Character)
 	self.Player = Player
 	self.Character = Character
 	self.Humanoid = Character:WaitForChild("Humanoid")
-	
+
 	self.MaxKillDistance = Settings.Security.Hit.MaxSwordKillDistance
 	self.Ties = Settings.WeaponDamageAfterDeath
 	self.Damages = {
 		Out = Settings.Sword.LungeDamage,
 		Down = Settings.Sword.SlashDamage,
 		Up  = Settings.Sword.IdleDamage
-	} 
-	
+	}
+
 	self.Kill = require(Modules:WaitForChild("Kill"))
-	
+
 	self.handle = tool:WaitForChild("Handle")
 	self.SwordModule = require(tool:WaitForChild("SwordModule"))
 
@@ -6635,70 +6635,70 @@ function Sword:Init(Settings,Modules,Buffers,Player,Character)
 	local lungeSound = self.handle:WaitForChild("Lunge")
 
 	local gripEvent = tool:WaitForChild("Grip")
-	
+
 	local PSPV = require(Modules.Security:WaitForChild("PSPV"))
 	local Security = require(Modules:WaitForChild("Security"))
 	local Aesthetics = require(Modules.Aesthetics)
-	
+
 	Aesthetics:HandleSword(Player, self.handle, true)
-	
+
 	local Primary
 	Primary = Damage.OnServerEvent:Connect(function(playerFired,hit,CharacterData,LocalCFrames)
-		
+
 		if playerFired~=Player then
 			return
 		end
-		
+
 		if hit and hit.Parent and hit.Parent:IsDescendantOf(workspace)  then
-			
-			if hit.Name == "HumanoidRootPart" 
-				or Character:FindFirstChildWhichIsA("ForceField") then 
-				return 
+
+			if hit.Name == "HumanoidRootPart"
+				or Character:FindFirstChildWhichIsA("ForceField") then
+				return
 			end
-			
+
 			local hitHumanoid = hit.Parent:FindFirstChildWhichIsA("Humanoid");
 			local HitPlayer = players:GetPlayerFromCharacter(hit.Parent)
-			
+
 			if hitHumanoid then
-				
+
 				local Alive = self.Character.Humanoid.Health>0
 				local TrueHit = not HitPlayer or not Settings.Security.PSPV or not Settings.Security.Master
-				
+
 				if Settings.Security.Master then
 					local SwordCFrames = {LocalCFrames[1][2].Sword,LocalCFrames[2][2].Sword,LocalCFrames[3][2].Sword}
 					local size = self.handle.Size -- Vector3.new(.2,.2,.2)
 					if HitPlayer then
-						
+
 						TrueHit = PSPV:Verify(
-							CharacterData, 
+							CharacterData,
 							SwordCFrames, -- hmmm...
-							size, 
-							Enum.PartType.Block, 
+							size,
+							Enum.PartType.Block,
 							HitPlayer.Name,
 							nil,
 							true
 						)
-						
+
 						if not TrueHit then
 							warn("PSPV failed for sword hit, hit plr:",
 								HitPlayer,"Sword owner:",
 								Player,
 								"Hit:",hit.Name)
-							
+
 							canDamage = false
-							
+
 							Primary:Disconnect()
-							
+
 							return
 						end
 
 						for _, sCF in pairs(SwordCFrames) do
-							
+
 							local CurrentPosition = Vector2.new(self.handle.Position.X, self.handle.Position.Z)
-							
+
 							local SentPosition = Vector2.new(sCF.Position.X, sCF.Position.Z)
 							local Mag = (SentPosition-CurrentPosition).Magnitude
-							
+
 							if Mag > 9 then
 								TrueHit = false
 								warn(
@@ -6710,42 +6710,42 @@ function Sword:Init(Settings,Modules,Buffers,Player,Character)
 							end
 						end
 					end
-					
+
 					Security:ApproveHandlePositions(Player, LocalCFrames)
 					Security:ApproveFuturePositions(Player, LocalCFrames)
 				end
-				
+
 				if TrueHit and canDamage then
 					self:Damage(hitHumanoid);
 				end
 			end
 		end
 	end)
-	
+
 	gripEvent.OnServerEvent:Connect(function(plr, gripType)
 		if Player == plr then
-			
+
 			-- replicate state
 			state = gripType
-			
+
 			if gripType == "Out" then
 				lungeSound:Play()
 				self.SwordModule:PositionLunge(tool)
-				
+
 			elseif gripType == "Down" then
 				slashSound:Play()
-				
+
 			elseif gripType == "Up" then
 				self.SwordModule:PositionIdle(tool)
 			end
 		end
 	end)
-	
+
 	-- sword equip sound server:
 	tool.Equipped:Connect(function()
-		equipSound:Play()	
+		equipSound:Play()
 	end)
-	
+
 	tool.Enabled = true
 end
 
@@ -7343,8 +7343,8 @@ function Slingshot:ComputeLaunchAngle(dx, dy, grav, speed)
 	local answer1 = math.atan(inATan1)
 	local answer2 = math.atan(inATan2)
 
-	if answer1 < answer2 then 
-		return answer1 
+	if answer1 < answer2 then
+		return answer1
 	end
 
 	return answer2
@@ -7355,17 +7355,17 @@ function Slingshot:Fire(Hit, mouse_pos, pellet, count, collisionGroup, now)
 	local spawnDistance = _G.BB.Settings.SlingClimb and 6 or _G.BB.Settings.Slingshot.SpawnDistance
 	local Speed = _G.BB.Settings.Slingshot.Speed
 	local ShootInsideBricks = _G.BB.Settings.Slingshot.ShootInsideBricks
-		
+
 	if collisionGroup ~= "Standard" then
 		spawnDistance = spawnDistances[collisionGroup]
 	end
-	
+
 	local launch = self.Character.PrimaryPart.Position + dir * spawnDistance
 	local delta = mouse_pos - launch
 	local unit_delta = delta.Unit
-	
+
 	local dir = unit_delta
-	
+
 	if workspace.Gravity > 0 then
 		local dy = delta.Y
 
@@ -7375,7 +7375,7 @@ function Slingshot:Fire(Hit, mouse_pos, pellet, count, collisionGroup, now)
 		unit_delta = delta.Unit
 
 		local theta = self:ComputeLaunchAngle(dx, dy, workspace.Gravity, Speed)
-		
+
 		if theta == -1 then
 			dir = (mouse_pos - self.Character.PrimaryPart.Position).Unit
 			dir = Vector3.new(dir.X, dir.Y + ADDED_Y_VEL, dir.Z)
@@ -7387,12 +7387,12 @@ function Slingshot:Fire(Hit, mouse_pos, pellet, count, collisionGroup, now)
 			dir = Vector3.new(vx, vy, vz)
 		end
 	end
-	
+
 	local vel = dir * Speed
 	pellet.Position = launch
 	pellet.Velocity = vel
 	pellet.Parent = self.ActiveFolder
-	
+
 	if (ShootInsideBricks == false) and self.isInsideSomething(pellet) then
 		local pPartPos = self.Character.PrimaryPart.Position
 		local clampedDist = math.clamp((mouse_pos - pPartPos).Magnitude, 0, spawnDistance)
@@ -7415,11 +7415,11 @@ function Slingshot:Fire(Hit, mouse_pos, pellet, count, collisionGroup, now)
 			pellet.Anchored = false
 		end
 	end
-	
+
 	self.Delete(pellet, 4)
-	
+
 	self.Hit:HandleHitDetection(pellet)
-	
+
 	return pellet.Position, vel
 end
 
@@ -7441,7 +7441,7 @@ function Slingshot:Init()
 	local Player = game:GetService("Players").LocalPlayer
 	local Character = Player.Character
 	local Mouse = Player:GetMouse()
-	
+
 	self.Hit = require(_G.BB.Modules:WaitForChild("Hit"))
 	self.Delete = require(_G.BB.ClientObjects:WaitForChild("Delete"))
 	self.ActiveFolder = workspace:WaitForChild("Projectiles"):WaitForChild("Active"):WaitForChild(Player.Name)
@@ -7450,10 +7450,10 @@ function Slingshot:Init()
 	local Targeting = require(_G.BB.ClientObjects:WaitForChild("Core"):WaitForChild("Targeting"))
 
 	local SafeWait = require(_G.BB.Modules.Security:WaitForChild("SafeWait"))
-	
+
 	self.isInsideSomething = require(_G.BB.ClientObjects:WaitForChild("isInsideSomething"))
 	local Security = require(_G.BB.Modules:WaitForChild("Security"))
-	
+
 	local handle = tool:WaitForChild("Handle")
 	local Activation = tool:WaitForChild("Activation")
 	local UpdateEvent = tool:WaitForChild("Update")
@@ -7462,10 +7462,10 @@ function Slingshot:Init()
 	NewSounds.Name = "ClientSounds"
 	NewSounds.Parent = handle
 	slingshotSounds:Destroy()
-	
+
 	local HandleCrosshair = require(_G.BB.ClientObjects:WaitForChild("HandleCrosshair"))
 	HandleCrosshair(tool)
-	
+
 	self.Character = Character
 
 	local down = false
@@ -7477,31 +7477,31 @@ function Slingshot:Init()
 			return
 		end
 		tool.Enabled = false
-		
+
 		local now = time()
 
 		local CollisionGroup = _G.BB.Settings.Doomspire.SlingFly and "JumpyPellets" or "Pellets"
 
 		local isHoldingSpace = game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Space)
 		local isJumping = (Character.Humanoid.FloorMaterial == Enum.Material.Air or isHoldingSpace)
-		
+
 		local mode = "Standard"
-		
+
 		-- Set mode (Standard, Climbing, or Flying)
 		if handle then
-			
+
 			if _G.BB.Settings.SlingClimb or _G.BB.Settings.Doomspire.SlingFly then
-				
+
 				local TouchingMiscPart = touchingMiscPart(Character, handle)
 				CollisionGroup = (TouchingMiscPart and isJumping) and "JumpyPellets" or "Pellets"
-				
+
 				if TouchingMiscPart then
-					
+
 					mode = "Climbing"
 					jumpyT0 = now
-					
+
 				elseif _G.BB.Settings.Doomspire.SlingFly  then
-					
+
 					if ((now - jumpyT0) > jumpyDeltaTime) and isJumping then
 						mode = "Flying"
 						CollisionGroup = "JumpyPellets"
@@ -7513,24 +7513,24 @@ function Slingshot:Init()
 
 		_G.BB.ProjectileCounts.Pellets += 1
 		local count = _G.BB.ProjectileCounts.Pellets
-		
+
 		local Pellet = MakePellet(Player, CollisionGroup, count)
-		
+
 		local position, velocity = self:Fire(Hit, targetPos, Pellet, count, mode, now)
-		UpdateEvent:FireServer(position, velocity, now, count, _G.BB.ServerTime.Value)	
+		UpdateEvent:FireServer(position, velocity, now, count, _G.BB.ServerTime.Value)
 
 		local Sound = NewSounds:FindFirstChild(_G.BB.Local.SlingshotSound)
 		Sound.Parent = handle
 		Sound:Play()
 		Sound.Parent = NewSounds
-		
+
 		SafeWait.wait(_G.BB.Settings.Slingshot.ReloadTime)
-		
+
 		tool.Enabled = true
-		
+
 		return true
 	end
-	
+
 	--This exception attempts to turn off automatic sling for mobile users, as it's nonfunctional and causes issues on the side.
 	--[[
 	if not (game:GetService("UserInputService").MouseEnabled) and
@@ -7540,7 +7540,7 @@ function Slingshot:Init()
 		warn("Your device was recognized as mobile and Slingshot Automatic fire was deactivated.")
 		warn("If your device is not mobile, contact a developer to report the issue.")
 	end]]
-	
+
 	local Thread = 0
 	local currentInputObject = nil
 	Activation.Event:Connect(function(Hit,targetPos, inputObject)
@@ -7571,7 +7571,7 @@ function Slingshot:Init()
 	if _G.BB.Settings.Slingshot.Automatic then
 		game:GetService("UserInputService").InputEnded:Connect(function(input)
 			--[[
-			if input.UserInputType == Enum.UserInputType.MouseButton1 
+			if input.UserInputType == Enum.UserInputType.MouseButton1
 				or input.UserInputType == Enum.UserInputType.Gamepad1
 				or input.UserInputType == Enum.UserInputType.Touch
 			then
@@ -7585,7 +7585,7 @@ function Slingshot:Init()
 				down = false
 			end
 		end)
-		
+
 		tool.AncestryChanged:Connect(function()
 			if tool.Parent ~= Character then
 				down = false
@@ -7623,7 +7623,7 @@ local Physics = game:GetService("PhysicsService")
 
 function Slingshot:CreatePhysicsFolder(count)
 	local PhysicsFolder = Instance.new("Folder")
-	
+
 	--_G.BB.ProjectileCounts[self.Player.Name].Pellets += 1
 
 	--PhysicsFolder.Name = "Slingshot".._G.BB.ProjectileCounts[self.Player.Name].Pellets
@@ -7634,37 +7634,37 @@ function Slingshot:CreatePhysicsFolder(count)
 	new_tag.Name = "creator"
 	new_tag.Value = self.Player
 	new_tag.Parent = PhysicsFolder
-	
+
 	local Active = Instance.new("BoolValue")
 	Active.Name = "Active"
 	Active.Value = true
 	Active.Parent = PhysicsFolder
-	
+
 	local character = Instance.new("ObjectValue")
 	character.Name = "Character"
 	character.Value = self.Character
 	character.Parent = PhysicsFolder
-	
+
 	local ProjectileType = Instance.new("StringValue")
 	ProjectileType.Name = "ProjectileType"
 	ProjectileType.Value = "Slingshot"
 	ProjectileType.Parent = PhysicsFolder
-	
+
 	local CanHalfDamageValue = Instance.new("BoolValue")
 	CanHalfDamageValue.Name = "CanHalfDamage"
 	CanHalfDamageValue.Value = true
 	CanHalfDamageValue.Parent = PhysicsFolder
-	
+
 	local Damage = Instance.new("IntValue")
 	Damage.Name = "Damage"
 	Damage.Value = self.Settings.Slingshot.Damage
 	Damage.Parent = PhysicsFolder;
-	
+
 	local ID = Instance.new("StringValue")
 	ID.Name = "UniqueID"
 	ID.Value = PhysicsFolder.Name.._G.BB.ProjectileCounts[self.Player.Name].Pellets
 	ID.Parent = PhysicsFolder
-	
+
 	local lp = Instance.new("Vector3Value")
 	lp.Name = "LatestPosition"
 	lp.Parent = PhysicsFolder
@@ -7672,7 +7672,7 @@ function Slingshot:CreatePhysicsFolder(count)
 	local lv = Instance.new("Vector3Value")
 	lv.Name = "LatestVelocity"
 	lv.Parent = PhysicsFolder
-	
+
 	local lt = Instance.new("NumberValue")
 	lt.Name = "LatestTime"
 	lt.Parent = PhysicsFolder
@@ -7685,59 +7685,59 @@ function Slingshot:CreatePhysicsFolder(count)
 	ThemeTag.Name = "Theme"
 	ThemeTag.Value = self.Aesthetics:DetermineTheme(self.Player)
 	ThemeTag.Parent = PhysicsFolder
-	
+
 	self.slingshotSounds:Clone().Parent = PhysicsFolder
-		
+
 	--print(PhysicsFolder:GetFullName())
 	return PhysicsFolder
 end
 
-function Slingshot:Init(Settings, Modules, Buffers, Player, Character, Folder)	
+function Slingshot:Init(Settings, Modules, Buffers, Player, Character, Folder)
 	local handle = tool:WaitForChild("Handle")
 	local UpdateEvent = tool:WaitForChild("Update")
-	
+
 	self.slingshotSounds = handle:WaitForChild("SlingshotSounds")
 	self.ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
 	self.Aesthetics = require(Modules:WaitForChild("Aesthetics"))
 	self.Settings = Settings
 	self.Player = Player
 	self.Character = Character
-	
+
 	local ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
-	
+
 	local Security = require(Modules:WaitForChild("Security"))
 
-	-- First activation must always work event if time() returns 0. 
+	-- First activation must always work event if time() returns 0.
 	local lastActivation = -0.2;
-	
+
 	UpdateEvent.OnServerEvent:Connect(function(firingPlayer, initPos, initVel, initTime, count, seenServerTime)
 		local now = time()
 		local Head = firingPlayer.Character and firingPlayer.Character:FindFirstChild("Head")
 		local LenientReloadTime = math.max(Settings.Slingshot.ReloadTime - 1, Settings.Slingshot.ReloadTime * .5)
-		
+
 		if Head and firingPlayer == Player and (now - lastActivation) > LenientReloadTime then
 			if Player.Character and Player.Character.Parent and Player.Character:FindFirstChild("Humanoid") and Player.Character.Humanoid.Health > 0 then
 				lastActivation = now
-							
+
 				local PhysicsFolder = self:CreatePhysicsFolder(count)
-		
-				
+
+
 				-- Replicate projectile
 				PhysicsFolder.LatestPosition.Value = initPos
 				PhysicsFolder.LatestVelocity.Value = initVel
 				PhysicsFolder.LatestTime.Value = initTime
 				PhysicsFolder.LastUpdateTick.Value = now
 				PhysicsFolder.Active.Value = true
-				
+
 				if Security:ApproveInit(PhysicsFolder) then
 					PhysicsFolder.Parent = self.ActiveFolder
 				end
-				
+
 				Debris:AddItem(PhysicsFolder ,Settings.Slingshot.DespawnTime)
 			end
 		end
 	end)
-	
+
 	tool.Enabled = true
 end
 
@@ -8027,64 +8027,64 @@ function Rocket:ProcessTouched(rocket)
 	local TouchedConnection;
 	local hasExploded = false
 	local CharacterData
-	
+
 	local Diamater = _G.BB.Settings.Rocket.Radius * 2
-	
+
 	rocket.Ready.Value = true
-	
+
 	TouchedConnection = rocket.Touched:Connect(function(hit)
 		local RocketPosition = rocket.Position
 
 		local hitCharacter = hit.Parent:IsA("Model") and hit.Parent
 		local hitHumanoid = hit.Parent:FindFirstChildWhichIsA("Humanoid")
-		
+
 		local hitPlr = hitCharacter and Players:GetPlayerFromCharacter(hitCharacter)
 		if hitPlr == self.Player and (not self.Kill:CanDamage(self.Player, hitHumanoid, _G.BB.Settings.Doomspire.RocketCollisions)) then
 			return
 		end
-		
+
 		local CallbackModule = _G.BB.Modules.Callbacks.RocketExplode
 		local Callback = CallbackModule and require(CallbackModule)
 		if Callback and Callback(hit) == false then
 			-- IF FALSE, ROCKET PASSES THROUGH
 			return
 		end
-		
+
 		if hasExploded then
 			return
 		end
-		
+
 		hasExploded = true
 		rocket.Ready.Value = false
 		rocket.Anchored = true
-		
+
 		TouchedConnection:Disconnect()
-		
+
 		-- Move rocket forward 2 studs
 		rocket.CFrame = rocket.CFrame + (rocket.CFrame * Vector3.new(0, 0, -2)) - rocket.Position
-		
+
 		-- Get character positions at two frames
 		if hitPlr then
 			CharacterData = self.PSPV:CreateCharFrameTables(hitPlr)
 		end
-		
+
 		--Debris:AddItem(rocket, 3)
-		
+
 		rocket.Size = Vector3.new(Diamater, Diamater, Diamater)
-		
+
 		local function CreateExpl()
-			
+
 			rocket.Swoosh:Destroy()
-			
+
 			-- client rocket explosion sound
 			local Sounds = rocket:WaitForChild("Boom")
 			local Sound = Sounds:FindFirstChild(_G.BB.Local.RocketExplosion)
 			Sound.Parent = rocket
 			Sound:Play()
-			
+
 			self.Aesthetics:CreateCustomExplosion(self.Player, rocket)
 		end
-		
+
 		task.spawn(CreateExpl)
 		self.Explosion:HandleHitDetection(rocket, hit, RocketPosition, CharacterData)
 	end)
@@ -8095,25 +8095,25 @@ function Rocket:Fire(rocket, TargetPosition, SpawnDistance)
 	local Speed = _G.BB.Settings.Rocket.Speed
 	local RampUpDuration = _G.BB.Settings.Rocket.RampUpDuration
 	local ShootInsideBricks = _G.BB.Settings.Rocket.ShootInsideBricks
-	
+
 	local InitPosition = tool.Handle.Position + (TargetPosition - tool.Handle.Position).unit * SpawnDistance
 	local InitialCFrame = CFrame.lookAt(InitPosition, TargetPosition)
-	
+
 	rocket.Origin.Value = InitialCFrame -- have to buffer this on the client
 	rocket.LastSentPosition.Value = InitialCFrame.Position
-	
+
 	rocket.CFrame = InitialCFrame
-	
+
 	local initialVelocity = rocket.CFrame.LookVector *InitialSpeed
 	local velocity = rocket.CFrame.LookVector * Speed
 
 	rocket.Velocity = initialVelocity
 	rocket.RocketVelocity.Velocity = velocity
-	
+
 	local force = (velocity - initialVelocity) * rocket:GetMass() / RampUpDuration
 	force = Vector3.new(math.abs(force.X), math.abs(force.Y), math.abs(force.Z))
 	rocket.RocketVelocity.MaxForce = force
-	
+
 	rocket.Parent = self.ActiveFolder
 
 	if not ShootInsideBricks and self.isInsideSomething(rocket) then
@@ -8128,43 +8128,43 @@ function Rocket:Fire(rocket, TargetPosition, SpawnDistance)
 		rocket.RocketVelocity.Velocity = velocity
 		rocket.Anchored = false
 	end
-	
+
 	game:GetService("Debris"):AddItem(rocket,9.5)
 	rocket.Swoosh:Play()
-	
+
 	self:ProcessTouched(rocket)
 	return rocket.CFrame
 end
 
 function Rocket:Init()
-	
+
 	local Player = Players.LocalPlayer
 	self.Player = Player
 	self.Character = self.Player.Character
-	
+
 	self.Kill = require(_G.BB.Modules:WaitForChild("Kill"))
 	self.Aesthetics = require(_G.BB.Modules:WaitForChild("Aesthetics"))
 	self.Explosion = require(_G.BB.Modules:WaitForChild("Explosion"))
-	self.PSPV = require(_G.BB.Modules.Security:WaitForChild("PSPV"))	
+	self.PSPV = require(_G.BB.Modules.Security:WaitForChild("PSPV"))
 	self.isInsideSomething = require(_G.BB.ClientObjects:WaitForChild("isInsideSomething"))
 
 	local SafeWait = require(_G.BB.Modules.Security:WaitForChild("SafeWait"))
 
 	self.ActiveFolder = workspace:WaitForChild("Projectiles"):WaitForChild("Active"):WaitForChild(Player.Name)
-	
+
 	local MakeRocket = require(_G.BB.ClientObjects:WaitForChild("MakeRocket"))
 
 	self.handle = tool:WaitForChild("Handle")
 
-	
+
 	local Activation = tool:WaitForChild("Activation")
 	local UpdateEvent = tool:WaitForChild("Update")
 	local HandleCrosshair = require(_G.BB.ClientObjects:WaitForChild("HandleCrosshair"))
 
 	HandleCrosshair(tool)
-	
+
 	Activation.Event:Connect(function(Hit, TargetPosition)
-		if tool.Enabled then 
+		if tool.Enabled then
 			tool.Enabled = false
 
 			local SpawnDistance = _G.BB.Settings.Rocket.SpawnDistance
@@ -8174,7 +8174,7 @@ function Rocket:Init()
 			local rocket = MakeRocket(self.Player, _G.BB.ProjectileCounts.Rockets)
 			local cframe = self:Fire(rocket, TargetPosition, SpawnDistance, _G.BB.ProjectileCounts.Rockets)
 			UpdateEvent:FireServer(cframe, _G.BB.ServerTime.Value, _G.BB.ProjectileCounts.Rockets)
-			
+
 			SafeWait.wait(_G.BB.Settings.Rocket.ReloadTime)
 
 			tool.Enabled = true
@@ -8219,45 +8219,45 @@ function Rocket:CreatePhysicsFolder(count)
 	local PhysicsFolder = Instance.new("Folder")
 	--PhysicsFolder.Name = "Rocket".._G.BB.ProjectileCounts[self.Player.Name].Rockets
 	PhysicsFolder.Name = "Rocket"..count
-	
+
 	local ThemeTag = Instance.new("StringValue")
 	ThemeTag.Name = "Theme"
 	ThemeTag.Value = self.Aesthetics:DetermineTheme(self.Player)
 	ThemeTag.Parent = PhysicsFolder
-	
+
 	local newTag = Instance.new("ObjectValue")
 	newTag.Name = "creator"
 	newTag.Value = self.Player
 	newTag.Parent = PhysicsFolder
-	
+
 	local character = Instance.new("ObjectValue")
 	character.Name = "Character"
 	character.Value = self.Character
 	character.Parent = PhysicsFolder
-	
+
 	local Active = Instance.new("BoolValue");
 	Active.Name = "Active"
 	Active.Value = true
 	Active.Parent = PhysicsFolder
-	
+
 	local Exploded = Instance.new("BoolValue")
 	Exploded.Name = "Exploded"
 	Exploded.Value = false
 	Exploded.Parent = PhysicsFolder
-	
+
 	local projType = Instance.new("StringValue")
 	projType.Name = "ProjectileType"
 	projType.Value = "Rocket"
 	projType.Parent = PhysicsFolder
-	
+
 	local LastUpdateTick = Instance.new("NumberValue")
 	LastUpdateTick.Name = "LastUpdateTick"
 	LastUpdateTick.Parent = PhysicsFolder
-	
+
 	local cf = Instance.new("CFrameValue")
 	cf.Name = "Origin"
 	cf.Parent = PhysicsFolder
-	
+
 	local rdist = Instance.new("NumberValue")
 	rdist.Name = "LatestDistance"
 	rdist.Parent = PhysicsFolder
@@ -8265,11 +8265,11 @@ function Rocket:CreatePhysicsFolder(count)
 	--local rvel = Instance.new("Vector3Value")
 	--rvel.Name = "LatestVelocity"
 	--rvel.Parent = PhysicsFolder
-	
+
 	local st = Instance.new("NumberValue")
 	st.Name = "ClientTime"
 	st.Parent = PhysicsFolder
-	
+
 	local mt = Instance.new("NumberValue")
 	mt.Name = "ServerTime"
 	mt.Parent = PhysicsFolder
@@ -8278,11 +8278,11 @@ function Rocket:CreatePhysicsFolder(count)
 	ID.Name = "UniqueID"
 	ID.Value = PhysicsFolder.Name.._G.BB.ProjectileCounts[self.Player.Name].Rockets
 	ID.Parent = PhysicsFolder
-	
+
 	-- Add the "shoosh" and "boom"
 	boom:Clone().Parent = PhysicsFolder
 	swoosh:Clone().Parent = PhysicsFolder
-	
+
 	return PhysicsFolder
 end
 
@@ -8290,11 +8290,11 @@ function Rocket:Init(Settings,Modules,Buffers,Player,Character,Folder)
 	self.Aesthetics = require(Modules:WaitForChild("Aesthetics"))
 	self.Player = Player
 	self.Character = Character
-	
+
 	local Security = require(Modules:WaitForChild("Security"))
-	
+
 	local ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
-	
+
 	local lastActivation = -10;
 	UpdateEvent.OnServerEvent:connect(function(playerFired, initCF, clientTime, count)
 		local now = tick()
@@ -8304,18 +8304,18 @@ function Rocket:Init(Settings,Modules,Buffers,Player,Character,Folder)
 				lastActivation = now;
 
 				local PhysicsFolder = self:CreatePhysicsFolder(count)
-				
+
 				-- Begin replication
 				PhysicsFolder.ServerTime.Value = _G.BB.ServerTime.Value
 				PhysicsFolder.ClientTime.Value = clientTime
 				PhysicsFolder.Origin.Value = initCF
 				PhysicsFolder.LatestDistance.Value = 0
 				PhysicsFolder.LastUpdateTick.Value = now
-				
+
 				if Security:ApproveInit(PhysicsFolder, handle) then
 					PhysicsFolder.Parent = ActiveFolder
 				end
-		
+
 				-- Clean up and prepare for next rocket
 				Debris:AddItem(PhysicsFolder, Settings.Rocket.DespawnTime)
 			end
@@ -8570,48 +8570,48 @@ function Trowel:Place(TargetPosition)
 	local Head = self.Character.PrimaryPart
 	local Lifetime = _G.BB.Settings.Trowel.Lifetime
 
-		
+
 	local vectorConstructor = Vector3.new(
 		math.ceil(TargetPosition.X-0.5),
 		math.floor(TargetPosition.Y*100)*0.01,
 		math.ceil(TargetPosition.Z-0.5)
 	)
-	
+
 	local lookAt = snap((vectorConstructor - Head.Position).unit)
-	
+
 	local cf = CFrame.new(vectorConstructor, vectorConstructor + lookAt)
 	local wall = self.Buffer.Value
-	
+
 	for _,Brick in pairs(wall:GetChildren()) do
 		local SB = Brick:FindFirstChildWhichIsA("SelectionBox")
 		if SB then
 			SB.Visible = _G.BB.Local.TrowelOutlines
 		end
 	end
-	
+
 	--wall.Parent = workspace
-	
+
 	game:GetService("Debris"):AddItem(wall, Lifetime)
 	local ct = wall.PhysicsFolder.RandomColor.Value
-	
+
 	-- Build client wall
 	local function BuildWall()
 		self.TrowelModule:BuildWall(cf,wall,.04, ct)
 	end
 	task.spawn(BuildWall)
-	
+
 	return cf
 end
 
 function Trowel:Init()
 	local Player = game:GetService("Players").LocalPlayer
-	
+
 	self.ActiveFolder = workspace:WaitForChild("Projectiles"):WaitForChild("Active"):WaitForChild(Player.Name)
-	
+
 	self.Character = game:GetService("Players").LocalPlayer.Character
-	
+
 	self.Buffer = _G.BB.Buffers:WaitForChild("Wall")
-	
+
 	self.TrowelModule = require(tool:WaitForChild("TrowelModule"))
 
 	local verifyBuffer = require(tool:WaitForChild("VerifyBuffer"))
@@ -8619,14 +8619,14 @@ function Trowel:Init()
 	local UpdateEvent = tool:WaitForChild("Update")
 
 	local ReloadTime = _G.BB.Settings.Trowel.ReloadTime
-	
+
 	local SafeWait = require(_G.BB.Modules.Security:WaitForChild("SafeWait"))
 
 	local HandleCrosshair = require(_G.BB.ClientObjects:WaitForChild("HandleCrosshair"))
 	HandleCrosshair(tool)
 
 	Activation.Event:Connect(function(Hit, TargetPosition)
-		if tool.Enabled then 
+		if tool.Enabled then
 			if not verifyBuffer(self.Buffer, self.ActiveFolder) then
 				UpdateEvent:FireServer()
 				tool.Enabled = true
@@ -8640,7 +8640,7 @@ function Trowel:Init()
 			else
 				return
 			end
-			
+
 			tool.Enabled = false
 
 			SafeWait.wait(ReloadTime)
@@ -8681,13 +8681,13 @@ local Collections = game:GetService("CollectionService")
 local Physics = game:GetService("PhysicsService")
 
 function Trowel:CreateBrick(brickModel)
-	
+
 	local Folder,Theme = Aesthetics:GetThemeObject(self.Player,"Trowel");
-	
+
 	local brick = Folder:FindFirstChildWhichIsA("Part"):Clone()
 	local BrickIndex = #brickModel:GetChildren() + 1
 	local Gradient = Folder:FindFirstChildWhichIsA("UIGradient")
-	
+
 	local RowNum = math.ceil(BrickIndex / self.BricksPerRow)
 	local Alpha = (RowNum - 1) / (self.BricksPerColumn - 1)
 
@@ -8702,7 +8702,7 @@ function Trowel:CreateBrick(brickModel)
 	brick.TopSurface = Enum.SurfaceType.Studs
 	brick.Size = self.BrickSize
 	brick.Position = self.Character.PrimaryPart.Position + Vector3.new(0,8000,0)
-	
+
 	if self.Outlines then
 		-- Add an aesthetic outline
 		local outLine = Instance.new("SelectionBox")
@@ -8711,39 +8711,39 @@ function Trowel:CreateBrick(brickModel)
 		outLine.Parent = brick
 		outLine.Adornee = brick
 	end
-	
+
 	brick.Parent = brickModel
-	
+
 	-- Make sure the first placed brick has the sound
 	if BrickIndex == 1 then
 		BuildSound:Clone().Parent = brick
 	end
-	
+
 	-- Add creator tag
 	local new_tag = Instance.new("ObjectValue")
 	new_tag.Name = ("creator")
 	new_tag.Value = self.Player
 	new_tag.Parent = brick
-	
+
 	-- Name the brick a number, which will determine when it is placed when a wall is built.
 	brick.Name = BrickIndex
-	
+
 	-- Pretty sure the "Trowel Exploit" happened because of this
 	--brick:SetNetworkOwner(self.Player)
-	
+
 	-- Temporarily anchor the briccc.
 	brick.Anchored = true
-	
+
 	Collections:AddTag(brick, "TrowelWallBrick")
 end
 
 function Trowel:PrepareBufferWall()
 	local name = (self.Player.Name.."'s Wall")
-	
+
 	if self.Buffer.Value ~= nil then
 		return
 	end
-	
+
 	-- Create new buffer wall model, now stored inside the buffer folder.
 	local Wall = Instance.new("Model")
 	Wall.Name = name;
@@ -8753,36 +8753,36 @@ function Trowel:PrepareBufferWall()
 	for i = 1,BrickCount do
 		self:CreateBrick(Wall)
 	end
-	
+
 	local PhysicsFolder = Instance.new("Folder")
 	PhysicsFolder.Name = "PhysicsFolder"
-	
+
 	local CT = Instance.new("Color3Value")
 	CT.Name = "RandomColor"
 	CT.Value = self.Aesthetics:RandomColor()
 	CT.Parent = PhysicsFolder
-	
+
 	local CF = Instance.new("CFrameValue")
 	CF.Name = "PlaceCFrame"
 	CF.Parent = PhysicsFolder
-	
+
 	local creator = Instance.new("ObjectValue")
 	creator.Name = "creator"
 	creator.Value = self.Player
 	creator.Parent = PhysicsFolder
-	
+
 	local wV = Instance.new("ObjectValue")
 	wV.Name = "Wall"
 	wV.Value = Wall
 	wV.Parent = PhysicsFolder
-	
+
 	local ProjectileType = Instance.new("StringValue")
 	ProjectileType.Name = "ProjectileType"
 	ProjectileType.Value = "Wall"
 	ProjectileType.Parent = PhysicsFolder
-	
+
 	PhysicsFolder.Parent = Wall
-	
+
 	Wall.Parent = self.BufferFolder
 	self.Buffer.Value = Wall
 end
@@ -8792,17 +8792,17 @@ function Trowel:Init(Settings,Modules,Buffers,Player,Character,Folder)
 	self.BricksPerRow = Settings.Trowel.BricksPerRow
 	self.BricksPerColumn = Settings.Trowel.BricksPerColumn
 	self.Outlines = Settings.Trowel.Outlines
-	
-	self.BufferFolder = Folder:WaitForChild("Buffers"):WaitForChild(Player.Name)	
-	
+
+	self.BufferFolder = Folder:WaitForChild("Buffers"):WaitForChild(Player.Name)
+
 	self.Buffer = Buffers:WaitForChild("Wall")
-	
+
 	self.Aesthetics = require(Modules:WaitForChild("Aesthetics"))
 	self.TrowelModule = require(tool:WaitForChild("TrowelModule"))
 
 	self.Player = Player
 	self.Character = Character
-	
+
 	local ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
 
 	local Lifetime = Settings.Trowel.Lifetime
@@ -8810,44 +8810,44 @@ function Trowel:Init(Settings,Modules,Buffers,Player,Character,Folder)
 	local verifyBuffer = require(tool:WaitForChild("VerifyBuffer"))
 
 	local lastActivation = -5
-	
+
 	UpdateEvent.OnServerEvent:connect(function(playerFired,cf)
 		local now = time()
-		
+
 		-- Ensure firing player is the owner of the tool and is waiting reload time.
 		local LenientReloadTime = math.max(Settings.Trowel.ReloadTime - 1, Settings.Trowel.ReloadTime * .6)
-		
+
 		if playerFired == Player and (now - lastActivation) > LenientReloadTime then
 			if Player.Character and Player.Character.Parent and Player.Character:FindFirstChild("Humanoid") and Player.Character.Humanoid.Health > 0 then
 				lastActivation = now;
-				
+
 				if verifyBuffer(self.Buffer, ActiveFolder) then
 					local wall = self.Buffer.Value
 					local PhysicsFolder = wall.PhysicsFolder
-			
+
 					wall.Parent = ActiveFolder
-					
+
 					PhysicsFolder.PlaceCFrame.Value = cf
 					wall.AncestryChanged:Connect(function()
 						PhysicsFolder:Destroy()
 					end)
-					
+
 					Debris:AddItem(wall, Lifetime);
-					
+
 					local function BuildWall()
 						self.TrowelModule:BuildWall(cf,wall, 0.04, true);
 					end
 					task.spawn(BuildWall)
 				end
-			
+
 				self.Buffer.Value = nil
 				self:PrepareBufferWall()
 			end
 		end
 	end)
-	
+
 	self:PrepareBufferWall()
-	
+
 	tool.Enabled = true
 end
 
@@ -8878,18 +8878,18 @@ local Aesthetics = require(_G.BB.Modules:WaitForChild("Aesthetics"))
 
 function Trowel:PositionBrick(CF,wallModel,BrickIndex,ct)
 	local WallBricks = wallModel:GetChildren()
-	
+
 	-- Bricks are named with numbers. Allows for the same brick to be placed in the same
 	-- place on both the client and server.
 	local Brick = wallModel:FindFirstChild(BrickIndex)
-	
+
 	-- Place the brick.
 	if Brick then
 		--Brick:FindFirstChildWhichIsA("BodyForce"):Destroy()
 		local Sound = Brick:FindFirstChildWhichIsA("Sound")
 		Brick.CFrame = CF
 		Brick.Anchored = false;
-		
+
 		if not (game.Players.LocalPlayer) then
 			Brick:MakeJoints()
 			if Sound then
@@ -8917,14 +8917,14 @@ function Trowel:PositionBrick(CF,wallModel,BrickIndex,ct)
 			j:Destroy()
 		end
 	end
-	
+
 	return Brick;
 end
 --[[
 function Trowel:CreateServerWeld(wallModel,BrickIndex,CF)
 	local WallBricks = wallModel:GetChildren();
 	local Brick = wallModel:FindFirstChild(BrickIndex);
-	
+
 	if Brick then
 		if (Brick.Position - CF.Position).Magnitude > 0.1 then
 			print("Waiting")
@@ -8940,28 +8940,28 @@ function Trowel:BuildWall(cf,wall,Speed,ct)
 	local yPos = 0;
 	local BrickIndex = 0
 	local Settings = _G.BB.Settings
-	
+
 	-- Build y rows
 	for i = 1,Settings.Trowel.BricksPerColumn do
 		local RunningVector
 		local xPos = -6
-		
+
 		-- Build x bricks per row
 		for i2 = 1,Settings.Trowel.BricksPerRow do
-			
+
 			-- Increase BrickIndex before each brick is placed for proper reference
 			BrickIndex = BrickIndex + 1
 			local Position = Vector3.new(xPos, yPos, 0)
 			local CF = cf * CFrame.new(Position + Settings.Trowel.BrickSize / 2)
 
 			self:PositionBrick(CF,wall,BrickIndex,ct)
-			
+
 			RunningVector = (Vector3.new(xPos, yPos, 0) + Settings.Trowel.BrickSize)
 			xPos = RunningVector.x
-			
+
 			task.wait(Speed)
 		end
-		
+
 		yPos = RunningVector.y
 	end
 end
@@ -8984,24 +8984,24 @@ return function(ObjectValue, ActiveFolder)
 		assert(ObjectValue,"ObjectValue does not exist.")
 		assert(ObjectValue.Value,"ObjectValue's value does not exist.")
 		assert(ObjectValue.Value.Parent ~= nil,"ObjectValue's value is parented to nil.")
-		assert(ObjectValue.Value.Parent ~= ActiveFolder, "ObjectValue's value has already been parented to ActiveFolder.")	
-		assert(ObjectValue.Value:IsA("Model"), "Improper class, msut be model.")	
+		assert(ObjectValue.Value.Parent ~= ActiveFolder, "ObjectValue's value has already been parented to ActiveFolder.")
+		assert(ObjectValue.Value:IsA("Model"), "Improper class, msut be model.")
 	end)
-	
+
 	if Success then
 		--print("Verification succeeded for: ",ObjectValue.Value.Name)
 		return true
 	elseif Error then
 		local ValueName = ObjectValue and ObjectValue.Name or "NIL_OBJVAL_NAME"
 		local ObjectName = (ObjectValue and ObjectValue.Value) and ObjectValue.Value.Name or "NIL_OBJ_NAME"
-		
+
 		warn(
 			"\n Error verifying ObjectValue...",
 			"\n Value:",ValueName,
 			"\n Object:",ObjectName,
 			"\n Error:",Error
 		)
-		
+
 		return false
 	end
 end]]></ProtectedString>
@@ -9098,10 +9098,10 @@ local jumpTime = 0
 local regular = "http://www.roblox.com/asset/?id=5320848090"
 local reload = "http://www.roblox.com/asset/?id=5321216729"
 
-function Bomb:TryBombJump(Bomb, override)	
+function Bomb:TryBombJump(Bomb, override)
 	local handle = tool:WaitForChild("Handle")
 	local BombSettings = _G.BB.Settings.Bomb
-	
+
 	if self.Character.Humanoid.FloorMaterial == Enum.Material.Air then
 		return
 	end
@@ -9118,14 +9118,14 @@ function Bomb:TryBombJump(Bomb, override)
 		BombJumpPosWindow = math.max(.3, BombJumpPosWindow)
 	end
 
-	if Bomb and Bomb.Parent and (override or self.Character.Humanoid.MoveDirection == Vector3.new(0, 0, 0) or WalkingBombJump) then	
+	if Bomb and Bomb.Parent and (override or self.Character.Humanoid.MoveDirection == Vector3.new(0, 0, 0) or WalkingBombJump) then
 		if not self.canBombJump then
 			return
 		end
-		
-		if not override and (not jumpTime or not clickTime) then 
+
+		if not override and (not jumpTime or not clickTime) then
 			return
-		end	
+		end
 
 		-- Click then jump (jumpTime ought to be larger since it comes after clickTime)
 		local Difference = jumpTime-clickTime
@@ -9133,13 +9133,13 @@ function Bomb:TryBombJump(Bomb, override)
 		-- Slight leniency with the activation order
 		if override or (Difference <= BombJumpPosWindow and Difference >= BombJumpNegWindow) then
 			Bomb.Ready.Value = false
-			PhysicsService:SetPartCollisionGroup(Bomb, "BombJumpBombs")
+			Bomb.CollisionGroup = "BombJumpBombs"
 			Bomb.Ready.Value = true
 
 			Difference = math.abs(Difference)
 
 			local JumpPower
-			
+
 			if override then
 				JumpPower = MaxBombJumpPower
 			elseif BombJumpPowerFormula == "Quadratic" then
@@ -9180,11 +9180,11 @@ function Bomb:TryBombJump(Bomb, override)
 			end
 
 			task.spawn(HandleReload)
-			
+
 			task.delay(BombJumpPosWindow + 0.5, function()
 				-- Reset collision group
 				Bomb.Ready.Value = false
-				PhysicsService:SetPartCollisionGroup(Bomb, "Default")
+				Bomb.CollisionGroup = "Default"
 				Bomb.Ready.Value = true
 			end)
 		end
@@ -9195,7 +9195,7 @@ function Bomb:BlowUp(Explosion)
 	if Explosion.BlownUpClient.Value == true then
 		return
 	end
-	
+
 	Explosion.Ready.Value = false
 	Explosion.BlownUpClient.Value = true
 
@@ -9203,17 +9203,17 @@ function Bomb:BlowUp(Explosion)
 	Explosion.Anchored = true
 	Explosion.Size = Vector3.new(Size, Size, Size)
 	Explosion.Tick:Destroy()
-	
+
 	-- Client explosion sound:
 	local Sounds = Explosion:WaitForChild("Boom")
 	local Sound = Sounds:FindFirstChild(_G.BB.Local.BombExplosion)
 	Sound.Parent = Explosion
 	Sound:Play()
-	
+
 	local function CreateVisual()
 		self.Aesthetics:CreateCustomExplosion(self.Player, Explosion)
 	end
-	
+
 	task.spawn(CreateVisual)
 	self.Explosion:HandleHitDetection(Explosion)
 end
@@ -9226,45 +9226,45 @@ function Bomb:HandleTick(Bomb)
 
 	--Bomb color was BaseColor on first two ticks.
 	--Bomb.Color = TickColor
-	
+
 	local looping = true
-	
+
 	Bomb.BlownUpClient.Changed:Connect(function()
 		if Bomb.BlownUpClient.Value == false then
 			looping = false
 		end
 	end)
-	
+
 	Bomb.Ready.Value = true
-	
+
 	local expectedTime = 0
 	local totalTime = 0
-	
+
 	while (updateInterval > 0.1) and looping do
-		
+
 		Bomb.Tick:Stop()
-		
+
 		-- For some reason, when changing TimePosition mobile players
 		-- could not hear the sound.
 		if not _G.BB.TrueMobile then
 			Bomb.Tick.TimePosition = 0.12
 		end
-		
+
 		Bomb.Tick:Play()
-		
+
 		expectedTime += updateInterval
 		totalTime += SafeWait.wait(updateInterval)
-		
+
 		if looping then
 			currentColor = currentColor == 1 and 2 or 1
-			
+
 			Bomb.Ready.Value = false
 			Bomb.Color = currentColor == 1 and TickColor or BaseColor
 			Bomb.Ready.Value = true
 			updateInterval = updateInterval * 0.9
 		end
 	end
-	
+
 	return (totalTime - expectedTime < 1)
 end
 
@@ -9287,7 +9287,7 @@ function Bomb:AssignTouchEvent(Bomb)
 
 		local hitPlr = Players:GetPlayerFromCharacter(hitCharacter)
 		local canHitSelf = self.Kill:CanDamage(self.Player, hitHumanoid, _G.BB.Settings.Bomb.TouchExplodeSelf)
-		
+
 		if hitPlr == self.Player and not canHitSelf then
 			return
 		end
@@ -9306,19 +9306,19 @@ function Bomb:FireAndBombJump()
 		self:TryBombJump(self.CurrentBomb, true)
 		return true
 	end
-	
+
 	return false
 end
 
 function Bomb:Fire()
-	if tool.Enabled then 
+	if tool.Enabled then
 
 		tool.Enabled = false
 
 		clickTime = tick()
 
 		_G.BB.ProjectileCounts.Bombs += 1
-		
+
 		local NewBomb = self.MakeBomb(self.Player, _G.BB.ProjectileCounts.Bombs)
 
 		self.CurrentBomb = NewBomb
@@ -9354,7 +9354,7 @@ function Bomb:Fire()
 		end
 
 		task.spawn(RunBomb)
-		
+
 		task.spawn(function()
 			SafeWait.wait(_G.BB.Settings.Bomb.ReloadTime)
 			tool.Enabled = true
@@ -9366,10 +9366,10 @@ function Bomb:Init()
 	self.canBombJump = true
 	self.bombJumpTimestamp = 0
 	self.CurrentBomb = nil
-	
+
 	self.Player = game:GetService("Players").LocalPlayer
 	self.Character = self.Player.Character
-	
+
 	self.Tool = tool
 	self.UpdateEvent = tool:WaitForChild("Update")
 	local Activation = tool:WaitForChild("Activation")
@@ -9389,7 +9389,7 @@ function Bomb:Init()
 	Activation.Event:Connect(function()
 		self:Fire()
 	end)
-	
+
 	-- Only fires once per jump.
 	self.Character.Humanoid.StateChanged:Connect(function(State)
 		if State == Enum.HumanoidStateType.Jumping then
@@ -9437,121 +9437,121 @@ local Physics = game:GetService("PhysicsService")
 
 function Bomb:CreatePhysicsFolder(count)
 	--_G.BB.ProjectileCounts[self.Player.Name].Bombs += 1
-	
+
 	local PhysicsFolder = Instance.new("Folder")
-		
+
 	PhysicsFolder.Name = "Bomb".._G.BB.ProjectileCounts[self.Player.Name].Bombs
 	PhysicsFolder.Name = "Bomb"..count
 	local new_tag = Instance.new("ObjectValue")
 	new_tag.Name = ("creator")
 	new_tag.Value = self.Player
 	new_tag.Parent = PhysicsFolder
-	
+
 	local character = Instance.new("ObjectValue")
 	character.Name = "Character"
 	character.Value = self.Character
 	character.Parent = PhysicsFolder
-	
-	
+
+
 	local projType = Instance.new("StringValue")
 	projType.Name = "ProjectileType"
 	projType.Value = "Bomb"
 	projType.Parent = PhysicsFolder
-	
+
 	local Exploded = Instance.new("BoolValue")
 	Exploded.Name = ("Exploded")
 	Exploded.Value = false;
 	Exploded.Parent = PhysicsFolder;
-	
+
 	local LastUpdateTick = Instance.new("NumberValue")
 	LastUpdateTick.Name = "LastUpdateTick"
 	LastUpdateTick.Parent = PhysicsFolder
-	
+
 	local ID = Instance.new("StringValue")
 	ID.Name = "UniqueID"
 	ID.Value = PhysicsFolder.Name.._G.BB.ProjectileCounts[self.Player.Name].Bombs
 	ID.Parent = PhysicsFolder
-	
+
 	local ThemeTag = Instance.new("StringValue")
 	ThemeTag.Name = "Theme"
 	ThemeTag.Value = self.Aesthetics:DetermineTheme(self.Player)
 	ThemeTag.Parent = PhysicsFolder
-	
+
 	local realCF = Instance.new("Vector3Value")
 	realCF.Name = "LatestPosition"
 	realCF.Parent = PhysicsFolder
-	
+
 	local LastCF = Instance.new("Vector3Value")
 	LastCF.Name = "LastSentPosition"
 	LastCF.Parent = PhysicsFolder
-	
+
 	local realVel = Instance.new("Vector3Value")
 	realVel.Name = "LatestVelocity"
 	realVel.Parent = PhysicsFolder
-	
+
 	--You need this because clocks aren't synchronized. Can't use a global timestamp.
 	--Bwuh bwuh bwuh why don't you synchronize the clocks? Well why don't YOU do it lole
 	local realFT = Instance.new("NumberValue")
 	realFT.Name = "LatestTime"
 	realFT.Value = 0
 	realFT.Parent = PhysicsFolder
-	
+
 	local realOT = Instance.new("NumberValue")
 	realOT.Name = "LocalOriginTime"
 	realOT.Value = 0
 	realOT.Parent = PhysicsFolder
-	
+
 	local ActiveTag = Instance.new("BoolValue")
 	ActiveTag.Name = ("Active")
 	ActiveTag.Value = false
 	ActiveTag.Parent = PhysicsFolder;
-	
+
 	local AssignedTouch = Instance.new("BoolValue")
 	AssignedTouch.Name = ("BlownUpClient")
 	AssignedTouch.Value = false
 	AssignedTouch.Parent = PhysicsFolder;
-	
+
 	-- Add sounds
 	TickSound:Clone().Parent = PhysicsFolder
 	BoomSound:Clone().Parent = PhysicsFolder
-	
+
 	return PhysicsFolder
 end
 
 function Bomb:Init(Settings,Modules,Buffers,Player,Character,Folder)
 	self.Settings = Settings
-	
+
 	local Security = require(Modules:WaitForChild("Security"))
 
 	self.Aesthetics = require(Modules:WaitForChild("Aesthetics"))
-	
+
 	local ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
-	
+
 	self.Player = Player
 	self.Character = Character
-	
+
 	-- First activation must always work even if time() returns 0.
-	local lastActivation = -5;	
+	local lastActivation = -5;
 	UpdateEvent.OnServerEvent:Connect(function(playerFired, initCF, initVel, initClientTime, count)
 		local now = tick()
 		local LenientReloadTime = math.max(Settings.Bomb.ReloadTime - 1, Settings.Bomb.ReloadTime * .6)
-		
+
 		if playerFired == Player and (now - lastActivation) > LenientReloadTime then
 			if Player.Character and Player.Character.Parent and Player.Character:FindFirstChild("Humanoid") and Player.Character.Humanoid.Health > 0 then
 				lastActivation = now
-				
+
 				local PhysicsFolder = self:CreatePhysicsFolder(count)
-				
+
 				PhysicsFolder.LatestPosition.Value = initCF.Position
 				PhysicsFolder.LatestVelocity.Value = initVel
 				PhysicsFolder.LatestTime.Value = 0
-				
+
 				PhysicsFolder.LocalOriginTime.Value = initClientTime
 				PhysicsFolder.LastUpdateTick.Value = now
-				
+
 				PhysicsFolder.Active.Value = true
 
-				
+
 				if Security:ApproveInit(PhysicsFolder) then
 					PhysicsFolder.Parent = ActiveFolder
 				end
@@ -9559,19 +9559,19 @@ function Bomb:Init(Settings,Modules,Buffers,Player,Character,Folder)
 				local function ForceExplode()
 					if PhysicsFolder.Parent
 						and PhysicsFolder.Active.Value then
-						
+
 						--print("Forced explosion for:",PhysicsFolder.UniqueID.Value)
-						
+
 						PhysicsFolder.Active.Value = false
 						game:GetService("Debris"):AddItem(PhysicsFolder, 0)
 					end
 				end
 				task.delay(Settings.Bomb.DespawnTime, ForceExplode)
 			end
-		end	
+		end
 	end)
 	tool.Enabled = true
-	
+
 end
 
 return Bomb]]></ProtectedString>
@@ -9868,29 +9868,29 @@ return Bomb]]></ProtectedString>
 local tool = script.Parent.Parent
 
 local function canSBJump(Character)
-	return (_G.BB.Settings.SuperballJump 
-		and Character.Humanoid.FloorMaterial == Enum.Material.Air 
+	return (_G.BB.Settings.SuperballJump
+		and Character.Humanoid.FloorMaterial == Enum.Material.Air
 		and _G.BB.CanSBFly)
 end
 
 function Superball:Fire(Superball, TargetPosition, SpawnDistance, count)
-	
+
 	local Speed = _G.BB.Settings.Superball.Speed
 	local ShootInsideBricks = _G.BB.Settings.Superball.ShootInsideBricks
-	
+
 	local now = time()
 	local SpawnPosition = self.Head.Position + (TargetPosition - self.Head.Position).unit * SpawnDistance
 	local LaunchCF = CFrame.new(SpawnPosition, TargetPosition)
 	local Velocity = LaunchCF.LookVector * Speed
-	
+
 	Superball.LastSentPosition.Value = LaunchCF.Position
 	Superball.LastSentVelocity.Value = Velocity
 	Superball.LastSentTime.Value = now
-	
+
 	Superball.CFrame = LaunchCF
 	Superball.Velocity = Velocity
 	Superball.Parent = self.ClientActiveFolder
-	
+
 	if not ShootInsideBricks and self.isInsideSomething(Superball) then
 		Superball.Anchored = true
 		local Position = self.handle.Position
@@ -9899,10 +9899,10 @@ function Superball:Fire(Superball, TargetPosition, SpawnDistance, count)
 		Superball.Velocity = Superball.CFrame.LookVector * Speed
 		Superball.Anchored = false
 	end
-	
+
 	self.handle.Boing:Play() -- or handle.Boing:Play()
-	
-	self.Delete(Superball, 8) -- exists for 8 seconds		
+
+	self.Delete(Superball, 8) -- exists for 8 seconds
 	self.Hit:HandleHitDetection(Superball, count)
 	return LaunchCF.Position, Velocity, now
 end
@@ -9910,7 +9910,7 @@ end
 function Superball:Init()
 	local Player = game:GetService("Players").LocalPlayer
 	local Character = Player.Character
-	
+
 	self.Hit = require(_G.BB.Modules:WaitForChild("Hit"))
 	self.Delete = require(_G.BB.ClientObjects:WaitForChild("Delete"))
 	self.isInsideSomething = require(_G.BB.ClientObjects:WaitForChild("isInsideSomething"))
@@ -9918,49 +9918,49 @@ function Superball:Init()
 	local MakeSuperball = require(_G.BB.ClientObjects:WaitForChild("MakeSuperball"))
 
 	self.ClientActiveFolder = workspace:WaitForChild("Projectiles"):WaitForChild("Active"):WaitForChild(Player.Name)
-	
+
 	self.handle = tool:WaitForChild("Handle")
 
 	self.Head = Character:WaitForChild("Head")
-	
+
 	local ReloadTime = _G.BB.Settings.Superball.ReloadTime
 
 	local Aesthetics = require(_G.BB.Modules:WaitForChild("Aesthetics"))
 	local HandleCrosshair = require(_G.BB.ClientObjects:WaitForChild("HandleCrosshair"))
-	
+
 	local UpdateEvent = tool:WaitForChild("Update")
 	local Activation = tool:WaitForChild("Activation")
 	local colorEvent = tool:WaitForChild("Color")
-	
+
 	local SafeWait = require(_G.BB.Modules.Security:WaitForChild("SafeWait"))
 
 	Aesthetics:HandleSBHandle(Player, self.handle, colorEvent, true)
 	HandleCrosshair(tool)
-	
+
 	Activation.Event:Connect(function(Hit, targetPos)
-		if tool.Enabled then 
+		if tool.Enabled then
 			tool.Enabled = false
-			
+
 			_G.BB.ProjectileCounts.Superballs += 1
-			
+
 			local count = _G.BB.ProjectileCounts.Superballs
-			local CollisionGroup = "Superballs" 
+			local CollisionGroup = "Superballs"
 			local SpawnDistance = _G.BB.Settings.Superball.SpawnDistance
-			
+
 			if canSBJump(Character) then
 				CollisionGroup = "JumpySuperballs"
 				SpawnDistance = 5 -- optimal spawn distance for superball jumping
 			end
-						
+
 			local Superball = MakeSuperball(Player, CollisionGroup, count, self.handle.Color)
-						
+
 			local position, velocity, now = self:Fire(Superball, targetPos, SpawnDistance, count)
 			UpdateEvent:FireServer(position, velocity, now, Superball.Color, count)
 
 			Aesthetics:HandleSBHandle(Player, self.handle, colorEvent)
 
 			SafeWait.wait(ReloadTime)
-			
+
 			tool.Enabled = true
 		end
 	end)
@@ -9999,22 +9999,22 @@ function Superball:CreatePhysicsFolder(color, count)
 	-- Aesthetics:
 	local Folder, Theme = self.Aesthetics:GetThemeObject(self.Player, "Superball")
 	local Part = Folder:FindFirstChildWhichIsA("Part")
-	
+
 	self.handle.Material = Part.Material
 	self.handle.Reflectance = Part.Reflectance
 	self.handle.Color = Theme == "Team Color" and self.Player.TeamColor.Color or Part.Color
 	self.handle.Transparency = Part.Transparency
-	
+
 	local CT = Instance.new("Color3Value")
 	CT.Name = "RandomColor"
-	CT.Value = self.handle.Color 
+	CT.Value = self.handle.Color
 	CT.Parent = PhysicsFolder
-	
+
 	local ThemeTag = Instance.new("StringValue")
 	ThemeTag.Name = "Theme"
 	ThemeTag.Value = self.Aesthetics:DetermineTheme(self.Player)
 	ThemeTag.Parent = PhysicsFolder
-	
+
 	if _G.BB.Settings.Themes.RandomSuperballColors and ThemeTag.Value == "Normal" then
 		CT.Value = color
 		self.handle.Color = color
@@ -10025,20 +10025,20 @@ function Superball:CreatePhysicsFolder(color, count)
 	new_tag.Name = ("creator")
 	new_tag.Value = self.Player;
 	new_tag.Parent = PhysicsFolder
-	
+
 	local lastUpdateCFrame = Instance.new("Vector3Value")
 	lastUpdateCFrame.Name = "LastSentPosition"
 	lastUpdateCFrame.Parent = PhysicsFolder
-	
+
 	local character = Instance.new("ObjectValue")
 	character.Name = "Character"
 	character.Value = self.Character
 	character.Parent = PhysicsFolder
-	
+
 	local lastSentTime = Instance.new("NumberValue")
 	lastSentTime.Name = "LastSentTime"
 	lastSentTime.Parent = PhysicsFolder
-	
+
 	local LastUpdateTick = Instance.new("NumberValue")
 	LastUpdateTick.Name = "LastUpdateTick"
 	LastUpdateTick.Parent = PhysicsFolder
@@ -10046,11 +10046,11 @@ function Superball:CreatePhysicsFolder(color, count)
 	local lp = Instance.new("Vector3Value")
 	lp.Name = "LatestPosition"
 	lp.Parent = PhysicsFolder
-	
+
 	local lv = Instance.new("Vector3Value")
 	lv.Name = "LatestVelocity"
 	lv.Parent = PhysicsFolder
-	
+
 	local lt = Instance.new("NumberValue")
 	lt.Name = "LatestTime"
 	lt.Parent = PhysicsFolder
@@ -10059,34 +10059,34 @@ function Superball:CreatePhysicsFolder(color, count)
 	projType.Name = "ProjectileType"
 	projType.Value = "Superball"
 	projType.Parent = PhysicsFolder
-	
+
 	local ID = Instance.new("StringValue")
 	ID.Name = "UniqueID"
 	ID.Value = PhysicsFolder.Name.._G.BB.ProjectileCounts[self.Player.Name].Superballs
 	ID.Parent = PhysicsFolder
-	
+
 	local ActiveVal = Instance.new("BoolValue")
 	ActiveVal.Name = "Active"
 	ActiveVal.Value = true
 	ActiveVal.Parent = PhysicsFolder
-	
+
 	local CanHalfDamageValue = Instance.new("BoolValue")
 	CanHalfDamageValue.Name = "CanHalfDamage"
 	CanHalfDamageValue.Value = true
 	CanHalfDamageValue.Parent = PhysicsFolder
-	
+
 	local Hacking = Instance.new("BoolValue")
 	Hacking.Name = "Hacking"
 	Hacking.Value = false
 	Hacking.Parent = PhysicsFolder
-	
+
 	local Damage = Instance.new("NumberValue")
 	Damage.Name = "Damage"
 	Damage.Value = _G.BB.Settings.Superball.Damage;
 	Damage.Parent = PhysicsFolder;
-	
+
 	self.Boing:Clone().Parent = PhysicsFolder
-		
+
 	return PhysicsFolder
 end
 
@@ -10096,53 +10096,53 @@ function Superball:Init(Settings, Modules, Buffers, Player, Character, Folder)
 	self.ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
 	self.Player = Player
 	self.Character = Character
-	
+
 	self.handle = tool:WaitForChild("Handle")
 	self.Boing = self.handle:WaitForChild("Boing")
-	
+
 	local Security = require(Modules:WaitForChild("Security"))
 	local UpdateEvent = tool:WaitForChild("Update")
 	local ColorEvent = tool:WaitForChild("Color")
 
 	--self.Aesthetics:HandleSBHandle(Player, self.handle)
-		
-	-- First activation must always work even if time() returns 0. 
+
+	-- First activation must always work even if time() returns 0.
 	local lastActivation = -10
-	
+
 	UpdateEvent.OnServerEvent:Connect(function(playerFired, initPos, initVel, initTime, color, count)
-		
+
 		local now = time()
 		local LenientReloadTime = math.max(Settings.Superball.ReloadTime - 1, Settings.Superball.ReloadTime * .6)
-		
+
 		if playerFired == Player and (now - lastActivation) > LenientReloadTime then
 			if Player.Character and Player.Character.Parent and Player.Character:FindFirstChild("Humanoid") and Player.Character.Humanoid.Health > 0 then
 				lastActivation = now
-				
+
 				local PhysicsFolder = self:CreatePhysicsFolder(color, count)
-				
+
 				-- Begin replication
 				PhysicsFolder.LatestPosition.Value = initPos
 				PhysicsFolder.LatestVelocity.Value = initVel
 				PhysicsFolder.LatestTime.Value = initTime
 				PhysicsFolder.LastUpdateTick.Value = now
 				PhysicsFolder.Active.Value = true
-				
+
 				if Security:ApproveInit(PhysicsFolder) then
 					PhysicsFolder.Parent = self.ActiveFolder
 				end
-				
+
 				game:GetService("Debris"):AddItem(PhysicsFolder, Settings.Superball.DespawnTime)
 			end
 		end
 	end)
-	
+
 	ColorEvent.OnServerEvent:Connect(function(player, color, transparency, reflectance, material)
 		self.handle.Color = color
 		self.handle.Material = material
 		self.handle.Reflectance = reflectance
 		self.handle.Transparency = transparency
 	end)
-	
+
 	tool.Enabled = true
 end
 
@@ -10516,7 +10516,7 @@ function Paintball:Fire(Paintball, TargetPosition, SpawnDistance, count)
 	Paintball.CFrame = LaunchCF
 	Paintball.Velocity = Velocity
 	Paintball.Parent = self.ClientActiveFolder
-	
+
 	if ShootInsideBricks == false and self.isInsideSomething(Paintball) then
 		Paintball.Anchored = true
 		local Position = tool.Handle.Position
@@ -10524,41 +10524,41 @@ function Paintball:Fire(Paintball, TargetPosition, SpawnDistance, count)
 		Paintball.Velocity = Paintball.CFrame.LookVector * Speed
 		Paintball.Anchored = false
 	end
-	
+
 	game:GetService("Debris"):AddItem(Paintball, 10)
-	
+
 	self.Hit:HandleHitDetection(Paintball)
 	return LaunchCF.Position, Velocity
 end
 
 function Paintball:Init()
 	local Player = game:GetService("Players").LocalPlayer
-	
+
 	self.Hit = require(_G.BB.Modules:WaitForChild("Hit"))
-	
+
 	self.ClientActiveFolder = workspace:WaitForChild("Projectiles"):WaitForChild("Active"):WaitForChild(Player.Name)
 	self.handle = tool:WaitForChild("Handle")
 	local UpdateEvent = tool:WaitForChild("Update")
 
 	local SafeWait = require(_G.BB.Modules.Security:WaitForChild("SafeWait"))
-	
+
 	self.Character = Player.Character
-	
+
 	local Activation = tool:WaitForChild("Activation")
 	local MakePaintball = require(_G.BB.ClientObjects:WaitForChild("MakePaintball"))
-	
+
 	local HandleCrosshair = require(_G.BB.ClientObjects:WaitForChild("HandleCrosshair"))
 	HandleCrosshair(tool)
-	
+
 	self.isInsideSomething = require(_G.BB.ClientObjects:WaitForChild("isInsideSomething"))
 
 	Activation.Event:Connect(function(Hit,targetPos)
-		if tool.Enabled then 
+		if tool.Enabled then
 			tool.Enabled = false
 
 			_G.BB.ProjectileCounts.Paintballs += 1
-			local count = _G.BB.ProjectileCounts.Paintballs	
-			
+			local count = _G.BB.ProjectileCounts.Paintballs
+
 			local Paintball = MakePaintball(Player, "Paintballs", count)
 
 			local position, velocity = self:Fire(Paintball, targetPos, _G.BB.Settings.PaintballGun.SpawnDistance, count)
@@ -10594,32 +10594,32 @@ return Paintball]]></ProtectedString>
 local tool = script.Parent.Parent
 
 function Paintball:CreatePhysicsFolder(color, count)
-	
+
 	local PhysicsFolder = Instance.new("Folder")
-	
+
 	--_G.BB.ProjectileCounts[self.Player.Name].Paintballs += 1
-	
+
 	--PhysicsFolder.Name = "PaintballGun".._G.BB.ProjectileCounts[self.Player.Name].Paintballs
 	PhysicsFolder.Name = "PaintballGun"..count
-	
+
 	local ThemeTag = Instance.new("StringValue")
 	ThemeTag.Name = "Theme"
 	ThemeTag.Value = self.Aesthetics:DetermineTheme(self.Player)
 	ThemeTag.Parent = PhysicsFolder
-	
+
 	local Folder,Theme = self.Aesthetics:GetThemeObject(self.Player,"PaintballGun");
 	local Pb = Folder:FindFirstChildWhichIsA("Part")
-	
+
 	local CT = Instance.new("Color3Value")
 	CT.Name = "RandomColor"
 	CT.Value = color
-	CT.Parent = PhysicsFolder	
-	
+	CT.Parent = PhysicsFolder
+
 	local character = Instance.new("ObjectValue")
 	character.Name = "Character"
 	character.Value = self.Character
 	character.Parent = PhysicsFolder
-	
+
 	-- Add the creator tag
 	local new_tag = Instance.new("ObjectValue")
 	new_tag.Name = "creator"
@@ -10630,7 +10630,7 @@ function Paintball:CreatePhysicsFolder(color, count)
 	projType.Name = "ProjectileType"
 	projType.Value = "PaintballGun"
 	projType.Parent = PhysicsFolder
-	
+
 	local ID = Instance.new("StringValue")
 	ID.Name = "UniqueID"
 	ID.Value = PhysicsFolder.Name.._G.BB.ProjectileCounts[self.Player.Name].Paintballs
@@ -10647,7 +10647,7 @@ function Paintball:CreatePhysicsFolder(color, count)
 	m.Name = "Mass"
 	m.Value = self.GetMass(pbSettings.Shape, pbSettings.Size, pbSettings.Density)
 	m.Parent = PhysicsFolder
-	
+
 	local lp = Instance.new("Vector3Value")
 	lp.Name = "LatestPosition"
 	lp.Parent = PhysicsFolder
@@ -10659,69 +10659,69 @@ function Paintball:CreatePhysicsFolder(color, count)
 	local lt = Instance.new("NumberValue")
 	lt.Name = "LatestTime"
 	lt.Parent = PhysicsFolder
-	
+
 	local LastUpdateTick = Instance.new("NumberValue")
 	LastUpdateTick.Name = "LastUpdateTick"
 	LastUpdateTick.Parent = PhysicsFolder
-	
+
 	local ActiveVal = Instance.new("BoolValue")
 	ActiveVal.Name = "Active"
 	ActiveVal.Value = true
 	ActiveVal.Parent = PhysicsFolder
-	
+
 	local ActiveVal = Instance.new("BoolValue")
 	ActiveVal.Name = "Exploded"
 	ActiveVal.Value = false
 	ActiveVal.Parent = PhysicsFolder
-	
+
 	local Damage = Instance.new("NumberValue")
 	Damage.Name = "Damage"
 	Damage.Value = self.Settings.PaintballGun.Damage
 	Damage.Parent = PhysicsFolder
-	
-	
+
+
 	return PhysicsFolder
 end
 
-function Paintball:Init(Settings, Modules, Buffers ,Player, Character, Folder)	
+function Paintball:Init(Settings, Modules, Buffers ,Player, Character, Folder)
 	self.Aesthetics = require(Modules:WaitForChild("Aesthetics"))
 	self.GetMass = require(tool:WaitForChild("GetMass"))
-	
+
 	self.ActiveFolder = Folder:WaitForChild("Active"):WaitForChild(Player.Name)
-	
+
 	self.Player = Player
 	self.Character = Character
-	
+
 	self.Settings = Settings
-	
+
 	local handle = tool:WaitForChild("Handle")
 	local UpdateEvent = tool:WaitForChild("Update")
 
 	local Security = require(Modules:WaitForChild("Security"))
-	
-	-- First activation must always work event if time() returns 0. 
+
+	-- First activation must always work event if time() returns 0.
 	local lastActivation = -10;
-	
+
 	UpdateEvent.OnServerEvent:Connect(function(playerFired,initPos,initVel, initTime, count, color)
-		
+
 		-- Verifying firer == player and reload time was waited upon.
 		local now = time()
 		local LenientReloadTime = math.max(Settings.PaintballGun.ReloadTime - 1, Settings.PaintballGun.ReloadTime * .6)
-		
+
 		if playerFired == Player and (now - lastActivation) > LenientReloadTime then
 			if Player.Character and Player.Character.Parent and Player.Character:FindFirstChild("Humanoid") and Player.Character.Humanoid.Health > 0 then
-			
+
 				lastActivation = now
-				
+
 				local PhysicsFolder = self:CreatePhysicsFolder(color, count)
-				
+
 				-- Replicate projectile
 				PhysicsFolder.LatestPosition.Value = initPos or Vector3.new()
 				PhysicsFolder.LatestVelocity.Value = initVel or Vector3.new()
-				PhysicsFolder.LatestTime.Value = initTime			
-				
+				PhysicsFolder.LatestTime.Value = initTime
+
 				handle:FindFirstChild("Fire"):Play()
-				
+
 				if Security:ApproveInit(PhysicsFolder) then
 					PhysicsFolder.Parent = self.ActiveFolder
 				end
@@ -10765,23 +10765,23 @@ return Paintball]]></ProtectedString>
 							<ProtectedString name="Source"><![CDATA[return function(Shape, Size, Density) -- Does not account for unions
 	if Shape == "Block" or Shape == "Wedge" then
 		local Mass = Size.X * Size.Y * Size.Z * Density
-		-- Wedges and cornerwedges do not currently have 
+		-- Wedges and cornerwedges do not currently have
 		-- variant mass from regular blocks
-		--if Shape == "Wedge" then 
+		--if Shape == "Wedge" then
 		--	Mass /= 2
 		--end
 		return Mass
 	elseif Shape == "Ball" then
 		local Radius = Size.Y / 2
-		return (4 / 3) * math.pi * (Radius ^ 3) * Density 
-		-- Roblox does not support irregular spheres unless using meshes, 
-		-- but because you can't actually resize spheres outside of 
+		return (4 / 3) * math.pi * (Radius ^ 3) * Density
+		-- Roblox does not support irregular spheres unless using meshes,
+		-- but because you can't actually resize spheres outside of
 		-- equilaterial sides, we dont need to find the smallest axis
 	elseif Shape == "Cylinder" then
 		local SmallestAxis = Size.Y > Size.Z and Size.Z or Size.Y
-		-- Roblox does not support irregular cylinders, 
-		-- and so because we can freely resize the cylinder regardless, 
-		-- we have to see which axis is smaller so we can use that as 
+		-- Roblox does not support irregular cylinders,
+		-- and so because we can freely resize the cylinder regardless,
+		-- we have to see which axis is smaller so we can use that as
 		-- the radius.
 		local Radius = SmallestAxis / 2
 		return math.pi * (Radius ^ 2) * Size.X * Density
@@ -11458,10 +11458,10 @@ local Aesthetics = require(_G.BB.Modules:WaitForChild("Aesthetics"))
 return function(Creator, CollisionGroup, count, _color)
 	local Folder,Theme = Aesthetics:GetThemeObject(Creator, "Superball");
 	local Part = Folder:FindFirstChildWhichIsA("Part"):Clone()
-	
+
 	Collections:AddTag(Part,"Superball")
 	Collections:AddTag(Part,"Projectile")
-	
+
 	Part.Name = Creator.Name.."'s Superball"
 	Part.CastShadow = true
 	Part.Massless = false
@@ -11471,28 +11471,28 @@ return function(Creator, CollisionGroup, count, _color)
 	Part.Shape = Enum.PartType.Ball
 	Part.BottomSurface = Enum.SurfaceType.Smooth
 	Part.TopSurface = Enum.SurfaceType.Smooth
-	
+
 	if _G.BB.Settings.Themes.RandomSuperballColors and Theme == "Normal" then
 		Part.Color =  _color
 	elseif Theme == "Team Color" then
 		Part.Color = Creator.TeamColor.Color
 	end
-	
+
 	_G.BB.ClientObjects.Sounds.SuperballSounds.Boing:Clone().Parent = Part
-	
+
 	Aesthetics:HandleProjectileVisuals(Creator, Part, Theme)
-	
+
 	--local PhysicsFolderVal = Instance.new("ObjectValue")
 	--PhysicsFolderVal.Name = "PhysicsFolder"
 	--PhysicsFolderVal.Value = PhysicsFolder
 	--PhysicsFolderVal.Parent = Part
-	
+
 	Part.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0, 1, 1, 1)
-	Physics:SetPartCollisionGroup(Part, CollisionGroup)
-	
+	Part.CollisionGroup = CollisionGroup
+
 	-- In order to remove the PhysicsFolder buffer, had to make the projectile
 	-- the location of data storage.
-	
+
 	local lastUpdateVel = Instance.new("Vector3Value")
 	lastUpdateVel.Name = "LastSentVelocity"
 	lastUpdateVel.Parent = Part
@@ -11504,39 +11504,39 @@ return function(Creator, CollisionGroup, count, _color)
 	local lastSentTime = Instance.new("NumberValue")
 	lastSentTime.Name = "LastSentTime"
 	lastSentTime.Parent = Part
-	
+
 	local Damage = Instance.new("NumberValue")
 	Damage.Name = "Damage"
 	Damage.Value = _G.BB.Settings.Superball.Damage
 	Damage.Parent = Part
-	
+
 	local Type = Instance.new("StringValue")
 	Type.Name = "ProjectileType"
 	Type.Value = "Superball"
 	Type.Parent = Part
-	
+
 	local c = Instance.new("ObjectValue")
 	c.Name = "creator"
 	c.Value = Creator
 	c.Parent = Part
-	
+
 	local active = Instance.new("BoolValue")
 	active.Name = "Active"
 	active.Value = true
 	active.Parent = Part
-	
+
 	local Ready = Instance.new("BoolValue")
 	Ready.Name = "Ready"
 	Ready.Value = false
 	Ready.Parent = Part
-	
+
 	if count then
 		local countVal = Instance.new("NumberValue")
 		countVal.Name = "Count"
 		countVal.Value = count
 		countVal.Parent = Part
 	end
-	
+
 	return Part
 end
 ]]></ProtectedString>
@@ -11561,7 +11561,7 @@ local Aesthetics = require(_G.BB.Modules:WaitForChild("Aesthetics"))
 return function(Creator, count, PhysicsFolder)
 
 	local Folder,Theme = Aesthetics:GetThemeObject(Creator, "Rocket")
-	
+
 	local Part = Folder:FindFirstChildWhichIsA("Part"):Clone()
 	Part.Name = Creator.Name.."s Rocket"
 	Part.Size = Vector3.new(1, 1, 4)
@@ -11574,27 +11574,27 @@ return function(Creator, count, PhysicsFolder)
 	Part.CanCollide = false
 	Part.CastShadow = true
 	Part.Massless = true
-	
+
 	Collections:AddTag(Part,"Rocket")
 	Collections:AddTag(Part,"Projectile")
-	
+
 	if Theme == "Team Color" then
 		Part.Color = Creator.TeamColor.Color
 	end
-	
+
 	-- Make it float
 	local force = Instance.new("BodyForce")
 	force.Name = "Floater"
 	force.Force = Vector3.new(0, Part:GetMass() * workspace.Gravity, 0)
 	force.Parent = Part
-	
+
 	-- Used for ramp-up
 	local vel = Instance.new("BodyVelocity")
 	vel.Name = "RocketVelocity"
 	vel.Velocity = Vector3.new(0, 0, 0)
 	vel.MaxForce = Vector3.new(0, 0, 0)
 	vel.Parent = Part
-	
+
 	Aesthetics:HandleProjectileVisuals(Creator, Part)
 
 	_G.BB.ClientObjects.Sounds.RocketSounds.Boom:Clone().Parent = Part
@@ -11608,7 +11608,7 @@ return function(Creator, count, PhysicsFolder)
 	local ld = Instance.new("Vector3Value")
 	ld.Name = "LastSentPosition"
 	ld.Parent = Part
-	
+
 	local lastUpdateVel = Instance.new("Vector3Value")
 	lastUpdateVel.Name = "LastSentVelocity"
 	lastUpdateVel.Parent = Part
@@ -11627,7 +11627,7 @@ return function(Creator, count, PhysicsFolder)
 	c.Name = "creator"
 	c.Value = Creator
 	c.Parent = Part
-	
+
 	local LastUpdateTick = Instance.new("NumberValue")
 	LastUpdateTick.Name = "LastUpdateTick"
 	LastUpdateTick.Parent = Part
@@ -11640,7 +11640,7 @@ return function(Creator, count, PhysicsFolder)
 	active.Name = "Active"
 	active.Value = true
 	active.Parent = Part
-	
+
 	local Ready = Instance.new("BoolValue")
 	Ready.Name = "Ready"
 	Ready.Value = false
@@ -11652,13 +11652,13 @@ return function(Creator, count, PhysicsFolder)
 		countVal.Value = count
 		countVal.Parent = Part
 	end
-		
+
 	if _G.BB.Settings.Doomspire.RocketCollisions then
-		Physics:SetPartCollisionGroup(Part, "RideableRockets")
+		Part.CollisionGroup = "RideableRockets"
 		Part.CanCollide = true
 	end
-		
-	
+
+
 	return Part
 end
 ]]></ProtectedString>
@@ -11706,19 +11706,19 @@ local Settings = Remotes:WaitForChild("AcquireSettings"):InvokeServer()
 
 local function getNumParts(char)
 	local count = 0
-	
+
 	for _, charPart in pairs(char:GetDescendants()) do
 		if charPart:IsA("BasePart") then
 			count += 1
 		end
 	end
-	
+
 	return count
 end
 
 local function partsLoaded(char, rigType)
 	local min = rigType == Enum.HumanoidRigType.R15 and 16 or 7
-	
+
 	return getNumParts(char) >= min
 end
 
@@ -11727,22 +11727,22 @@ function SetCollisions(char)
 	while not _G.BB do
 		task.wait()
 	end
-	
+
 	_G.BB.CanSBFly = true
-	
+
 	local humanoid = char:FindFirstChildWhichIsA("Humanoid")
-	
+
 	while not partsLoaded(char, humanoid.RigType) do
 		task.wait()
 	end
-	
+
 	for _,CharacterPart in pairs(char:GetDescendants()) do
 		if CharacterPart:IsA("BasePart") then
 			--print("Set collisions for: "..CharacterPart.Name)
-			Physics:SetPartCollisionGroup(CharacterPart,"PlayerParts")
+			CharacterPart.CollisionGroup = "PlayerParts"
 		end
 	end
-	
+
 	local Humanoid = char:FindFirstChildWhichIsA("Humanoid")
 	if Humanoid and Settings.SuperballJump and not Settings.SuperballFly then
 		SuperballCollisions(Humanoid)
@@ -11754,7 +11754,7 @@ function LoadTool(Tool)
 	local ClientFolder = Tool:FindFirstChild("Client")
 	local ClientModule = ClientFolder and ClientFolder:FindFirstChildWhichIsA("ModuleScript")
 	local ActivationEvent = Tool:FindFirstChild("Activation")
-	
+
 	if ClientModule and ActivationEvent then
 		Collections:AddTag(Tool, "Initialized")
 		require(ClientModule):Init()
@@ -11812,10 +11812,10 @@ local function CharacterAdded(character)
 	if not character.Parent then
 		character.AncestryChanged:Wait()
 	end
-	
+
 	if character.Parent and Player.Character == character then
 		character:WaitForChild("Humanoid")
-		
+
 		task.spawn(InitializeClient)
 		SetCollisions(character)
 	end
@@ -11861,11 +11861,11 @@ end
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
-	
+
 	local tool = Security:ApproveActivation(Player)
 	local isSling = (tool and tool.Name == "Slingshot")
-	
-	if input.UserInputType == Enum.UserInputType.MouseButton1 
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
 		or input.UserInputType == Enum.UserInputType.Gamepad1
 		or (
 			input.UserInputType == Enum.UserInputType.Touch and
@@ -11934,35 +11934,35 @@ local player = game:GetService("Players").LocalPlayer -- player would be nil for
 function Targeting:CastRay(StartPos, Direction, Length)
 	local _set = _G.BB.Settings
 	local Settings = _set.Targeting
-	
+
 	local ref =  _G.BB.Modules.Callbacks.Targeting
 	local Callback = ref and require(ref)
-	
+
 	local raycastParams = RaycastParams.new()
 	raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
 	raycastParams.FilterDescendantsInstances = Filtered
 	raycastParams.IgnoreWater = true
-	
-	local RaycastResults = workspace:Raycast(StartPos,Direction * Length, raycastParams) 
+
+	local RaycastResults = workspace:Raycast(StartPos,Direction * Length, raycastParams)
 		or {Position = StartPos + (Direction* Length)}
-	
+
 	local Hit = RaycastResults and RaycastResults.Instance
 	local EndPos = RaycastResults and RaycastResults.Position
-	
-	if Hit then		
+
+	if Hit then
 		local CallbackResult = Callback(Hit)
-		
+
 		if CallbackResult == false then
-			
+
 			-- Cast another ray
 			table.insert(Filtered,Hit)
 			return self:CastRay(EndPos, Direction, Length - ((StartPos - EndPos).magnitude))
 		end
 	end
-	
+
 	-- Return the hit and target position
 	Filtered = {}
-	
+
 	--print("Hit:", Hit, "Position:", EndPos)
 	return Hit,EndPos
 end
@@ -11995,20 +11995,20 @@ local Physics = game:GetService("PhysicsService")
 local Debris = game:GetService("Debris")
 local TweenService = game:GetService("TweenService")
 
-local TickTimeStamps = { 
-	0.4, 
-	0.76, 
-	1.084, 
-	1.3756, 
-	1.63804, 
-	1.874236, 
-	2.0868124, 
+local TickTimeStamps = {
+	0.4,
+	0.76,
+	1.084,
+	1.3756,
+	1.63804,
+	1.874236,
+	2.0868124,
 	2.27813116,
 	2.450318044,
-	2.6052862396, 
-	2.74475761564, 
-	2.870281854076, 
-	2.9832536686684, 
+	2.6052862396,
+	2.74475761564,
+	2.870281854076,
+	2.9832536686684,
 	3.0849283018016 -- Looks like a wedge of cheese tbh
 }
 
@@ -12026,7 +12026,7 @@ local RenderInterval = 1/60 -- in seconds
 
 local function validateTime(Now, Then, Interval, Update)
 	local OutsideInterval = Now - Then > Interval
-	if OutsideInterval then 
+	if OutsideInterval then
 		if Update then
 			LastUpdate = Now
 		else
@@ -12049,7 +12049,7 @@ local function getProjectileData(Projectile)
 		-- Send ID array, CFrame, and Velocity
 		local PositionMag = (Projectile.CFrame.Position-Projectile.LastSentPosition.Value).Magnitude
 		local VelocityMag = (Projectile.Velocity-Projectile.LastSentVelocity.Value).Magnitude
-		
+
 		if PositionMag > 1 or VelocityMag > 1 then
 
 			Projectile.LastSentPosition.Value = Projectile.Position
@@ -12070,22 +12070,22 @@ local function getProjectileData(Projectile)
 		if (CurrentPosition - LastSentPosition).Magnitude > 1 or VelocityMag > 1 then
 
 			Projectile.LastSentPosition.Value = CurrentPosition
-			
+
 			local array = {ID_array, Distance}
-			
+
 			-- only send if necessary
 			--if _G.BB.Settings.Rocket.Speed ~= _G.BB.Settings.Rocket.InitialSpeed then
 			--	table.insert(array, Projectile.Velocity)
 			--end
-			
+
 			--if _G.BB.Settings.Extrapolation.PingCompensation.Rocket then
-				
+
 			--	-- physics replicator determines data based on position
 			--	-- in sent array
 			--	if #array == 2 then
 			--		table.insert(array, Vector3.new(0,0,0))
 			--	end
-				
+
 			--	table.insert(array, _G.BB.ServerTime.Value)
 			--end
 
@@ -12093,17 +12093,17 @@ local function getProjectileData(Projectile)
 		end
 
 	elseif projectileType == "Bomb" then
-				
+
 		local Now = tick()
 		local TickDifference = Now - Projectile.LocalOriginTime.Value
 		local PositionMag = (Projectile.CFrame.Position - Projectile.LastSentPosition.Value).Magnitude
 		local VelocityMag = (Projectile.Velocity - Projectile.LastSentVelocity.Value).Magnitude
 
 		if PositionMag > 1 or VelocityMag > .5 or TickDifference > .1 then
-			
+
 			Projectile.LastSentPosition.Value = Projectile.Position
 			Projectile.LastSentVelocity.Value = Projectile.Velocity
-			
+
 			return {ID_array, Projectile.Position, Projectile.Velocity, TickDifference}
 		end
 	end
@@ -12111,12 +12111,12 @@ end
 
 function Extrapolation:SendUpdateData()
 	local PhysicsPacket = {}
-		
+
 	for _, Projectile in pairs(self.ClientActiveFolder:GetChildren()) do
 		if not table.find(InvalidClasses, Projectile.ClassName) then
-			
+
 			if Projectile and Projectile.Active.Value then
-				
+
 				local ProjectileDataArray = getProjectileData(Projectile)
 
 				if ProjectileDataArray then
@@ -12133,7 +12133,7 @@ end
 
 -- Uses data from an added folder that contains physics values to replicate a projectile
 function Extrapolation:Begin(PhysicsFolder)
-	
+
 	if PhysicsFolder:IsA("Model") then
 		local CandidatePF = PhysicsFolder:FindFirstChild("PhysicsFolder")
 		if CandidatePF then
@@ -12157,9 +12157,9 @@ function Extrapolation:Begin(PhysicsFolder)
 
 	local extrapProjectile
 	local creator = PhysicsFolder.creator.Value
-	
+
 	local tickRender = nil
-	
+
 	if PhysicsFolder.ProjectileType.Value == "Superball" then
 
 		-- Make new superball
@@ -12176,7 +12176,7 @@ function Extrapolation:Begin(PhysicsFolder)
 		latestVel.Changed:Connect(function()
 			extrapProjectile.Velocity = latestVel.Value
 		end)
-		
+
 		-- Remove projectile upon inactivity
 		local function checkActive()
 			if PhysicsFolder.Active.Value == false then
@@ -12192,7 +12192,7 @@ function Extrapolation:Begin(PhysicsFolder)
 		extrapProjectile.Parent = self.ExtrapolatedFolder
 
 		extrapProjectile.Boing:Play()
-		
+
 		checkActive()
 
 	elseif PhysicsFolder.ProjectileType.Value == "Slingshot" then
@@ -12209,16 +12209,16 @@ function Extrapolation:Begin(PhysicsFolder)
 		latestVel.Changed:Connect(function()
 			extrapProjectile.Velocity = latestVel.Value
 		end)
-		
+
 		-- Remove projectile upon inactivity
 		local function checkActive()
 			if PhysicsFolder.Active.Value == false then
 				Debris:AddItem(extrapProjectile, 1)
 			end
 		end
-		
+
 		PhysicsFolder.Active.Changed:Connect(checkActive)
-		
+
 		-- Fire the pellet!
 		extrapProjectile.Position = latestPos.Value
 		extrapProjectile.Velocity = latestVel.Value
@@ -12229,12 +12229,12 @@ function Extrapolation:Begin(PhysicsFolder)
 			Sound.Parent = extrapProjectile
 			Sound:Play()
 		end
-		
+
 		checkActive()
 
 	elseif PhysicsFolder.ProjectileType.Value == "PaintballGun" then
 		extrapProjectile = self.MakePaintball(creator, "Paintballs", nil, PhysicsFolder.RandomColor.Value)
-		
+
 		-- Update position upon value changed
 		local latestPos = PhysicsFolder.LatestPosition
 		latestPos.Changed:Connect(function()
@@ -12246,16 +12246,16 @@ function Extrapolation:Begin(PhysicsFolder)
 		latestVel.Changed:Connect(function()
 			extrapProjectile.Velocity = latestVel.Value
 		end)
-		
+
 		-- Explode paintball upon inactivity
 		local function checkActive()
 			if PhysicsFolder.Active.Value == false then
 				self.Aesthetics:ExplodePaintball(extrapProjectile)
 			end
 		end
-		
+
 		PhysicsFolder.Active.Changed:Connect(checkActive)
-		
+
 		-- Fire the paintball!
 		extrapProjectile.Position = latestPos.Value
 		extrapProjectile.Velocity = latestVel.Value
@@ -12264,9 +12264,9 @@ function Extrapolation:Begin(PhysicsFolder)
 		checkActive()
 
 	elseif PhysicsFolder.ProjectileType.Value == "Rocket" then
-		
+
 		extrapProjectile = self.MakeRocket(creator, nil, PhysicsFolder)
-		
+
 		local function determineOffset()
 			local ClientTime = _G.BB.ServerTime.Value
 			local ServerTime = PhysicsFolder.ServerTime.Value
@@ -12275,11 +12275,11 @@ function Extrapolation:Begin(PhysicsFolder)
 			local offset = TotalDelay * _G.BB.Settings.Rocket.Speed
 			return offset
 		end
-		
+
 		local origin = PhysicsFolder.Origin.Value
 		local pingCompensation = _G.BB.Settings.Extrapolation.PingCompensation.Rocket and determineOffset()
-		
-		
+
+
 		local progress = pingCompensation and (origin.lookVector * pingCompensation) or origin.lookVector
 		local newCF = origin + progress
 
@@ -12287,22 +12287,22 @@ function Extrapolation:Begin(PhysicsFolder)
 
 		local InitialVelocity = origin.lookVector * _G.BB.Settings.Rocket.InitialSpeed
 		local Velocity = origin.lookVector * _G.BB.Settings.Rocket.Speed
-		
+
 		extrapProjectile.Velocity = InitialVelocity
 		extrapProjectile.RocketVelocity.Velocity = InitialVelocity
 		extrapProjectile.RocketVelocity.MaxForce = Vector3.new(1e9, 1e9, 1e9)
-		
+
 		local tweenInfo = TweenInfo.new(_G.BB.Settings.Rocket.RampUpDuration, Enum.EasingStyle.Linear)
 		local tween = TweenService:Create(extrapProjectile.RocketVelocity, tweenInfo, {Velocity = Velocity})
-		
+
 		tween:Play()
-		
-		
+
+
 		if _G.BB.Settings.RocketRiding and PhysicsFolder and not self.Kill:CanDamage(creator, self.Player.Character.Humanoid) then
 			-- Can Collide true
 			extrapProjectile.CanCollide = true
 
-			Physics:SetPartCollisionGroup(extrapProjectile, "RideableRockets")
+			extrapProjectile.CollisionGroup = "RideableRockets"
 
 			-- Make dense
 			local densityMultiplier = 140
@@ -12331,7 +12331,7 @@ function Extrapolation:Begin(PhysicsFolder)
 
 			local Attachment0 = Instance.new("Attachment")
 			Attachment0.Name = "Rocket"
-			Attachment0.Parent = extrapProjectile 
+			Attachment0.Parent = extrapProjectile
 			Attachment0.Axis = Vector3.new(0, 0, 1)
 
 			local Constraint = Instance.new("AlignOrientation")
@@ -12347,7 +12347,7 @@ function Extrapolation:Begin(PhysicsFolder)
 
 			Debris:AddItem(Part,10)
 		end
-		
+
 		-- Update distance upon value changed
 		-- Compensate for ping if settings dictate so
 		local latestDistance = PhysicsFolder.LatestDistance
@@ -12363,13 +12363,13 @@ function Extrapolation:Begin(PhysicsFolder)
 
 			extrapProjectile.CFrame = newCF
 		end)
-	
+
 		-- Update velocity upon value changed
 		--local latestVel = PhysicsFolder.LatestVelocity
 		--latestVel.Changed:Connect(function()
 		--	extrapProjectile.Velocity = latestVel.Value
 		--end)
-		
+
 		-- Explode rocket upon inactivity
 		local function checkActive()
 			if PhysicsFolder.Active.Value == false then
@@ -12378,16 +12378,16 @@ function Extrapolation:Begin(PhysicsFolder)
 		end
 
 		PhysicsFolder.Active.Changed:Connect(checkActive)
-		
+
 		extrapProjectile.Parent = self.ExtrapolatedFolder
 		extrapProjectile.Swoosh:Play()
-		
+
 		checkActive()
 
 	elseif PhysicsFolder.ProjectileType.Value == "Bomb" then
-		
+
 		extrapProjectile = self.MakeBomb(creator)
-		
+
 		local exploded = false
 
 		-- Update position upon value changed
@@ -12395,7 +12395,7 @@ function Extrapolation:Begin(PhysicsFolder)
 		latestPos.Changed:Connect(function()
 			extrapProjectile.Position = latestPos.Value
 		end)
-		
+
 		-- Update velocity upon value changed
 		local latestVel = PhysicsFolder.LatestVelocity
 		latestVel.Changed:Connect(function()
@@ -12412,7 +12412,7 @@ function Extrapolation:Begin(PhysicsFolder)
 				self.Explosion:ExtrapolateExplosion(extrapProjectile, PhysicsFolder)
 			end
 		end
-		
+
 		extrapProjectile.Position = latestPos.Value
 		extrapProjectile.Velocity = latestVel.Value
 		extrapProjectile.Parent = self.ExtrapolatedFolder
@@ -12423,11 +12423,11 @@ function Extrapolation:Begin(PhysicsFolder)
 			extrapProjectile.Tick.TimePosition = 0.12
 		end
 		extrapProjectile.Tick:Play()
-		
+
 		-- Update last tick time value
 		local latestTime = PhysicsFolder.LatestTime
 		--local _tick = 1
-		
+
 		local function updateTick(dt)
 			if exploded then
 				if tickRender then
@@ -12435,7 +12435,7 @@ function Extrapolation:Begin(PhysicsFolder)
 				end
 				return
 			end
-			
+
 			-- Update last tick time value
 			local receivedTime = PhysicsFolder.LatestTime.Value
 			local lastTime = extrapProjectile.LastReceivedTime.Value
@@ -12480,7 +12480,7 @@ function Extrapolation:Begin(PhysicsFolder)
 				end
 			end
 		end
-		
+
 		--latestTime.Changed:Connect(function(new)
 		--	updateTick(new - extrapProjectile.LastReceivedTime.Value)
 		--end)
@@ -12488,33 +12488,33 @@ function Extrapolation:Begin(PhysicsFolder)
 		tickRender = game:GetService("RunService").RenderStepped:Connect(function(dt)
 			updateTick(dt)
 		end)
-		
+
 		PhysicsFolder.Active.Changed:Connect(checkActive)
 
 		checkActive()
-		
+
 	elseif PhysicsFolder.ProjectileType.Value == "Wall" then
-		
+
 		-- Toggle trowel outlines
 		local CF = PhysicsFolder.PlaceCFrame.Value
 		local CT = PhysicsFolder.RandomColor.Value
 		local wall = PhysicsFolder.Wall.Value
-		
+
 		for _,Brick in pairs(wall:GetChildren()) do
-			
+
 			local SB = Brick:FindFirstChildWhichIsA("SelectionBox")
-			
+
 			if SB then
 				SB.Visible = _G.BB.Local.TrowelOutlines
 			end
-			
+
 			self.Aesthetics:ApplyWallColors(Brick,CT)
 		end
 	end
 
-	if not extrapProjectile then 
+	if not extrapProjectile then
 		--warn("Added physics folder has improper projectile type")
-		return 
+		return
 	end
 
 	PhysicsFolder.AncestryChanged:Connect(function(_, newParent)
@@ -12531,15 +12531,15 @@ end
 
 
 function Extrapolation:Init(Settings, Modules, Remotes, Player, ProjectileFolder)
-	
+
 	local objects = Player.PlayerScripts.ToolObjects
-	
+
 	self.Player = Player
-	
+
 	self.Aesthetics = require(Modules:WaitForChild("Aesthetics"))
 	self.Explosion = require(Modules:WaitForChild("Explosion"))
 	self.Kill = require(Modules:WaitForChild("Kill"))
-	
+
 	self.UpdateRemote = Remotes:WaitForChild("UpdatePhysics")
 
 	self.MakeSuperball = require(objects:WaitForChild("MakeSuperball"))
@@ -12547,7 +12547,7 @@ function Extrapolation:Init(Settings, Modules, Remotes, Player, ProjectileFolder
 	self.MakeBomb = require(objects:WaitForChild("MakeBomb"))
 	self.MakePellet = require(objects:WaitForChild("MakePellet"))
 	self.MakePaintball = require(objects:WaitForChild("MakePaintball"))
-	
+
 
 	-- Folder that contains each player's various physics folders and projectiles
 	self.ActiveFolder = ProjectileFolder:WaitForChild("Active")
@@ -12560,8 +12560,8 @@ function Extrapolation:Init(Settings, Modules, Remotes, Player, ProjectileFolder
 
 	local function EvaluateFolder(Folder)
 		-- Do not extrapolate own projectiles
-		if not Folder:IsA("Folder") or Folder.Name == Player.Name then 
-			return 
+		if not Folder:IsA("Folder") or Folder.Name == Player.Name then
+			return
 		end
 
 		for _,Folder2 in pairs(Folder:GetChildren()) do
@@ -12571,7 +12571,7 @@ function Extrapolation:Init(Settings, Modules, Remotes, Player, ProjectileFolder
 		Folder.ChildAdded:Connect(function(Folder3)
 			self:Begin(Folder3)
 		end)
-	end	
+	end
 
 	for _,Folder in pairs(self.ActiveFolder:GetChildren()) do
 		EvaluateFolder(Folder)
@@ -12613,7 +12613,7 @@ local REGION_CORNER = Vector3.new(10, 10, 10)
 
 return function(Humanoid)
 	local char = Humanoid.Parent
-	
+
 	Humanoid.StateChanged:Connect(function(state)
 		if state == Enum.HumanoidStateType.Landed then
 			local headPos = char.Head.Position
@@ -12659,10 +12659,10 @@ local Physics = game:GetService("PhysicsService")
 local Aesthetics = require(_G.BB.Modules:WaitForChild("Aesthetics"))
 
 return function (Creator, CollisionGroup, count)
-	
+
 	local Folder, Theme = Aesthetics:GetThemeObject(Creator, "Slingshot")
 	local Part = Folder:FindFirstChildWhichIsA("Part"):Clone()
-	
+
 	Part.Name = Creator.Name.."'s pellet"
 	Part.CastShadow = true
 	Part.Massless = false
@@ -12673,12 +12673,12 @@ return function (Creator, CollisionGroup, count)
 	Part.BottomSurface = Enum.SurfaceType.Smooth
 	Part.TopSurface = Enum.SurfaceType.Smooth
 	Part.Color = Theme == "Team Color" and Creator.TeamColor.Color or Part.Color
-	
+
 	Aesthetics:HandleProjectileVisuals(Creator, Part)
 
 	Collections:AddTag(Part,"Pellet")
 	Collections:AddTag(Part,"Projectile")
-	
+
 	_G.BB.ClientObjects.Sounds.SlingshotSounds:Clone().Parent = Part
 
 	local lastUpdateVel = Instance.new("Vector3Value")
@@ -12712,21 +12712,21 @@ return function (Creator, CollisionGroup, count)
 	active.Name = "Active"
 	active.Value = true
 	active.Parent = Part
-	
+
 	local Ready = Instance.new("BoolValue")
 	Ready.Name = "Ready"
 	Ready.Value = false
 	Ready.Parent = Part
-	
+
 	if count then
 		local countVal = Instance.new("NumberValue")
 		countVal.Name = "Count"
 		countVal.Value = count
 		countVal.Parent = Part
 	end
-	
+
 	if CollisionGroup then
-		Physics:SetPartCollisionGroup(Part,CollisionGroup)
+		Part.CollisionGroup = CollisionGroup
 	end
 
 	return Part
@@ -12748,12 +12748,12 @@ local Physics = game:GetService("PhysicsService")
 local Aesthetics = require(_G.BB.Modules:WaitForChild("Aesthetics"))
 
 return function(Creator, CollisionGroup, count, color)
-	
+
 	local Folder, Theme = Aesthetics:GetThemeObject(Creator, "PaintballGun")
 	local Part = Folder:FindFirstChildWhichIsA("BasePart"):Clone()
-	
-	Physics:SetPartCollisionGroup(Part, "Paintballs")
-	
+
+	Part.CollisionGroup = "Paintballs"
+
 	Part.Name = Creator.Name.."s Paintball"
 	Part.CastShadow = true
 	Part.Massless = false
@@ -12762,15 +12762,15 @@ return function(Creator, CollisionGroup, count, color)
 	Part.Size = _G.BB.Settings.PaintballGun.Size
 	Part.BottomSurface = Enum.SurfaceType.Smooth
 	Part.TopSurface = Enum.SurfaceType.Smooth
-	
-	if _G.BB.Settings.PaintballGun.Density ~= nil then 
+
+	if _G.BB.Settings.PaintballGun.Density ~= nil then
 		Part.CustomPhysicalProperties = PhysicalProperties.new(_G.BB.Settings.PaintballGun.Density, 0.3, 0.5)
 	end
-	
+
 	if Part.ClassName == "Part" then -- rather than WedgePart or others
 		Part.Shape = _G.BB.Settings.PaintballGun.Shape
 	end
-	
+
 	if color then
 		Part.Color = color
 	else
@@ -12780,10 +12780,10 @@ return function(Creator, CollisionGroup, count, color)
 			Part.Color = Creator.TeamColor.Color
 		end
 	end
-	
+
 	local Attachment0 = Instance.new("Attachment")
 	Attachment0.Parent = Part
-	
+
 	local Force = Instance.new("VectorForce")
 	Force.Force = _G.BB.Settings.PaintballGun.VectorForce
 	Force.RelativeTo = Enum.ActuatorRelativeTo.World
@@ -12792,7 +12792,7 @@ return function(Creator, CollisionGroup, count, color)
 
 	Collections:AddTag(Part, "Paintball")
 	Collections:AddTag(Part, "Projectile")
-	
+
 	Aesthetics:HandleProjectileVisuals(Creator, Part)
 
 	-- In order to remove the PhysicsFolder buffer, had to make the projectile
@@ -12829,7 +12829,7 @@ return function(Creator, CollisionGroup, count, color)
 	active.Name = "Active"
 	active.Value = true
 	active.Parent = Part
-	
+
 	local Ready = Instance.new("BoolValue")
 	Ready.Name = "Ready"
 	Ready.Value = false
@@ -12862,12 +12862,12 @@ local Player = Players.LocalPlayer
 local Bindable = _G.BB.IconStateChanged
 --[[
 	Bindable params (fires with):
-	1st param: "NoTools" = no tools equipped, 
-			   "Equipped" = tool equipped, 
+	1st param: "NoTools" = no tools equipped,
+			   "Equipped" = tool equipped,
 			   "Reloaded" = tool reloaded
 	2nd: lastTime: the time() at which tool was last fired
 	3rd: the reload time of the tool
-	
+
 	Notice how there is no firing when a tool is unequipped.
 	This is because all cases are covered when any other tool
 	is equipped or when a player unequips and no longer has a tool.
@@ -12877,16 +12877,16 @@ local Mouse = Player:GetMouse()
 return function(Tool)
 	local Equipped = true
 	local lastTime = 0
-	
+
 	local RELOAD_TIME = Settings[Tool.Name].ReloadTime
-		
+
 	local function ToggleCrosshair()
 		if Equipped and Settings.NativeCrosshair then
 			local NewIcon = (Tool.Enabled and "Regular" or "Reload") .. "Icon"
 			Mouse.Icon = Settings.Targeting[NewIcon]
 		end
 	end
-	
+
 	local function isDead()
 		local Character = Player.Character
 		if (Character.Humanoid.Health<=0) or not Tool.Parent then
@@ -12899,7 +12899,7 @@ return function(Tool)
 		end;
 		return false
 	end
-	
+
 	Tool.Equipped:Connect(function()
 		if not isDead() then
 			Equipped = true
@@ -12907,7 +12907,7 @@ return function(Tool)
 			ToggleCrosshair()
 		end
 	end)
-	
+
 	Tool:GetPropertyChangedSignal("Enabled"):Connect(function()
 		--local Character = Player.Character
 		if not isDead() then
@@ -12920,7 +12920,7 @@ return function(Tool)
 			ToggleCrosshair()
 		end
 	end)
-	
+
 	Tool.Unequipped:Connect(function()
 		if not isDead() then
 			Equipped = false
@@ -12928,23 +12928,23 @@ return function(Tool)
 				Mouse.Icon = Settings.Targeting.DefaultIcon
 			end
 			task.wait()
-			if (Player.Character ~= nil) 
+			if (Player.Character ~= nil)
 				and (Player.Character:FindFirstChildWhichIsA("Tool")) then
 				Bindable:Fire("NoTools", lastTime, RELOAD_TIME)
 			end
 		end
 	end)
-	
+
 	Tool.AncestryChanged:Connect(function()
 		local Character = Player.Character
 		if (Character == nil) or (Character.Parent == nil)
 			or (not (
-				(Tool.Parent == Character) or 
+				(Tool.Parent == Character) or
 					((Tool.Parent ~= nil) and (Tool.Parent:IsA("Backpack"))
 					)
 				)
 			) then
-			
+
 			Equipped = false
 			Bindable:Fire("NoTools", lastTime, RELOAD_TIME)
 
@@ -12972,7 +12972,7 @@ local Aesthetics = require(_G.BB.Modules:WaitForChild("Aesthetics"))
 -- Create the Rocket
 return function(Creator, count)
 	local Folder, Theme = Aesthetics:GetThemeObject(Creator, "Bomb")
-	
+
 	local Part = Folder:FindFirstChild("Base"):Clone()
 	Collections:AddTag(Part,"Bomb")
 	Part.Size = Vector3.new(2, 2, 2)
@@ -12985,24 +12985,24 @@ return function(Creator, count)
 	Part.Anchored = false
 	Part.CanCollide = true
 	Part.CustomPhysicalProperties = _G.BB.Settings.Bomb.PhysicsProperties
-	
+
 	_G.BB.ClientObjects.Sounds.BombSounds.Boom:Clone().Parent = Part
 	_G.BB.ClientObjects.Sounds.BombSounds.Tick:Clone().Parent = Part
-	
+
 	local Tick = Instance.new("Color3Value")
 	Tick.Name = "TickColor"
 	Tick.Value = Theme == "Team Color" and Creator.TeamColor.Color or Folder:FindFirstChild("TickColor").Value
 	Tick.Parent = Part
-	
+
 	local Base = Instance.new("Color3Value")
 	Base.Name = "BaseColor"
 	Base.Value = Part.Color
 	Base.Parent = Part
-	
+
 	local ld = Instance.new("Vector3Value")
 	ld.Name = "LastSentPosition"
 	ld.Parent = Part
-	
+
 	local rp = Instance.new("Vector3Value")
 	rp.Name = "LatestPosition"
 	rp.Parent = Part
@@ -13015,17 +13015,17 @@ return function(Creator, count)
 	realOT.Name = "LocalOriginTime"
 	realOT.Value = tick()
 	realOT.Parent = Part
-	
+
 	local lrt = Instance.new("NumberValue")
 	lrt.Name = "LastReceivedTime"
 	lrt.Value = 0
 	lrt.Parent = Part
-	
+
 	local ActiveTag = Instance.new("BoolValue")
 	ActiveTag.Name = "Active"
 	ActiveTag.Value = true
 	ActiveTag.Parent = Part
-	
+
 	local c = Instance.new("ObjectValue")
 	c.Name = "creator"
 	c.Value = Creator
@@ -13035,26 +13035,26 @@ return function(Creator, count)
 	AssignedTouch.Name = "BlownUpClient"
 	AssignedTouch.Value = false
 	AssignedTouch.Parent = Part
-	
+
 	local Type = Instance.new("StringValue")
 	Type.Name = "ProjectileType"
 	Type.Value = "Bomb"
 	Type.Parent = Part
-	
+
 	local Ready = Instance.new("BoolValue")
 	Ready.Name = "Ready"
 	Ready.Value = false
 	Ready.Parent = Part
-	
+
 	if count then
 		local countVal = Instance.new("NumberValue")
 		countVal.Name = "Count"
 		countVal.Value = count
 		countVal.Parent = Part
 	end
-	
+
 	Part.Color = Tick.Value
-	
+
 	Part.Name = Creator.Name.."'s Bomb"
 	return Part
 end
@@ -13172,10 +13172,10 @@ return function(instance, completelyInside)
 				end
 			end
 		end
-		
+
 		return #parts > 0
 	end
-	
+
 	for _, part in next, parts do
 		for _, face in next, getFaces(part) do
 			for _, point in next, points do
@@ -13185,7 +13185,7 @@ return function(instance, completelyInside)
 			end
 		end
 	end
-	
+
 	return false
 end]]></ProtectedString>
 							<int64 name="SourceAssetId">-1</int64>
@@ -13205,9 +13205,9 @@ end]]></ProtectedString>
 		--warn("Projectile already deleted:", Projectile)
 		return
 	end
-	
+
 	local ID_array = {Projectile.ProjectileType.Value, Projectile.Count.Value}
-	
+
 	local function delete()
 		if Projectile.Parent ~= nil and Projectile.Active.Value then
 			--print("Sending deletion info for",Projectile,PhysicsFolder.ProjectileType.Value)
@@ -13218,7 +13218,7 @@ end]]></ProtectedString>
 			game:GetService("Debris"):AddItem(Projectile, 0)
 		end
 	end
-	
+
 	if DelayTime > 0 then
 		task.delay(DelayTime, delete)
 	else
@@ -13351,25 +13351,25 @@ script:Destroy()]]></ProtectedString>
 	return script:WaitForChild("Callbacks"):WaitForChild(Callback)
 end
 local Settings = {
-	
+
 	-- GENERAL WEAPON SETTINGS --
 	BombJump = true,
 	SuperballJump = true,
 	SuperballFly = true,
 	SlingClimb = false,
 	RocketRiding = true,
-	
+
 	RocketsExplodeSBs = false,
 	MaxSafeWait = 0.25,
-	
-	-- DAMAGE SETTINGS -- 
+
+	-- DAMAGE SETTINGS --
 	WeaponsDamageAfterDeath = true, -- You will never be able to shoot after you die.
 	InstantDamage = true, -- Does not pair well with security deactivations
 	TeamKill = false, -- Whether teammates can kill eachother
 	AllowHumanoidChanges = true, -- Prevents admin abuse and exploiting
 	TagLifetime = 1,
-	
-	
+
+
 	-- TEAM SETTINGS --
 	AutoTeamColors = true, -- Color projectiles and explosions to team colors
 	ThemeOverrides = true, -- themes will override team colors if above is true
@@ -13378,12 +13378,12 @@ local Settings = {
 	TeamsFilterType = false,
 	SpectatorTeamActive = false,   -- Spectators can't take or deal dmg.
 	SpectatorTeamName = "Spectators", -- The name of the spectator team
-	
-	
+
+
 	-- THEME SETTINGS --
 	Themes = {
 		ThemePacks = {};
-		RandomSuperballColors = true; -- This overrides the Superball Colors setting below.	
+		RandomSuperballColors = true; -- This overrides the Superball Colors setting below.
 		RandomPaintballColors = true;
 		RandomWallColors = true;
 		TrailsOmitted = {"Normal"}; -- Add theme names for them to not have trails
@@ -13392,16 +13392,16 @@ local Settings = {
 		WeaponsFiltered = {"Superball","PaintballGun","Sword"};
 		UseRobloxExplosions = false;
 	},
-	
-	
+
+
 	-- DOOMSPIRE SETTINGS --
 	Doomspire = {
 		SlingFly = true;
 		RocketCollisions = true;
 		BombSpawnToCam = false;
 	},
-	
-	
+
+
 	-- EXPLOSION SETTINGS --
 	Explosions = {
 		DestroyParts = false;
@@ -13416,41 +13416,41 @@ local Settings = {
 		ExclusionTag = "BB_NonExplodable"; -- collection service
 		DebrisTime = 0; -- must be >0 for parts to be added to debris collection
 	},
-	
-	
+
+
 	-- RICOCHET SETTINGS --
 	Ricochet = {
 		HalfDamageDelay = 0, -- min is one frame
 		ResetStateDelay = 1/30
 	},
-	
-	
+
+
 	-- TARGETING SETTINGS --
 	Targeting = { -- whitelist has priority over blacklist
 		RegularIcon = "rbxassetid://507449825";
 		ReloadIcon = "rbxassetid://507449806";
 		DefaultIcon = "";
 	},
-	
-	
+
+
 	-- MOBILE SETTINGS --
 	Mobile = {
 		DoubleJumpToSwordLunge = true;
-		ShootMode = "InWorld"; 
-		--[[ 
+		ShootMode = "InWorld";
+		--[[
 		Can be "InWorld" or "UserInput", case-sensitive
-			
+
 			What's the difference?
-			
-			- UserInput triggers weapons at any tap other than the jump button and 
+
+			- UserInput triggers weapons at any tap other than the jump button and
 			some GUI buttons.It has no input delay.
-			
+
 			- InWorld does not trigger weapons at taps on GUIs or the joystick, but it is
 			slightly delayed.
 		]]
 	},
-	
-	
+
+
 	-- EXTRAPOLATION SETTINGS --
 	Extrapolation = {
 		Updates = { -- send regular updates about the object's position and velocity
@@ -13464,9 +13464,9 @@ local Settings = {
 			Rocket = false;
 		}
 	},
-	
-	
-	-- SPECIFIC WEAPON SETTINGS -- 
+
+
+	-- SPECIFIC WEAPON SETTINGS --
 	Bomb = {
 		Damage = 101;
 		ReloadTime = 5;
@@ -13491,7 +13491,7 @@ local Settings = {
 		TeleportOnExplode = false; -- Gameboy...
 		Radius = 12;
 		TouchExplode = false;
-		TouchExplodeSelf = false; 
+		TouchExplodeSelf = false;
 		DespawnTime = 5; -- despawns after x seconds
 	},
 	Rocket = {
@@ -13537,7 +13537,7 @@ local Settings = {
 		Speed = 200;
 		SelfDamage = false; -- (not recommended) if SelfKill == false will not deal self dmg
 		RicochetDamage = true;
-		ShootInsideBricks = true;	
+		ShootInsideBricks = true;
 		DespawnTime = 10; -- despawns after x seconds
 	},
 	Sword = {
@@ -13582,17 +13582,17 @@ local Settings = {
 		ShootInsideBricks = true;
 		ColorResetTime = 25; -- set to 0 for no color resetting
 	},
-	
-	
+
+
 	-- CHOOSE WEAPONS --
 	WeaponsFiltered = {},
 	WeaponsFilterType = false,
 	CustomWeaponsDirectory = nil, -- can be game.ServerStorage.Weapons, for example
-	
-	
+
+
 	-- SECURIY SETTINGS --
 	Security = {
-		-- Numbers are thresholds that, if surpassed, will deactivate projectile 
+		-- Numbers are thresholds that, if surpassed, will deactivate projectile
 		--(cause no dmg and stop replication)
 		Master = true, -- If set to false, will have no security logs or repercussions
 		Webhook = nil, -- Change to a string of your Discord webhook URL to notify if someone was marked as exploiting
@@ -13602,14 +13602,14 @@ local Settings = {
 			Superball2D = 10; -- (SpawnPosition - Head.Position).Magnitude | X and Z axes
 			Superball3D = 50; -- (SpawnPosition - Head.Position).Magnitude
 			Rocket2D = 10; -- (SpawnPosition - Handle.Position).Magnitude | X and Z axes
-			Rocket3D = 50; -- (SpawnPosition - Handle.Position).Magnitude 
+			Rocket3D = 50; -- (SpawnPosition - Handle.Position).Magnitude
 			PaintballGun2D = 10;
 			PaintballGun3D = 50;
-			Bomb3D = 10;	
+			Bomb3D = 10;
 		},
 		Update = { -- Physics updates sent from each client on regular intervals
 			Deactivate = true; -- No possible damage and stop replication
-			Warn = true; 
+			Warn = true;
 			Rocket = 75; -- NewDistanceFromOrigin-OldDistanceFromOrigin
 			Bomb = 100; -- (UpdatePosition - CurrentPosition).Magnitude
 			BombVelocity = 500; -- (UpdateVelocity - CurrentVelocity).Magnitude
@@ -13642,8 +13642,8 @@ local Settings = {
 			if TimeSinceLastFire>=ServerReloadCheck then
 		]]
 	},
-	
-	
+
+
 	-- LOCAL MISC SETTINGS --
 	LocalSettingsDefaults = { -- mostly aesthetic
 		NewIcons = false;
@@ -13658,12 +13658,12 @@ local Settings = {
 		ThemesHighGraphics = true;
 		VisualHitIndicators = true;
 	},
-	
-	
-	-- DEVELOPER SETTINGS -- 
+
+
+	-- DEVELOPER SETTINGS --
 	NativeCrosshair = true,
-	
-	
+
+
 	-- Callbacks must simply point to a module that returns a function
 	Callbacks = {
 		PaintballColor = getCallback("PaintballColor"),
@@ -13732,9 +13732,9 @@ end]]></ProtectedString>
 						<string name="Name">Targeting</string>
 						<string name="ScriptGuid">{78EDBC8D-7962-4E28-8331-204E3ABA545E}</string>
 						<ProtectedString name="Source"><![CDATA[return function(Hit)
-	return Hit.Parent:FindFirstChildWhichIsA("Humanoid") 
+	return Hit.Parent:FindFirstChildWhichIsA("Humanoid")
 		or (
-			not Hit.Parent:IsA("Accoutrement") 
+			not Hit.Parent:IsA("Accoutrement")
 			and Hit.CanCollide
 			and (Hit.Transparency <= 0.9)
 			and not game:GetService("CollectionService"):HasTag(Hit, "Projectile")
@@ -14529,10 +14529,10 @@ end]]></ProtectedString>
 				<ProtectedString name="Source"><![CDATA[local CustomPhysicsReplicator = {}
 
 function CustomPhysicsReplicator:Init(Remotes, Modules)
-	
+
 	local Settings = _G.BB.Settings
 	local UpdateSet = Settings.Security.Update
-	
+
 	local Security = require(_G.BB.Modules.Security)
 
 	local UpdateRemote = Remotes:WaitForChild("UpdatePhysics")
@@ -14548,28 +14548,28 @@ function CustomPhysicsReplicator:Init(Remotes, Modules)
 					Projectile Time
 				}
 			]]
-			
+
 			local ID_array = InfoArray[1]
 			local PhysicsFolder = Security:GetPhysicsFolder(ID_array, RemoteSender, true)
 
 			if not PhysicsFolder then
 				return
 			end
-			
+
 			local ProjectileType = PhysicsFolder.ProjectileType.Value
-		
+
 			local LastUpdateTick = PhysicsFolder.LastUpdateTick.Value
-			
+
 			local Now = tick()
 			local DeltaTime = LastUpdateTick and Now - LastUpdateTick or 0
 			PhysicsFolder.LastUpdateTick.Value = Now
-			
+
 			if not Security:ApproveUpdate(PhysicsFolder, InfoArray, UpdateSet, DeltaTime) then
 				return
 			end
-			
+
 			if ProjectileType == "Rocket" then
-				
+
 				--local clientTime = InfoArray[4]
 				--local serverTime = _G.BB.ServerTime.Value
 
@@ -14584,28 +14584,28 @@ function CustomPhysicsReplicator:Init(Remotes, Modules)
 				--if _G.BB.Settings.Rocket.Speed ~= _G.BB.Settings.Rocket.InitialSpeed then
 				--	LatestVelocity.Value = NewVelocity
 				--end
-				
+
 			else
 				PhysicsFolder.LatestPosition.Value = InfoArray[2]
 				PhysicsFolder.LatestVelocity.Value = InfoArray[3]
 				PhysicsFolder.LatestTime.Value = InfoArray[4]
 			end
-			
+
 		end
 	end)
-	
+
 	Delete.OnServerEvent:Connect(function(RemoteSender, array)
 		local PhysicsFolder = _G.BB.ProjectileFolder.Active[RemoteSender.Name]:FindFirstChild(array[1]..array[2])
 		if not PhysicsFolder or not PhysicsFolder.Parent then
 			--warn("No physics folder sent from "..RemoteSender.Name.."!", array)
 			return
 		end
-		
+
 		if RemoteSender == PhysicsFolder.creator.Value then
 			task.wait(.1)
 			--print("making inactive", PhysicsFolder)
 			PhysicsFolder.Active.Value = false
-		end		
+		end
 	end)
 end
 
@@ -14666,7 +14666,7 @@ return function(PlayerAddedFunction, PlayerRemovingFunction, CharacterAddedFunct
 				We check if this player's PlayerRemovingFunction has already been run by either PlayerRemoving or ApplyFunctionToAll.
 				Again, this prevents the PlayerRemovingFunction from being run twice when the last player leaves, or if the server crashes.
 				Note that before making this checker function, I never actually ran into this issue while testing using data stores
-				(can't test with basic print statements because the output cannot be read while the game is being closed). It's just here 
+				(can't test with basic print statements because the output cannot be read while the game is being closed). It's just here
 				to make absolute sure the issue never pops up, and it would also annoy me if it wasn't here. ]]
 			if not Left[Player] then -- We use the player's instance rather than their UserId so rejoining doesn't break things
 				Left[Player] = true
@@ -14679,9 +14679,9 @@ return function(PlayerAddedFunction, PlayerRemovingFunction, CharacterAddedFunct
 			-- Hopefully Roblox adds this functionality somehow. See the forum post I made about NOT being able to do this: https://devforum.roblox.com/t/note-to-myself/835748
 			game:BindToClose(
 				function()
-					if RemoveConnection.Connected == true then 
+					if RemoveConnection.Connected == true then
 						-- Can't "UnbindFromClose", so this is the next-best thing
-						-- Why would anyone disconnect that connection on the server anyway? 
+						-- Why would anyone disconnect that connection on the server anyway?
 						-- Again, it would just annoy me if this wasn't here.
 						ApplyFunctionToAll(RunCheck)
 					end
@@ -14690,9 +14690,9 @@ return function(PlayerAddedFunction, PlayerRemovingFunction, CharacterAddedFunct
 		end
 	end
 
-	if CharacterAddedFunction then 
-		--[[ 
-			Optional third argument per a friend's request. Personally I don't have a use for it because I'm either yielding for 
+	if CharacterAddedFunction then
+		--[[
+			Optional third argument per a friend's request. Personally I don't have a use for it because I'm either yielding for
 			information gathered from within the PlayerAddedFunction, or I'm using the CharacterAppearanceLoaded listener instead. ]]
 		CharacterConnections = {}
 		local function DefaultPlayerAdded(Player)
@@ -14719,7 +14719,7 @@ return function(PlayerAddedFunction, PlayerRemovingFunction, CharacterAddedFunct
 	-- To solve this, consider a bool value "ListenForCharacterAdded" you make false when you intend to disconnect all CharacterAdded functions. Using this module, you would write your code like this:
 	--[[
 		local CharacterConnections
-		
+
 		function OnCharacterAdded(Player, Character)
 			if ListenForCharacterAdded == false then
 				return CharacterConnections[Player]:Disconnect()
@@ -14727,7 +14727,7 @@ return function(PlayerAddedFunction, PlayerRemovingFunction, CharacterAddedFunct
 			end
 			-- Here would be all your code that usually runs when a character is added
 		end
-		
+
 		_, _, CharacterConnections = require(ThisModule)(
 			nil, -- PlayerAddedFunction
 			nil, -- PlayerRemovingFunction
@@ -14773,7 +14773,7 @@ end]]></ProtectedString>
 --		if SPService then
 --			-- This conditional is to prevent infinite recursion
 --			return LoadContents(SPService,Folder)
---		end 
+--		end
 		local SubService = game:FindFirstChildWhichIsA(Folder.Name, true)
 		if SubService then
 			return LoadContents(SubService, Folder)

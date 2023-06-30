@@ -22,7 +22,7 @@ local function spectatorsCantCollide()
 
 				local con = RunService.Heartbeat:Connect(function()
 					for _, part in pairs(parts) do
-						PhysicsService:SetPartCollisionGroup(part, "Spectators")
+						part.CollisionGroup = "Spectators"
 					end
 				end)
 
@@ -30,7 +30,7 @@ local function spectatorsCantCollide()
 					con:Disconnect()
 
 					for _, part in pairs(parts) do
-						PhysicsService:SetPartCollisionGroup(part, "PlayerParts")
+						part.CollisionGroup = "PlayerParts"
 					end
 				end
 			end,
