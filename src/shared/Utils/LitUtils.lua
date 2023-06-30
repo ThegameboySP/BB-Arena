@@ -3,8 +3,7 @@ local LitUtils = {}
 function LitUtils.getIndefiniteArticle(text)
 	local firstLetter = string.lower(string.sub(text, 1, 1))
 
-	return
-		if firstLetter == "a"
+	return if firstLetter == "a"
 			or firstLetter == "e"
 			or firstLetter == "i"
 			or firstLetter == "o"

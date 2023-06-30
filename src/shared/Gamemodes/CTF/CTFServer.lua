@@ -202,8 +202,7 @@ local function formatWonGame(winningTeam, teamToScore)
 		table.insert(scoreStrings, string.format("%s team: %d", data.team.Name, data.score))
 	end
 
-	return
-		RichText.color(
+	return RichText.color(
 		string.format("The %s team has won the game!\n", winningTeam.Name),
 		winningTeam.TeamColor.Color
 	) .. RichText.color(table.concat(scoreStrings, "\n"), Color3.new(1, 1, 1))

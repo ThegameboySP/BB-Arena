@@ -8,8 +8,7 @@ return function(context, enabled)
 	local original = store:getState().game.anonymousFighters
 	store:dispatch(actions.setAnonymousFighters(enabled))
 
-	return
-		if original == store:getState().game.anonymousFighters
+	return if original == store:getState().game.anonymousFighters
 		then "Already " .. tostring(enabled)
 		elseif enabled then "Set to true"
 		else "Set to false"

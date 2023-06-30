@@ -20,8 +20,7 @@ end
 local function getValidateMsg(typeName, min, max)
 	local capitalTypeName = typeName:sub(1, 1):upper() .. typeName:sub(2, -1)
 
-	return
-		if min == -inf and max ~= inf
+	return if min == -inf and max ~= inf
 		then ("%s must be within %d and below."):format(capitalTypeName, max)
 		elseif min ~= -inf and max == inf then ("%s must be within %d and up."):format(capitalTypeName, min)
 		else ("%s must be between %d and %d."):format(capitalTypeName, min, max)

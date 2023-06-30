@@ -15,10 +15,8 @@ return function(context, mapName)
 		local state = context:GetStore("Common").Store:getState()
 
 		if selectors.getAdmin(state, context.Executor.UserId) < GameEnum.AdminTiers.Owner then
-			return
-				"This map is currently not available and you don't have permission to change to it." .. (type(
-				lockedMap
-			) == "string" and ("\nReason: %q"):format(lockedMap) or "")
+			return "This map is currently not available and you don't have permission to change to it."
+				.. (type(lockedMap) == "string" and ("\nReason: %q"):format(lockedMap) or "")
 		end
 	end
 

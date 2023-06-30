@@ -193,9 +193,8 @@ function Scrimmage:_formatWonGame(winningTeam, fightingTeams)
 		table.insert(scoreStrings, string.format("%s team: %d", data.team.Name, data.score))
 	end
 
-	return
-		RichText.color(string.format(strings.wonGame, winningTeam.Name) .. "\n", winningTeam.TeamColor.Color)
-			.. RichText.color(table.concat(scoreStrings, "\n"), Color3.new(1, 1, 1))
+	return RichText.color(string.format(strings.wonGame, winningTeam.Name) .. "\n", winningTeam.TeamColor.Color)
+		.. RichText.color(table.concat(scoreStrings, "\n"), Color3.new(1, 1, 1))
 end
 
 function Scrimmage:finishGame(winningTeam)

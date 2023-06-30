@@ -33,10 +33,14 @@ return function()
 
 	it("should reconcile when oldTeams > newTeams, merging old teams together", function()
 		local players = { {}, {} }
-		local reconciledTeams, newTeamMap, untrackedPlayers = reconcileTeams(players, { Gladiators = BrickColor.Red() }, {
-			Red = { color = BrickColor.Red(), players = { players[1] } },
-			Blue = { color = BrickColor.Blue(), players = { players[2] } },
-		})
+		local reconciledTeams, newTeamMap, untrackedPlayers = reconcileTeams(
+			players,
+			{ Gladiators = BrickColor.Red() },
+			{
+				Red = { color = BrickColor.Red(), players = { players[1] } },
+				Blue = { color = BrickColor.Blue(), players = { players[2] } },
+			}
+		)
 
 		expect(count(reconciledTeams)).to.equal(1)
 

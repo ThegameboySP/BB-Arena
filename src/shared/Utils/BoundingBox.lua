@@ -67,10 +67,9 @@ function BoundingBox.isAABBIntersecting(
 	bMaxY,
 	bMaxZ
 )
-	return
-		(aMinX <= bMaxX and aMaxX >= bMinX)
-			and (aMinY <= bMaxY and aMaxY >= bMinY)
-			and (aMinZ <= bMaxZ and aMaxZ >= bMinZ)
+	return (aMinX <= bMaxX and aMaxX >= bMinX)
+		and (aMinY <= bMaxY and aMaxY >= bMinY)
+		and (aMinZ <= bMaxZ and aMaxZ >= bMinZ)
 end
 
 function BoundingBox.isPointIntersecting(x, y, z, minX, minY, minZ, maxX, maxY, maxZ)

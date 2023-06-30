@@ -33,8 +33,7 @@ return {
 			end,
 			-- Translates tool state/game state state into text every frame.
 			text = function(tool, root)
-				return
-					if tool.module.canBombJump then "Bomb jump" else "Bomb jump - reloading",
+				return if tool.module.canBombJump then "Bomb jump" else "Bomb jump - reloading",
 					if getSavedSetting(root.Store:getState(), UserId, "bombJumpDefault")
 						then "Stop click and jump"
 						else nil

@@ -14,11 +14,9 @@ local FROM_COLOR = Color3.fromRGB(225, 225, 225)
 local TO_COLOR = Color3.fromRGB(255, 255, 255)
 
 local function snap(Vector)
-	return (math.abs(Vector.x) > math.abs(Vector.z)) and ((Vector.x > 0) and Vector3.new(1, 0, 0) or Vector3.new(
-		-1,
-		0,
-		0
-	)) or ((Vector.z > 0) and Vector3.new(0, 0, 1) or Vector3.new(0, 0, -1))
+	return (math.abs(Vector.x) > math.abs(Vector.z))
+			and ((Vector.x > 0) and Vector3.new(1, 0, 0) or Vector3.new(-1, 0, 0))
+		or ((Vector.z > 0) and Vector3.new(0, 0, 1) or Vector3.new(0, 0, -1))
 end
 
 local function makeWall()

@@ -42,8 +42,7 @@ local function isUserBanned(state, userId)
 end
 
 local function getDefaultForSetting(setting)
-	return
-		if UserInputService.TouchEnabled
+	return if UserInputService.TouchEnabled
 			and setting.mobile
 			and setting.mobile.default ~= nil
 		then setting.mobile.default

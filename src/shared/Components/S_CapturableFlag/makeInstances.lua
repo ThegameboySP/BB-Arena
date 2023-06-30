@@ -21,8 +21,7 @@ return function(instance, radiusSize, noBottomCollision, bottomCollisionHeight)
 	radius.CFrame = CFrame.new(poleBottomPos - Vector3.new(0, radius.Size.X / 2 - 0.05, 0))
 		* CFrame.Angles(0, 0, math.pi / 2)
 
-	return
-		radius,
+	return radius,
 		noBottomCollision and poleBottomPos or poleBottomPos - Vector3.new(0, bottomCollisionHeight, 0),
 		noBottomCollision and 40 or 40 + bottomCollisionHeight
 end
