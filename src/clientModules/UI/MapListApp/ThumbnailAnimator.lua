@@ -16,7 +16,7 @@ function ThumbnailAnimator:Update()
 	local elapsedTime = math.clamp(os.clock() - self.started, 0, self.scrollingTime)
 
 	if self.scrollingBehavior == "Sine" then
-		extra = math.sin(elapsedTime * ((math.pi * 2) / self.scrollingTime)) * 8
+		extra = math.sin(elapsedTime * (math.pi * 2) / 8) * 8
 	elseif self.scrollingBehavior == "Linear" then
 		local speed = 40 / self.scrollingTime
 		extra = (elapsedTime * -speed) + 20
