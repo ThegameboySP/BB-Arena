@@ -38,6 +38,16 @@ function gameActions.setMapInfo(mapInfo)
 	}
 end
 
+function gameActions.setSpecificMapInfo(mapName, mapInfo)
+	return {
+		type = "game_setSpecificMapInfo",
+		payload = {
+			mapName = mapName,
+			mapInfo = mapInfo,
+		},
+	}
+end
+
 function gameActions.playerDied(userId, killerId, cause, weapon, distance)
 	return {
 		type = "game_playerDied",

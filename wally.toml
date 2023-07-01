@@ -16,6 +16,7 @@ RoactRodux = "roblox/roact-rodux@0.3.0"
 RoactHooks = "kampfkarren/roact-hooks@0.3.0"
 RoactSpring = "chriscerie/roact-spring@1.1.6"
 TestEZ = "roblox/testez@0.4.1"
+Rewire = "sayhisam1/rewire@0.3.0"
 
 [server-dependencies]
 Cmdr = "evaera/cmdr@1.9.0"

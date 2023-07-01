@@ -34,6 +34,13 @@ return Rodux.createReducer({
 			mapInfo = action.payload.mapInfo,
 		})
 	end,
+	game_setSpecificMapInfo = function(state, action)
+		local mapName = action.payload.mapName
+
+		local merged = Dictionary.merge(state.mapInfo[mapName], action.payload.mapInfo)
+
+		return Dictionary.merge(state, { mapInfo = Dictionary.merge(state.mapInfo, { [mapName] = merged }) })
+	end,
 	game_setAnonymousFighters = function(state, action)
 		return Dictionary.merge(state, {
 			anonymousFighters = action.payload.enabled,

@@ -15,9 +15,18 @@ local function populateMapInfo(root)
 	local MapService = root:GetService("MapService")
 	local GamemodeService = root:GetService("GamemodeService")
 
+	local metaFolder = Instance.new("Folder")
+	metaFolder.Name = "MapMetaFolder"
+	metaFolder.Parent = ReplicatedStorage
+
 	local mapInfo = {}
 
 	for _, map in MapService:GetMaps() do
+		local metaModule = map:FindFirstChild("Meta")
+		local metaClone = metaModule:Clone()
+		metaClone.Name = map.Name
+		metaClone.Parent = metaFolder
+
 		local meta = require(map:FindFirstChild("Meta"))
 		local size
 		if map:IsA("Model") then
