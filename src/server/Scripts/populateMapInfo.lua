@@ -1,4 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
 local RoduxFeatures = require(ReplicatedStorage.Common.RoduxFeatures)
 
 local function countTeams(t)
@@ -19,13 +21,16 @@ local function populateMapInfo(root)
 	metaFolder.Name = "MapMetaFolder"
 	metaFolder.Parent = ReplicatedStorage
 
+	local isStudio = RunService:IsStudio()
 	local mapInfo = {}
 
 	for _, map in MapService:GetMaps() do
-		local metaModule = map:FindFirstChild("Meta")
-		local metaClone = metaModule:Clone()
-		metaClone.Name = map.Name
-		metaClone.Parent = metaFolder
+		if isStudio then
+			local metaModule = map:FindFirstChild("Meta")
+			local metaClone = metaModule:Clone()
+			metaClone.Name = map.Name
+			metaClone.Parent = metaFolder
+		end
 
 		local meta = require(map:FindFirstChild("Meta"))
 		local size
