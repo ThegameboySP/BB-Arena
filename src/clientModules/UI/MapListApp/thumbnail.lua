@@ -62,7 +62,7 @@ local function thumbnail(props, hooks)
 	local lastThumbnail, setLastThumbnail = hooks.useState(nil)
 	local lastThumbnails = hooks.useValue(thumbnails)
 	local blendThumbnailPromise = hooks.useValue(Promise.resolve())
-	local lastProps = hooks.useValue(props)
+	local lastProps = hooks.useValue(nil)
 
 	-- print(
 	-- 	"Current thumbnail:",
@@ -76,7 +76,7 @@ local function thumbnail(props, hooks)
 		if lastThumbnail ~= currentThumbnail and lastProps.value == props then
 			blend = true
 		-- If we received new thumbnails: last = current, current = new.
-		elseif lastThumbnails.value ~= thumbnails then
+		elseif lastThumbnails.value ~= thumbnails or lastProps.value == nil then
 			lastThumbnails.value = thumbnails
 			setLastThumbnail(currentThumbnail)
 			setCurrentThumbnail(thumbnails[1])
