@@ -4,6 +4,8 @@ local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local Chat = game:GetService("Chat")
 
 local Roact = require(ReplicatedStorage.Packages.Roact)
 local Effects = require(ReplicatedStorage.Common.Utils.Effects)
@@ -64,8 +66,17 @@ local function updateHUD(root)
 		repeat
 			task.wait()
 		until pcall(function()
-			StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
-		end)
+				StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+				StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.EmotesMenu, false)
+			end)
+	end)
+
+	task.spawn(function()
+		if UserInputService.MouseEnabled then
+			local ClientChatModules = Chat:WaitForChild("ClientChatModules")
+			local ChatSettings = require(ClientChatModules:WaitForChild("ChatSettings"))
+			ChatSettings.WindowResizable = true
+		end
 	end)
 
 	local activeHumanoid = nil
